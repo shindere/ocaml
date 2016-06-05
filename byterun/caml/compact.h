@@ -20,10 +20,12 @@
 
 #include "config.h"
 #include "misc.h"
+#include "mlvalues.h"
 
-extern void caml_compact_heap (void);
-extern void caml_compact_heap_maybe (void);
+void caml_compact_heap (void);
+void caml_compact_heap_maybe (void);
 
 #endif /* CAML_INTERNALS */
+void invert_root (value v, value *p);
 
 #endif /* CAML_COMPACT_H */
