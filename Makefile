@@ -1006,6 +1006,13 @@ ocamlyacc:
 clean::
 	$(MAKE) -C yacc clean
 
+# OCamltest
+ocamltest: ocamlc ocamlyacc ocamllex
+	cd ocamltest && $(MAKE)
+
+#ocamltest.opt: ocamlc.opt ocamlyacc ocamllex
+#	cd ocamltest && $(MAKE) opt.opt
+
 # OCamldoc
 
 .PHONY: ocamldoc
