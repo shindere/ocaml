@@ -1,0 +1,10 @@
+<<<<<<< 05ddf24cca9a82408469fc5060b30cfd96464303:testsuite/tests/typing-objects/pr6383.ml.reference
+
+# Characters 11-16:
+=======
+Characters 35-41:
+>>>>>>> Migrate testsuite/tests/typing-objects:testsuite/tests/typing-objects/pr6383.compilers.reference
+  let f (x: #M.foo) = 0;;
+             ^^^^^
+Error: Unbound module M
+
