@@ -1010,8 +1010,11 @@ clean::
 ocamltest: ocamlc ocamlyacc ocamllex
 	cd ocamltest && $(MAKE)
 
-#ocamltest.opt: ocamlc.opt ocamlyacc ocamllex
-#	cd ocamltest && $(MAKE) opt.opt
+ocamltest.opt: ocamlc.opt ocamlyacc ocamllex
+	cd ocamltest && $(MAKE) ocamltest.opt
+
+partialclean::
+	cd ocamltest && $(MAKE) clean
 
 # OCamldoc
 
