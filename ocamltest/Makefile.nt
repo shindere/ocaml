@@ -15,4 +15,6 @@
 
 # Makefile to build ocamltest for Non-Cygwin Windows ports
 
+run := run_windows
+
 include Makefile.shared

@@ -28,18 +28,11 @@
 #include <signal.h>
 
 #include "run.h"
+#include "run_common.h"
 
 #define COREFILENAME "core"
 
 static volatile int timeout_expired = 0;
-
-
-/* is_defined(str) returns 1 iff str points to a non-empty string */
-/* Otherwise returns 0 */
-static inline int is_defined(const char *str)
-{
-  return (str != NULL) && (*str != '\0');
-}
 
 void defaultLogger(void *where, const char *format, va_list ap)
 {
