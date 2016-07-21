@@ -15,4 +15,6 @@
 
 # Makefile to build ocamltest for Unix systems
 
+run := run_unix
+
 include Makefile.shared

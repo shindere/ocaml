@@ -21,7 +21,7 @@ CC := $(BYTECC)
 
 CFLAGS = -I ../stdlib -g -O0
 modules :=\
-  run.o \
+  $(run).o \
   run_stubs.o \
   run_command.cmo \
   testlib.cmo \
