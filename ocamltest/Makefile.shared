@@ -19,7 +19,7 @@ include ../config/Makefile
 
 CC := $(BYTECC)
 
-CFLAGS = -I ../stdlib -g -O0
+CFLAGS = -I ../byterun -I ../stdlib -g -O0
 modules :=\
   $(run).o \
   run_stubs.o \
