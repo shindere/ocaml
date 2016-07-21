@@ -15,6 +15,10 @@
 
 # Common ocamltest-related variables and rules
 
+include ../config/Makefile
+
+CC := $(BYTECC)
+
 CFLAGS = -I ../stdlib -g -O0
 modules :=\
   run.o \
