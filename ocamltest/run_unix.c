@@ -13,7 +13,7 @@
 /*                                                                        */
 /**************************************************************************/
 
-/* Run programs and log their stdout/stderr, etc., with an optional timer */
+/* Run programs with rediretions and timeouts under Unix */
 
 #include <stdio.h>
 #include <limits.h>
