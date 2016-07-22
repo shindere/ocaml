@@ -86,7 +86,12 @@ let setup_symlinks test_source_directory build_directory files =
     let src = Filename.concat test_source_directory filename in
     let cmd = "ln -sf " ^ src ^" " ^ build_directory in
     Testlib.run_system_command cmd in
-  List.iter symlink files
+  let copy filename =
+    let src = Filename.concat test_source_directory filename in
+    let dst = Filename.concat build_directory filename in
+    Testlib.copy_file src dst in
+  let f = if Sys.os_type="Win32" then copy else symlink in
+  List.iter f files
 
 (* Compilers and flags *)
 
