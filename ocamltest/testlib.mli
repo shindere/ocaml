@@ -26,3 +26,5 @@ val run_system_command : string -> unit
 val make_directory : string -> unit
 
 val string_of_file : string -> string
+
+val copy_file : string -> string -> unit
