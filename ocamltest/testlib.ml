@@ -74,3 +74,33 @@ let string_of_file filename =
     close_in chan;
     result
   end
+
+let with_input_file ?(bin=false) x f =
+  let ic = (if bin then open_in_bin else open_in) x in
+  try let res = f ic in close_in ic; res with e -> (close_in ic; raise e)
+
+let with_output_file ?(bin=false) x f =
+  let oc = (if bin then open_out_bin else open_out) x in
+  try let res = f oc in close_out oc; res with e -> (close_out oc; raise e)
+
+
+let copy_chan ic oc =
+  let m = in_channel_length ic in
+  let m = (m lsr 12) lsl 12 in
+  let m = max 16384 (min Sys.max_string_length m) in
+  let buf = Bytes.create m in
+  let rec loop () =
+    let len = input ic buf 0 m in
+    if len > 0 then begin
+      output oc buf 0 len;
+      loop ()
+    end
+  in loop ()
+
+let copy_file src dest =
+  with_input_file ~bin:true src begin fun ic ->
+    with_output_file ~bin:true dest begin fun oc ->
+      copy_chan ic oc
+    end
+  end
+
