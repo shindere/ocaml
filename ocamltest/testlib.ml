@@ -56,7 +56,11 @@ let run_system_command command = match Sys.command command with
       command exitcode;
     exit 2
 
-let make_directory dir = run_system_command ("mkdir -p " ^ dir)
+let mkdir dir = run_system_command ("mkdir " ^ dir)
+
+let rec make_directory dir =
+  if Sys.file_exists dir then ()  
+  else (make_directory (Filename.dirname dir); mkdir dir)
 
 let string_of_file filename =
   let chan = open_in filename in
