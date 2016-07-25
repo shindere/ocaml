@@ -57,57 +57,17 @@ void error_with_location(
   va_end(ap);
 }
 
-#define error(msg, ...) \
-error_with_location(__FILE__, __LINE__, settings, msg, ## __VA_ARGS__)
-
-/*
-  Note: the ## __VA_ARGS__ construct is gcc specific.
-  For a more portable (but also more complex) solution, see
-  http://stackoverflow.com/questions/20818800/variadic-macro-and-trailing-comma
-*/
-
-void myperror_with_location(
-  const char *file, int line,
+static void report_error(
+  char *file, int line,
   const command_settings *settings,
-  const char *msg, ...)
+  char *message)
 {
-  va_list ap;
-  Logger *logger = (settings->logger != NULL) ? settings->logger
-                                              : defaultLogger;
-  void *loggerData = settings->loggerData;
-  va_start(ap, msg);
-  mylog(logger, loggerData, "%s:%d: ", file, line);
-  logger(loggerData, msg, ap);
-  mylog(logger, loggerData, ": %s\n", strerror(errno));
-  va_end(ap);
+  char error_message[1024];
+  DWORD error = GetLastError();
+  FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, error, 0,
+    (LPTSTR) &error_message, sizeof(error_message), NULL);
+  error_with_location(file, line, settings, "%s: %s", message, error_message);
 }
-
-#define myperror(msg, ...) \
-myperror_with_location(__FILE__, __LINE__, settings, msg, ## __VA_ARGS__)
-
-/* Same remark as for the error macro. */
-
-void open_error_with_location(
-  const char *file, int line,
-  const command_settings *settings,
-  const char *msg)
-{
-  myperror_with_location(file, line, settings, "Can not open %s", msg);
-}
-
-#define open_error(filename) \
-open_error_with_location(__FILE__, __LINE__, settings, filename)
-
-void realpath_error_with_location(
-  const char *file, int line,
-  const command_settings *settings,
-  const char *msg)
-{
-  myperror_with_location(file, line, settings, "realpath(\"%s\") failed", msg);
-}
-
-#define realpath_error(filename) \
-realpath_error_with_location(__FILE__, __LINE__, settings, filename)
 
 char *find_program(const char *program_name)
 {
@@ -204,6 +164,11 @@ int run_command(const command_settings *settings)
   DWORD wait_result, timeout, status;
   
   program = find_program(settings->program);
+  if (program == NULL)
+  {
+    report_error(__FILE__, __LINE__, settings, "Could not find program to execute");
+    return -1;
+  }
 
   commandline = commandline_of_arguments(settings->argv);
 
@@ -314,7 +279,11 @@ int run_command(const command_settings *settings)
     &startup_info,
     &process_info
   );
-  if (ret==FALSE) return -1;
+  if (ret==FALSE)
+  {
+    report_error(__FILE__, __LINE__, settings, "Could not execute program");
+    return -1;
+  }
   if (settings->timeout == 0) timeout = INFINITE;
   else timeout = settings->timeout * 1000;
   wait_result = WaitForSingleObject(process_info.hProcess, timeout);
