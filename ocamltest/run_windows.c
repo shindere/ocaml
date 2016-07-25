@@ -152,7 +152,7 @@ char *commandline_of_arguments(char **arguments)
 int run_command(const command_settings *settings)
 {
   BOOL ret;
-  int stdout_redirected = 0, stderr_redirected = 0;
+  int stdin_redirected = 0, stdout_redirected = 0, stderr_redirected = 0;
   char *program = NULL;
   char *commandline = NULL;
   LPSECURITY_ATTRIBUTES process_attributes = NULL;
@@ -203,6 +203,7 @@ int run_command(const command_settings *settings)
       report_error(__FILE__, __LINE__, settings, "Could not redirect standard input");
       return -1;
     }
+    stdin_redirected = 1;
   }
 
   stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -315,6 +316,10 @@ int run_command(const command_settings *settings)
     report_error(__FILE__, __LINE__, settings, "Failure while waiting for process termination");
     status = -1;
   }
+  if (stdin_redirected) CloseHandle(stdin_handle);
+  if (stdout_redirected) CloseHandle(stdout_handle);
+  if ( stderr_redirected && (stderr_handle != stdout_handle))
+    CloseHandle(stderr_handle);
   free(program);
   free(commandline);
   return status;
