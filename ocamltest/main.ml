@@ -96,7 +96,8 @@ let get_test_build_directory test_dirname =
       Printf.eprintf "The %s environment variable is not defined. Using %s.\n%!"
         ocamltestdir_variable default_root;
       default_root in
-  Filename.concat root test_dirname
+  if test_dirname = "." then root
+  else Filename.concat root test_dirname
 
 let main () =
   if !Options.testfile = "" then begin
