@@ -88,8 +88,12 @@ char *find_program(const char *program_name)
   );
   if (result == 0)
   {
+    /* It may be an absolute path, return a copy of it */
+    int l = strlen(program_name) + 1;
     free(fullpath);
-    return NULL;
+    fullpath = malloc(l);
+    if (fullpath != NULL) strcpy(fullpath, program_name);
+    return fullpath;
   }
   if (result <= max_path_length) return fullpath;
 
