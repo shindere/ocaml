@@ -56,7 +56,8 @@ let run_system_command command = match Sys.command command with
       command exitcode;
     exit 2
 
-let mkdir dir = run_system_command ("mkdir " ^ dir)
+let mkdir dir =
+  if not (Sys.file_exists dir) then run_system_command ("mkdir " ^ dir)
 
 let rec make_directory dir =
   if Sys.file_exists dir then ()  
