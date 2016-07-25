@@ -109,10 +109,10 @@ let ocamlrun ocamlsrcdir =
   make_path [ocamlsrcdir; "byterun"; ocamlrunfile]
 
 let ocamlc ocamlsrcdir =
-  make_path [ocamlsrcdir; mkexe "ocamlc"]
+  make_path [ocamlsrcdir; "ocamlc"]
 
 let ocaml ocamlsrcdir =
-  make_path [ocamlsrcdir; mkexe "ocaml"]
+  make_path [ocamlsrcdir; "ocaml"]
 
 let ocamlc_dot_byte ocamlsrcdir =
   let ocamlrun = ocamlrun ocamlsrcdir in
@@ -120,10 +120,10 @@ let ocamlc_dot_byte ocamlsrcdir =
   ocamlrun ^ " " ^ ocamlc
 
 let ocamlc_dot_opt ocamlsrcdir =
-  make_path [ocamlsrcdir; mkexe "ocamlc.opt"]
+  make_path [ocamlsrcdir; "ocamlc.opt"]
 
 let ocamlopt ocamlsrcdir =
-  make_path [ocamlsrcdir; mkexe "ocamlopt"]
+  make_path [ocamlsrcdir; "ocamlopt"]
 
 let ocamlopt_dot_byte ocamlsrcdir =
   let ocamlrun = ocamlrun ocamlsrcdir in
@@ -131,7 +131,7 @@ let ocamlopt_dot_byte ocamlsrcdir =
   ocamlrun ^ " " ^ ocamlopt
 
 let ocamlopt_dot_opt ocamlsrcdir =
-  make_path [ocamlsrcdir; mkexe "ocamlopt.opt"]
+  make_path [ocamlsrcdir; "ocamlopt.opt"]
 
 let ocaml_dot_byte ocamlsrcdir =
   let ocamlrun = ocamlrun ocamlsrcdir in
@@ -142,7 +142,7 @@ let ocaml_dot_opt ocamlsrcdir =
   make_path [ocamlsrcdir; mkexe "ocamlnat"]
 
 let cmpbyt ocamlsrcdir =
-  make_path [ocamlsrcdir; "tools"; mkexe "cmpbyt"]
+  make_path [ocamlsrcdir; "tools"; "cmpbyt"]
 
 let stdlib ocamlsrcdir =
   make_path [ocamlsrcdir; "stdlib"]
