@@ -93,6 +93,11 @@ let setup_symlinks test_source_directory build_directory files =
   let f = if Sys.os_type="Win32" then copy else symlink in
   List.iter f files
 
+let mkexe =
+  if Sys.os_type="Win32"
+  then fun name -> make_file_name name "exe"
+  else fun name -> name
+
 (* Compilers and flags *)
 
 let ocamlsrcdir () =
@@ -100,13 +105,14 @@ let ocamlsrcdir () =
   with Not_found -> failwith "The OCAMLSRCDIR environment variable is not set"
 
 let ocamlrun ocamlsrcdir =
-  make_path [ocamlsrcdir; "byterun"; "ocamlrun"]
+  let ocamlrunfile = mkexe "ocamlrun" in
+  make_path [ocamlsrcdir; "byterun"; ocamlrunfile]
 
 let ocamlc ocamlsrcdir =
-  make_path [ocamlsrcdir; "ocamlc"]
+  make_path [ocamlsrcdir; mkexe "ocamlc"]
 
 let ocaml ocamlsrcdir =
-  make_path [ocamlsrcdir; "ocaml"]
+  make_path [ocamlsrcdir; mkexe "ocaml"]
 
 let ocamlc_dot_byte ocamlsrcdir =
   let ocamlrun = ocamlrun ocamlsrcdir in
@@ -114,10 +120,10 @@ let ocamlc_dot_byte ocamlsrcdir =
   ocamlrun ^ " " ^ ocamlc
 
 let ocamlc_dot_opt ocamlsrcdir =
-  make_path [ocamlsrcdir; "ocamlc.opt"]
+  make_path [ocamlsrcdir; mkexe "ocamlc.opt"]
 
 let ocamlopt ocamlsrcdir =
-  make_path [ocamlsrcdir; "ocamlopt"]
+  make_path [ocamlsrcdir; mkexe "ocamlopt"]
 
 let ocamlopt_dot_byte ocamlsrcdir =
   let ocamlrun = ocamlrun ocamlsrcdir in
@@ -125,7 +131,7 @@ let ocamlopt_dot_byte ocamlsrcdir =
   ocamlrun ^ " " ^ ocamlopt
 
 let ocamlopt_dot_opt ocamlsrcdir =
-  make_path [ocamlsrcdir; "ocamlopt.opt"]
+  make_path [ocamlsrcdir; mkexe "ocamlopt.opt"]
 
 let ocaml_dot_byte ocamlsrcdir =
   let ocamlrun = ocamlrun ocamlsrcdir in
@@ -133,10 +139,10 @@ let ocaml_dot_byte ocamlsrcdir =
   ocamlrun ^ " " ^ ocaml
 
 let ocaml_dot_opt ocamlsrcdir =
-  make_path [ocamlsrcdir; "ocamlnat"]
+  make_path [ocamlsrcdir; mkexe "ocamlnat"]
 
 let cmpbyt ocamlsrcdir =
-  make_path [ocamlsrcdir; "tools"; "cmpbyt"]
+  make_path [ocamlsrcdir; "tools"; mkexe "cmpbyt"]
 
 let stdlib ocamlsrcdir =
   make_path [ocamlsrcdir; "stdlib"]
@@ -473,7 +479,8 @@ let compile_test_program program_variable compiler log env =
     compiler_reference_filename env compilerreference_prefix compiler in
   let compiler_reference_variable = compiler.compiler_reference_variable in
   let executable_filename =
-    make_file_name testfile_basename (Backends.executable_extension backend) in
+    mkexe
+      (make_file_name testfile_basename (Backends.executable_extension backend)) in
   let executable_path = make_path [build_directory; executable_filename] in
   let compiler_output_filename =
     make_file_name compiler.compiler_directory "output" in
