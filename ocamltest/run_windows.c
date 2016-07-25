@@ -198,7 +198,11 @@ int run_command(const command_settings *settings)
       flags_and_attributes,
       template_file
     );
-    if (stdin_handle == INVALID_HANDLE_VALUE) return -1;
+    if (stdin_handle == INVALID_HANDLE_VALUE)
+    {
+      report_error(__FILE__, __LINE__, settings, "Could not redirect standard input");
+      return -1;
+    }
   }
 
   stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -223,7 +227,11 @@ int run_command(const command_settings *settings)
       flags_and_attributes,
       template_file
     );
-    if (stdin_handle == INVALID_HANDLE_VALUE) return -1;
+    if (stdin_handle == INVALID_HANDLE_VALUE)
+    {
+      report_error(__FILE__, __LINE__, settings, "Could not redirect standard output");
+      return -1;
+    }
     stdout_redirected = 1;
   }
 
@@ -260,7 +268,11 @@ int run_command(const command_settings *settings)
         flags_and_attributes,
         template_file
       );
-      if (stdin_handle == INVALID_HANDLE_VALUE) return -1;
+      if (stdin_handle == INVALID_HANDLE_VALUE)
+      {
+        report_error(__FILE__, __LINE__, settings, "Could not redirect standard error");
+        return -1;
+      }
       stderr_redirected = 1;
     }
   }
@@ -299,7 +311,10 @@ int run_command(const command_settings *settings)
     /* The timeout has expired, terminate the process */
     TerminateProcess(process_info.hProcess, 0);
     status = -1;
-  } else status = -1;
+  } else {
+    report_error(__FILE__, __LINE__, settings, "Failure while waiting for process termination");
+    status = -1;
+  }
   free(program);
   free(commandline);
   return status;
