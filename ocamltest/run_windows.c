@@ -153,6 +153,7 @@ int run_command(const command_settings *settings)
 {
   BOOL ret;
   int stdin_redirected = 0, stdout_redirected = 0, stderr_redirected = 0;
+  int wait_again = 0;
   char *program = NULL;
   char *commandline = NULL;
   LPSECURITY_ATTRIBUTES process_attributes = NULL;
@@ -307,12 +308,15 @@ int run_command(const command_settings *settings)
   if (wait_result == WAIT_OBJECT_0)
   {
     /* The child has terminated before the timeout has expired */
-    GetExitCodeProcess(process_info.hProcess, &status);
+    if (GetExitCodeProcess(process_info.hProcess, &status) == 0)
+      report_error(__FILE__, __LINE__, settings, "GetExitCodeProcess failed");
   } else if (wait_result == WAIT_TIMEOUT) {
     /* The timeout has expired, terminate the process */
     TerminateProcess(process_info.hProcess, 0);
     status = -1;
+    wait_again = 1;
   } else {
+    error_with_location(__FILE__, __LINE__, settings, "WaitForSingleObject failed\n");
     report_error(__FILE__, __LINE__, settings, "Failure while waiting for process termination");
     status = -1;
   }
@@ -322,5 +326,8 @@ int run_command(const command_settings *settings)
     CloseHandle(stderr_handle);
   free(program);
   free(commandline);
+  if (wait_again) wait_result = WaitForSingleObject(process_info.hProcess, timeout);
+  CloseHandle(process_info.hProcess);
+  CloseHandle(process_info.hThread);
   return status;
 }
