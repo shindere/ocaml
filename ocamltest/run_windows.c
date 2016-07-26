@@ -219,7 +219,7 @@ int run_command(const command_settings *settings)
     security_attributes.nLength = sizeof(SECURITY_ATTRIBUTES);
     security_attributes.lpSecurityDescriptor = NULL;
     security_attributes.bInheritHandle = TRUE;
-    stdin_handle = CreateFile
+    stdout_handle = CreateFile
     (
       settings->stdout_filename,
       desired_access,
@@ -229,7 +229,7 @@ int run_command(const command_settings *settings)
       flags_and_attributes,
       template_file
     );
-    if (stdin_handle == INVALID_HANDLE_VALUE)
+    if (stdout_handle == INVALID_HANDLE_VALUE)
     {
       report_error(__FILE__, __LINE__, settings, "Could not redirect standard output");
       return -1;
@@ -260,9 +260,9 @@ int run_command(const command_settings *settings)
       security_attributes.nLength = sizeof(SECURITY_ATTRIBUTES);
       security_attributes.lpSecurityDescriptor = NULL;
       security_attributes.bInheritHandle = TRUE;
-      stdin_handle = CreateFile
+      stderr_handle = CreateFile
       (
-        settings->stdout_filename,
+        settings->stderr_filename,
         desired_access,
         share_mode,
         &security_attributes, 
@@ -270,7 +270,7 @@ int run_command(const command_settings *settings)
         flags_and_attributes,
         template_file
       );
-      if (stdin_handle == INVALID_HANDLE_VALUE)
+      if (stderr_handle == INVALID_HANDLE_VALUE)
       {
         report_error(__FILE__, __LINE__, settings, "Could not redirect standard error");
         return -1;
