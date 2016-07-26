@@ -186,7 +186,7 @@ int run_command_child(const command_settings *settings)
       myperror("dup2 for stderr");
   }
 
-  res = execv(settings->program, settings->argv); /* , settings->envp); */
+  res = execvp(settings->program, settings->argv); /* , settings->envp); */
 
   myperror("Cannot execute %s", settings->program);
   return res;
