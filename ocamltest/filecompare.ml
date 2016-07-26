@@ -45,20 +45,36 @@ let make_cmp_tool bytes_to_ignore =
 
 let default_comparison_tool = make_cmp_tool 0
 
+type filetype = Binary | Text
+
 type files = {
+  filetype : filetype;
   reference_filename : string;
   output_filename : string;
 }
 
+let unixify_end_of_lines filename =
+  let commandline = "sed -i -e s/\\r$// " ^ filename in
+  let status = Run_command.run_commandline commandline in
+  (status, commandline)
+
 let compare_files ?(tool = default_comparison_tool) files =
-  let command = String.concat " "
-  [
-    tool.tool_name;
-    tool.tool_flags;
-    files.reference_filename;
-    files.output_filename
-  ] in
-  tool.result_of_exitcode command (Sys.command command)
+  let (status, commandline) =
+    if files.filetype = Text && Sys.os_type="Win32"
+    then unixify_end_of_lines files.output_filename
+    else (0, "") in
+  match status with
+    | 0 ->
+      let commandline = String.concat " "
+      [
+        tool.tool_name;
+        tool.tool_flags;
+        files.reference_filename;
+        files.output_filename
+      ] in
+      let status = Run_command.run_commandline commandline in
+      tool.result_of_exitcode commandline status
+    | _ -> Error (commandline, status)
 
 let check_file ?(tool = default_comparison_tool) files =
   if Sys.file_exists files.reference_filename

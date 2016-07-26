@@ -31,7 +31,10 @@ val make_cmp_tool : int -> tool
 
 val default_comparison_tool : tool
 
+type filetype = Binary | Text
+
 type files = {
+  filetype : filetype;
   reference_filename : string;
   output_filename : string;
 }

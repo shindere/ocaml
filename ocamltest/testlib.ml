@@ -52,9 +52,9 @@ let string_of_location loc =
 let run_system_command command = match Sys.command command with
   | 0 -> ()
   | _ as exitcode ->
-    Printf.eprintf "%s failed with status %d\n%!"
+    Printf.eprintf "Sysem command %s failed with status %d\n%!"
       command exitcode;
-    exit 2
+    exit 3
 
 let mkdir dir =
   if not (Sys.file_exists dir) then run_system_command ("mkdir " ^ dir)
