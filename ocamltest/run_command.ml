@@ -27,4 +27,19 @@ type settings = {
   log : out_channel;
 }
 
+let settings_of_commandline commandline =
+  let words = Testlib.words commandline in
+  {
+    progname = List.hd words;
+    argv = Array.of_list words;
+    stdin_filename = "";
+    stdout_filename = "";
+    stderr_filename = "";
+    append = false;
+    timeout = 0;
+    log = stderr
+  }
+
 external run : settings -> int = "caml_run_command"
+
+let run_commandline commandline = run (settings_of_commandline commandline)

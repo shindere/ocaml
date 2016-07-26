@@ -23,8 +23,8 @@ CFLAGS = -I ../byterun -I ../stdlib -g -O0
 modules :=\
   $(run).o \
   run_stubs.o \
-  run_command.cmo \
   testlib.cmo \
+  run_command.cmo \
   filetype.cmo \
   filecompare.cmo \
   backends.cmo \

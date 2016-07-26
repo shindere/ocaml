@@ -621,6 +621,7 @@ let check_output kind_of_output output_variable reference_variable log env =
     kind_of_output output_filename reference_filename;
   let files =
   {
+    Filecompare.filetype = Filecompare.Text;
     Filecompare.reference_filename = reference_filename;
     Filecompare.output_filename = output_filename
   } in
@@ -718,6 +719,7 @@ let compare_programs backend comparison_tool log env =
     (Backends.string_of_backend backend) program program2 in
   Printf.fprintf log "%s\n%!" what;
   let files = {
+    Filecompare.filetype = Filecompare.Binary;
     Filecompare.reference_filename = program;
     Filecompare.output_filename = program2
   } in
