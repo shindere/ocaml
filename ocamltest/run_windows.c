@@ -299,7 +299,9 @@ int run_command(const command_settings *settings)
   );
   if (ret==FALSE)
   {
-    report_error(__FILE__, __LINE__, settings, "Could not execute program");
+    char message[1024];
+    snprintf(message, sizeof(message), "Could not execute program %s", program);
+    report_error(__FILE__, __LINE__, settings,message);
     return -1;
   }
   if (settings->timeout == 0) timeout = INFINITE;
