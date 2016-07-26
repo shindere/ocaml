@@ -118,7 +118,9 @@ let main () =
   let test_dirname = Filename.dirname test_filename in
   let test_basename = Filename.basename test_filename in
   let test_prefix = Filename.chop_extension test_basename in
-  let test_directory = Filename.concat test_dirname test_prefix in
+  let test_directory =
+    if test_dirname="." then test_prefix
+    else Filename.concat test_dirname test_prefix in
   let test_source_directory = get_test_source_directory test_dirname in
   let test_build_directory = get_test_build_directory test_directory in
   let reference_filename = Filename.concat
