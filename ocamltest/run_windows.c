@@ -210,8 +210,8 @@ int run_command(const command_settings *settings)
   stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
   if (is_defined(settings->stdout_filename))
   {
-    DWORD desired_access = settings->append? FILE_APPEND_DATA : GENERIC_WRITE;
-    DWORD share_mode = FILE_SHARE_READ;
+    DWORD desired_access = settings->append ? FILE_APPEND_DATA : GENERIC_WRITE;
+    DWORD share_mode = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
     SECURITY_ATTRIBUTES security_attributes;
     DWORD creation_disposition = settings->append ? OPEN_ALWAYS : CREATE_ALWAYS;
     DWORD flags_and_attributes = FILE_ATTRIBUTE_NORMAL;
