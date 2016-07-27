@@ -18,11 +18,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <wtypes.h>
+#include <winbase.h>
 #include <windows.h>
 #include <process.h>
 #include <string.h>
 #include <errno.h>
 #include <stdarg.h>
+#include <sys/types.h>
 
 #include "run.h"
 #include "run_common.h"
@@ -42,12 +44,13 @@ static void report_error(
 static char *find_program(const char *program_name)
 {
   int max_path_length = 512;
+  DWORD result;
   LPCTSTR searchpath = NULL, extension = ".exe";
   char **filepart = NULL;
   char *fullpath = malloc(max_path_length);
   if (fullpath == NULL) return NULL;
   
-  DWORD result = SearchPath
+  result = SearchPath
   (
     searchpath,
     program_name,
