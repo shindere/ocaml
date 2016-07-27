@@ -25,4 +25,35 @@ static inline int is_defined(const char *str)
   return (str != NULL) && (*str != '\0');
 }
 
+static void defaultLogger(void *where, const char *format, va_list ap)
+{
+  vfprintf(stderr, format, ap);
+}
+
+static void mylog(Logger *logger, void *loggerData, char *fmt, ...)
+{
+  va_list ap;
+  va_start(ap, fmt);
+  logger(loggerData, fmt, ap);
+  va_end(ap);
+}
+
+static void error_with_location(
+  const char *file, int line,
+  const command_settings *settings,
+  const char *msg, ...)
+{
+  va_list ap;
+  Logger *logger = (settings->logger != NULL) ? settings->logger
+                                              : defaultLogger;
+  void *loggerData = settings->loggerData;
+  va_start(ap, msg);
+  mylog(logger, loggerData, "%s:%d: ", file, line);
+  logger(loggerData, msg, ap);
+  mylog(logger, loggerData, "\n");
+  va_end(ap);
+}
+
+
+
 #endif /* __RUN_COMMON_H__ */

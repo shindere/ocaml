@@ -34,35 +34,6 @@
 
 static volatile int timeout_expired = 0;
 
-void defaultLogger(void *where, const char *format, va_list ap)
-{
-  vfprintf(stderr, format, ap);
-}
-
-void mylog(Logger *logger, void *loggerData, char *fmt, ...)
-{
-  va_list ap;
-  va_start(ap, fmt);
-  logger(loggerData, fmt, ap);
-  va_end(ap);
-}
-
-void error_with_location(
-  const char *file, int line,
-  const command_settings *settings,
-  const char *msg, ...)
-{
-  va_list ap;
-  Logger *logger = (settings->logger != NULL) ? settings->logger
-                                              : defaultLogger;
-  void *loggerData = settings->loggerData;
-  va_start(ap, msg);
-  mylog(logger, loggerData, "%s:%d: ", file, line);
-  logger(loggerData, msg, ap);
-  mylog(logger, loggerData, "\n");
-  va_end(ap);
-}
-
 #define error(msg, ...) \
 error_with_location(__FILE__, __LINE__, settings, msg, ## __VA_ARGS__)
 
