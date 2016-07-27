@@ -195,9 +195,17 @@ static HANDLE create_output_handle(const char *filename, int append)
   );
 }
 
+#define checkerr(condition, message) \
+if ( condition ) \
+{ \
+  report_error(__FILE__, __LINE__, settings, message); \
+  status = -1; \
+  goto cleanup; \
+} else { }
+
 int run_command(const command_settings *settings)
 {
-  BOOL ret;
+  BOOL process_created;
   int stdin_redirected = 0, stdout_redirected = 0, stderr_redirected = 0;
   int combined = 0; /* stdout and stderr are redirected to the same file */
   int wait_again = 0;
@@ -215,24 +223,19 @@ int run_command(const command_settings *settings)
   DWORD wait_result, timeout, status;
 
   ZeroMemory(&startup_info, sizeof(STARTUPINFO));
-  
+  startup_info.cb = sizeof(STARTUPINFO);
+  startup_info.dwFlags = STARTF_USESTDHANDLES;
+
   program = find_program(settings->program);
-  if (program == NULL)
-  {
-    report_error(__FILE__, __LINE__, settings, "Could not find program to execute");
-    return -1;
-  }
+  checkerr( (program == NULL), "Could not find program to execute");
 
   commandline = commandline_of_arguments(settings->argv);
 
   if (is_defined(settings->stdin_filename))
   {
     startup_info.hStdInput = create_input_handle(settings->stdin_filename);
-    if (startup_info.hStdInput == INVALID_HANDLE_VALUE)
-    {
-      report_error(__FILE__, __LINE__, settings, "Could not redirect standard input");
-      return -1;
-    }
+    checkerr( (startup_info.hStdInput == INVALID_HANDLE_VALUE),
+      "Could not redirect standard input");
     stdin_redirected = 1;
   } else startup_info.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
 
@@ -241,11 +244,8 @@ int run_command(const command_settings *settings)
     startup_info.hStdOutput = create_output_handle(
       settings->stdout_filename, settings->append
     );
-    if (startup_info.hStdOutput == INVALID_HANDLE_VALUE)
-    {
-      report_error(__FILE__, __LINE__, settings, "Could not redirect standard output");
-      return -1;
-    }
+    checkerr( (startup_info.hStdOutput == INVALID_HANDLE_VALUE),
+      "Could not redirect standard output");
     stdout_redirected = 1;
   } else startup_info.hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
 
@@ -267,18 +267,13 @@ int run_command(const command_settings *settings)
       (
         settings->stderr_filename, settings->append
       );
-      if (startup_info.hStdError == INVALID_HANDLE_VALUE)
-      {
-        report_error(__FILE__, __LINE__, settings, "Could not redirect standard error");
-        return -1;
-      }
+      checkerr( (startup_info.hStdError == INVALID_HANDLE_VALUE),
+        "Could not redirect standard error");
       stderr_redirected = 1;
     }
   } else startup_info.hStdError = GetStdHandle(STD_ERROR_HANDLE);
 
-  startup_info.cb = sizeof(STARTUPINFO);
-  startup_info.dwFlags = STARTF_USESTDHANDLES;
-  ret = CreateProcess(
+  process_created = CreateProcess(
     program,
     commandline,
     process_attributes,
@@ -290,27 +285,23 @@ int run_command(const command_settings *settings)
     &startup_info,
     &process_info
   );
-  if (ret==FALSE)
-  {
-    char message[1024];
-    snprintf(message, sizeof(message), "Could not execute program %s", program);
-    report_error(__FILE__, __LINE__, settings,message);
-    return -1;
-  }
+  checkerr( (! process_created), "CreateProcess failed");
 
   CloseHandle(process_info.hThread); /* Not needed so closed ASAP */
 
   if (settings->timeout == 0) timeout = INFINITE;
   else timeout = settings->timeout * 1000;
+
   wait_result = WaitForSingleObject(process_info.hProcess, timeout);
   if (wait_result == WAIT_OBJECT_0)
   {
     /* The child has terminated before the timeout has expired */
-    if (GetExitCodeProcess(process_info.hProcess, &status) == 0)
-      report_error(__FILE__, __LINE__, settings, "GetExitCodeProcess failed");
+    checkerr( (! GetExitCodeProcess(process_info.hProcess, &status)),
+      "GetExitCodeProcess failed");
   } else if (wait_result == WAIT_TIMEOUT) {
     /* The timeout has expired, terminate the process */
-    TerminateProcess(process_info.hProcess, 0);
+    checkerr( (! TerminateProcess(process_info.hProcess, 0)),
+      "TerminateProcess failed");
     status = -1;
     wait_again = 1;
   } else {
@@ -318,12 +309,18 @@ int run_command(const command_settings *settings)
     report_error(__FILE__, __LINE__, settings, "Failure while waiting for process termination");
     status = -1;
   }
+
+cleanup:
+  free(program);
+  free(commandline);
   if (stdin_redirected) CloseHandle(startup_info.hStdInput);
   if (stdout_redirected) CloseHandle(startup_info.hStdOutput);
   if (stderr_redirected && !combined) CloseHandle(startup_info.hStdError);
-  free(program);
-  free(commandline);
-  if (wait_again) wait_result = WaitForSingleObject(process_info.hProcess, timeout);
-  CloseHandle(process_info.hProcess);
+  if (wait_again)
+  {
+    /* Wait agian but this time just 1sec to avoid being blocked */
+    WaitForSingleObject(process_info.hProcess, 1000);
+  }
+  if (process_created) CloseHandle(process_info.hProcess);
   return status;
 }
