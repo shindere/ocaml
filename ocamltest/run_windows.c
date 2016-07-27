@@ -72,7 +72,7 @@ static void report_error(
 char *find_program(const char *program_name)
 {
   int max_path_length = 512;
-  LPCTSTR searchpath = NULL, extension = NULL;
+  LPCTSTR searchpath = NULL, extension = ".exe";
   char **filepart = NULL;
   char *fullpath = malloc(max_path_length);
   if (fullpath == NULL) return NULL;
