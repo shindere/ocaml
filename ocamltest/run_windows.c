@@ -297,6 +297,9 @@ int run_command(const command_settings *settings)
     report_error(__FILE__, __LINE__, settings,message);
     return -1;
   }
+
+  CloseHandle(process_info.hThread); /* Not needed so closed ASAP */
+
   if (settings->timeout == 0) timeout = INFINITE;
   else timeout = settings->timeout * 1000;
   wait_result = WaitForSingleObject(process_info.hProcess, timeout);
@@ -322,6 +325,5 @@ int run_command(const command_settings *settings)
   free(commandline);
   if (wait_again) wait_result = WaitForSingleObject(process_info.hProcess, timeout);
   CloseHandle(process_info.hProcess);
-  CloseHandle(process_info.hThread);
   return status;
 }
