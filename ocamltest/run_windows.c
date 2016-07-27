@@ -120,26 +120,23 @@ static char *commandline_of_arguments(char **arguments)
   return commandline;
 }
 
+static SECURITY_ATTRIBUTES security_attributes = {
+  .nLength = sizeof(SECURITY_ATTRIBUTES),
+  .lpSecurityDescriptor = NULL,
+  .bInheritHandle = TRUE
+};
+
 static HANDLE create_input_handle(const char *filename)
 {
-  DWORD desired_access = GENERIC_READ;
-  DWORD share_mode = FILE_SHARE_READ;
-  SECURITY_ATTRIBUTES security_attributes;
-  DWORD creation_disposition = OPEN_EXISTING;
-  DWORD flags_and_attributes = FILE_ATTRIBUTE_NORMAL;
-  HANDLE template_file = NULL;
-  security_attributes.nLength = sizeof(SECURITY_ATTRIBUTES);
-  security_attributes.lpSecurityDescriptor = NULL;
-  security_attributes.bInheritHandle = TRUE;
   return CreateFile
   (
     filename,
-    desired_access,
-    share_mode,
+    GENERIC_READ, /* DWORD desired_access */
+    FILE_SHARE_READ, /* DWORD share_mode */
     &security_attributes, 
-    creation_disposition,
-    flags_and_attributes,
-    template_file
+    OPEN_EXISTING, /* DWORD creation_disposition */
+    FILE_ATTRIBUTE_NORMAL, /* DWORD flags_and_attributes */
+    NULL /* HANDLE template_file */
   );
 }
 
@@ -147,13 +144,7 @@ static HANDLE create_output_handle(const char *filename, int append)
 {
   DWORD desired_access = append ? FILE_APPEND_DATA : GENERIC_WRITE;
   DWORD share_mode = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
-  SECURITY_ATTRIBUTES security_attributes;
   DWORD creation_disposition = append ? OPEN_ALWAYS : CREATE_ALWAYS;
-  DWORD flags_and_attributes = FILE_ATTRIBUTE_NORMAL;
-  HANDLE template_file = NULL;
-  security_attributes.nLength = sizeof(SECURITY_ATTRIBUTES);
-  security_attributes.lpSecurityDescriptor = NULL;
-  security_attributes.bInheritHandle = TRUE;
   return CreateFile
   (
     filename,
@@ -161,13 +152,13 @@ static HANDLE create_output_handle(const char *filename, int append)
     share_mode,
     &security_attributes, 
     creation_disposition,
-    flags_and_attributes,
-    template_file
+    FILE_ATTRIBUTE_NORMAL, /* DWORD flags_and_attributes */
+    NULL /* HANDLE template_file */
   );
 }
 
 #define checkerr(condition, message) \
-if ( condition ) \
+if ( (condition) ) \
 { \
   report_error(__FILE__, __LINE__, settings, message); \
   status = -1; \
@@ -178,20 +169,17 @@ int run_command(const command_settings *settings)
 {
   BOOL process_created;
   int stdin_redirected = 0, stdout_redirected = 0, stderr_redirected = 0;
-  int combined = 0; /* stdout and stderr are redirected to the same file */
+  int combined = 0; /* 1 if stdout and stderr are redirected to the same file */
   int wait_again = 0;
   char *program = NULL;
   char *commandline = NULL;
-  LPSECURITY_ATTRIBUTES process_attributes = NULL;
-  LPSECURITY_ATTRIBUTES thread_attributes = NULL;
-  BOOL inherit_handles = TRUE;
 
-  DWORD creation_flags = 0;
   LPVOID environment = NULL;
   LPCTSTR current_directory = NULL;
   STARTUPINFO startup_info;
   PROCESS_INFORMATION process_info;
-  DWORD wait_result, timeout, status;
+  DWORD wait_result, status;
+  DWORD timeout = (settings->timeout > 0) ? settings->timeout * 1000 : INFINITE;
 
   ZeroMemory(&startup_info, sizeof(STARTUPINFO));
   startup_info.cb = sizeof(STARTUPINFO);
@@ -247,21 +235,18 @@ int run_command(const command_settings *settings)
   process_created = CreateProcess(
     program,
     commandline,
-    process_attributes,
-    thread_attributes,
-    inherit_handles,
-    creation_flags,
-    environment,
-    current_directory,
+    NULL, /* SECURITY_ATTRIBUTES process_attributes */
+    NULL, /* SECURITY_ATTRIBUTES thread_attributes */
+    TRUE, /* BOOL inherit_handles */
+    0, /* DWORD creation_flags */
+    NULL, /* LPVOID environment */
+    NULL, /* LPCSTR current_directory */
     &startup_info,
     &process_info
   );
   checkerr( (! process_created), "CreateProcess failed");
 
   CloseHandle(process_info.hThread); /* Not needed so closed ASAP */
-
-  if (settings->timeout == 0) timeout = INFINITE;
-  else timeout = settings->timeout * 1000;
 
   wait_result = WaitForSingleObject(process_info.hProcess, timeout);
   if (wait_result == WAIT_OBJECT_0)
