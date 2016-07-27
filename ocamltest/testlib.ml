@@ -57,7 +57,9 @@ let run_system_command command = match Sys.command command with
     exit 3
 
 let mkdir dir =
-  if not (Sys.file_exists dir) then run_system_command ("mkdir " ^ dir)
+  if not (Sys.file_exists dir) then 
+    let quoted_dir = "\"" ^ dir ^ "\"" in
+    run_system_command ("mkdir " ^ quoted_dir)
 
 let rec make_directory dir =
   if Sys.file_exists dir then ()  
