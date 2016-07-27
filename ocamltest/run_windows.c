@@ -164,9 +164,10 @@ int run_command(const command_settings *settings)
   LPVOID environment = NULL;
   LPCTSTR current_directory = NULL;
   STARTUPINFO startup_info;
-  HANDLE stdin_handle, stdout_handle, stderr_handle;
   PROCESS_INFORMATION process_info;
   DWORD wait_result, timeout, status;
+
+  ZeroMemory(&startup_info, sizeof(STARTUPINFO));
   
   program = find_program(settings->program);
   if (program == NULL)
@@ -177,7 +178,7 @@ int run_command(const command_settings *settings)
 
   commandline = commandline_of_arguments(settings->argv);
 
-  stdin_handle = GetStdHandle(STD_INPUT_HANDLE);
+  startup_info.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
   if (is_defined(settings->stdin_filename))
   {
     DWORD desired_access = GENERIC_READ;
@@ -189,7 +190,7 @@ int run_command(const command_settings *settings)
     security_attributes.nLength = sizeof(SECURITY_ATTRIBUTES);
     security_attributes.lpSecurityDescriptor = NULL;
     security_attributes.bInheritHandle = TRUE;
-    stdin_handle = CreateFile
+    startup_info.hStdInput = CreateFile
     (
       settings->stdin_filename,
       desired_access,
@@ -199,7 +200,7 @@ int run_command(const command_settings *settings)
       flags_and_attributes,
       template_file
     );
-    if (stdin_handle == INVALID_HANDLE_VALUE)
+    if (startup_info.hStdInput == INVALID_HANDLE_VALUE)
     {
       report_error(__FILE__, __LINE__, settings, "Could not redirect standard input");
       return -1;
@@ -207,7 +208,7 @@ int run_command(const command_settings *settings)
     stdin_redirected = 1;
   }
 
-  stdout_handle = GetStdHandle(STD_OUTPUT_HANDLE);
+  startup_info.hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
   if (is_defined(settings->stdout_filename))
   {
     DWORD desired_access = settings->append ? FILE_APPEND_DATA : GENERIC_WRITE;
@@ -219,7 +220,7 @@ int run_command(const command_settings *settings)
     security_attributes.nLength = sizeof(SECURITY_ATTRIBUTES);
     security_attributes.lpSecurityDescriptor = NULL;
     security_attributes.bInheritHandle = TRUE;
-    stdout_handle = CreateFile
+    startup_info.hStdOutput = CreateFile
     (
       settings->stdout_filename,
       desired_access,
@@ -229,7 +230,7 @@ int run_command(const command_settings *settings)
       flags_and_attributes,
       template_file
     );
-    if (stdout_handle == INVALID_HANDLE_VALUE)
+    if (startup_info.hStdOutput == INVALID_HANDLE_VALUE)
     {
       report_error(__FILE__, __LINE__, settings, "Could not redirect standard output");
       return -1;
@@ -237,14 +238,14 @@ int run_command(const command_settings *settings)
     stdout_redirected = 1;
   }
 
-  stderr_handle = GetStdHandle(STD_ERROR_HANDLE);
+  startup_info.hStdError = GetStdHandle(STD_ERROR_HANDLE);
   if (is_defined(settings->stderr_filename))
   {
     if (stdout_redirected)
     {
       if (strcmp(settings->stdout_filename, settings->stderr_filename) == 0)
       {
-        stderr_handle = stdout_handle;
+        startup_info.hStdError = startup_info.hStdOutput;
         stderr_redirected = 1;
       }
     }
@@ -260,7 +261,7 @@ int run_command(const command_settings *settings)
       security_attributes.nLength = sizeof(SECURITY_ATTRIBUTES);
       security_attributes.lpSecurityDescriptor = NULL;
       security_attributes.bInheritHandle = TRUE;
-      stderr_handle = CreateFile
+      startup_info.hStdError = CreateFile
       (
         settings->stderr_filename,
         desired_access,
@@ -270,7 +271,7 @@ int run_command(const command_settings *settings)
         flags_and_attributes,
         template_file
       );
-      if (stderr_handle == INVALID_HANDLE_VALUE)
+      if (startup_info.hStdError == INVALID_HANDLE_VALUE)
       {
         report_error(__FILE__, __LINE__, settings, "Could not redirect standard error");
         return -1;
@@ -279,12 +280,8 @@ int run_command(const command_settings *settings)
     }
   }
 
-  ZeroMemory(&startup_info, sizeof(STARTUPINFO));
   startup_info.cb = sizeof(STARTUPINFO);
   startup_info.dwFlags = STARTF_USESTDHANDLES;
-  startup_info.hStdInput = stdin_handle;
-  startup_info.hStdOutput = stdout_handle;
-  startup_info.hStdError = stderr_handle;
   ret = CreateProcess(
     program,
     commandline,
@@ -322,10 +319,10 @@ int run_command(const command_settings *settings)
     report_error(__FILE__, __LINE__, settings, "Failure while waiting for process termination");
     status = -1;
   }
-  if (stdin_redirected) CloseHandle(stdin_handle);
-  if (stdout_redirected) CloseHandle(stdout_handle);
-  if ( stderr_redirected && (stderr_handle != stdout_handle))
-    CloseHandle(stderr_handle);
+  if (stdin_redirected) CloseHandle(startup_info.hStdInput);
+  if (stdout_redirected) CloseHandle(startup_info.hStdOutput);
+  if ( stderr_redirected && (startup_info.hStdError != startup_info.hStdOutput))
+    CloseHandle(startup_info.hStdError);
   free(program);
   free(commandline);
   if (wait_again) wait_result = WaitForSingleObject(process_info.hProcess, timeout);
