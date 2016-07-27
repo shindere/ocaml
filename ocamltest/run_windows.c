@@ -123,9 +123,9 @@ static char *commandline_of_arguments(char **arguments)
 }
 
 static SECURITY_ATTRIBUTES security_attributes = {
-  .nLength = sizeof(SECURITY_ATTRIBUTES),
-  .lpSecurityDescriptor = NULL,
-  .bInheritHandle = TRUE
+  sizeof(SECURITY_ATTRIBUTES), /* nLength */
+  NULL, /* lpSecurityDescriptor */
+  TRUE /* bInheritHandle */
 };
 
 static HANDLE create_input_handle(const char *filename)
