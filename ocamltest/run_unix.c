@@ -43,7 +43,7 @@ error_with_location(__FILE__, __LINE__, settings, msg, ## __VA_ARGS__)
   http://stackoverflow.com/questions/20818800/variadic-macro-and-trailing-comma
 */
 
-void myperror_with_location(
+static void myperror_with_location(
   const char *file, int line,
   const command_settings *settings,
   const char *msg, ...)
@@ -64,7 +64,7 @@ myperror_with_location(__FILE__, __LINE__, settings, msg, ## __VA_ARGS__)
 
 /* Same remark as for the error macro. */
 
-void open_error_with_location(
+static void open_error_with_location(
   const char *file, int line,
   const command_settings *settings,
   const char *msg)
@@ -75,7 +75,7 @@ void open_error_with_location(
 #define open_error(filename) \
 open_error_with_location(__FILE__, __LINE__, settings, filename)
 
-void realpath_error_with_location(
+static void realpath_error_with_location(
   const char *file, int line,
   const command_settings *settings,
   const char *msg)
@@ -86,12 +86,12 @@ void realpath_error_with_location(
 #define realpath_error(filename) \
 realpath_error_with_location(__FILE__, __LINE__, settings, filename)
 
-void handle_alarm(int sig)
+static void handle_alarm(int sig)
 {
   timeout_expired = 1;
 }
 
-int run_command_child(const command_settings *settings)
+static int run_command_child(const command_settings *settings)
 {
   int res;
   int stdin_fd = -1, stdout_fd = -1, stderr_fd = -1; /* -1 means not redirected */
@@ -171,7 +171,7 @@ int run_command_child(const command_settings *settings)
    diffferent process)
  * Returns the code to return if this is the child process
  */
-int handle_process_termination(
+static int handle_process_termination(
   const command_settings *settings,
   pid_t pid, int status, const char *corefilename_prefix)
 {
@@ -211,7 +211,7 @@ int handle_process_termination(
   return -signal;
 }
 
-int run_command_parent(const command_settings *settings, pid_t child_pid)
+static int run_command_parent(const command_settings *settings, pid_t child_pid)
 {
   int waiting = 1, status, code, child_code;
   pid_t pid;
