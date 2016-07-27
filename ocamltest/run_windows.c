@@ -153,6 +153,7 @@ int run_command(const command_settings *settings)
 {
   BOOL ret;
   int stdin_redirected = 0, stdout_redirected = 0, stderr_redirected = 0;
+  int combined = 0; /* stdout and stderr are redirected to the same file */
   int wait_again = 0;
   char *program = NULL;
   char *commandline = NULL;
@@ -247,6 +248,7 @@ int run_command(const command_settings *settings)
       {
         startup_info.hStdError = startup_info.hStdOutput;
         stderr_redirected = 1;
+        combined = 1;
       }
     }
     
@@ -321,8 +323,7 @@ int run_command(const command_settings *settings)
   }
   if (stdin_redirected) CloseHandle(startup_info.hStdInput);
   if (stdout_redirected) CloseHandle(startup_info.hStdOutput);
-  if ( stderr_redirected && (startup_info.hStdError != startup_info.hStdOutput))
-    CloseHandle(startup_info.hStdError);
+  if (stderr_redirected && !combined) CloseHandle(startup_info.hStdError);
   free(program);
   free(commandline);
   if (wait_again) wait_result = WaitForSingleObject(process_info.hProcess, timeout);
