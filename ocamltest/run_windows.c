@@ -28,12 +28,12 @@
 #include "run.h"
 #include "run_common.h"
 
-void defaultLogger(void *where, const char *format, va_list ap)
+static void defaultLogger(void *where, const char *format, va_list ap)
 {
   vfprintf(stderr, format, ap);
 }
 
-void mylog(Logger *logger, void *loggerData, char *fmt, ...)
+static void mylog(Logger *logger, void *loggerData, char *fmt, ...)
 {
   va_list ap;
   va_start(ap, fmt);
@@ -41,7 +41,7 @@ void mylog(Logger *logger, void *loggerData, char *fmt, ...)
   va_end(ap);
 }
 
-void error_with_location(
+static void error_with_location(
   const char *file, int line,
   const command_settings *settings,
   const char *msg, ...)
@@ -69,7 +69,7 @@ static void report_error(
   error_with_location(file, line, settings, "%s: %s", message, error_message);
 }
 
-char *find_program(const char *program_name)
+static char *find_program(const char *program_name)
 {
   int max_path_length = 512;
   LPCTSTR searchpath = NULL, extension = ".exe";
@@ -116,7 +116,7 @@ char *find_program(const char *program_name)
   return fullpath;
 }
 
-char *commandline_of_arguments(char **arguments) 
+static char *commandline_of_arguments(char **arguments) 
 {
   char *commandline = NULL, **arguments_p, *commandline_p;
   int args = 0; /* Number of arguments */
