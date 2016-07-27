@@ -149,6 +149,52 @@ static char *commandline_of_arguments(char **arguments)
   return commandline;
 }
 
+static HANDLE create_input_handle(const char *filename)
+{
+  DWORD desired_access = GENERIC_READ;
+  DWORD share_mode = FILE_SHARE_READ;
+  SECURITY_ATTRIBUTES security_attributes;
+  DWORD creation_disposition = OPEN_EXISTING;
+  DWORD flags_and_attributes = FILE_ATTRIBUTE_NORMAL;
+  HANDLE template_file = NULL;
+  security_attributes.nLength = sizeof(SECURITY_ATTRIBUTES);
+  security_attributes.lpSecurityDescriptor = NULL;
+  security_attributes.bInheritHandle = TRUE;
+  return CreateFile
+  (
+    filename,
+    desired_access,
+    share_mode,
+    &security_attributes, 
+    creation_disposition,
+    flags_and_attributes,
+    template_file
+  );
+}
+
+static HANDLE create_output_handle(const char *filename, int append)
+{
+  DWORD desired_access = append ? FILE_APPEND_DATA : GENERIC_WRITE;
+  DWORD share_mode = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
+  SECURITY_ATTRIBUTES security_attributes;
+  DWORD creation_disposition = append ? OPEN_ALWAYS : CREATE_ALWAYS;
+  DWORD flags_and_attributes = FILE_ATTRIBUTE_NORMAL;
+  HANDLE template_file = NULL;
+  security_attributes.nLength = sizeof(SECURITY_ATTRIBUTES);
+  security_attributes.lpSecurityDescriptor = NULL;
+  security_attributes.bInheritHandle = TRUE;
+  return CreateFile
+  (
+    filename,
+    desired_access,
+    share_mode,
+    &security_attributes, 
+    creation_disposition,
+    flags_and_attributes,
+    template_file
+  );
+}
+
 int run_command(const command_settings *settings)
 {
   BOOL ret;
@@ -179,57 +225,21 @@ int run_command(const command_settings *settings)
 
   commandline = commandline_of_arguments(settings->argv);
 
-  startup_info.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
   if (is_defined(settings->stdin_filename))
   {
-    DWORD desired_access = GENERIC_READ;
-    DWORD share_mode = FILE_SHARE_READ;
-    SECURITY_ATTRIBUTES security_attributes;
-    DWORD creation_disposition = OPEN_EXISTING;
-    DWORD flags_and_attributes = FILE_ATTRIBUTE_NORMAL;
-    HANDLE template_file = NULL;
-    security_attributes.nLength = sizeof(SECURITY_ATTRIBUTES);
-    security_attributes.lpSecurityDescriptor = NULL;
-    security_attributes.bInheritHandle = TRUE;
-    startup_info.hStdInput = CreateFile
-    (
-      settings->stdin_filename,
-      desired_access,
-      share_mode,
-      &security_attributes, 
-      creation_disposition,
-      flags_and_attributes,
-      template_file
-    );
+    startup_info.hStdInput = create_input_handle(settings->stdin_filename);
     if (startup_info.hStdInput == INVALID_HANDLE_VALUE)
     {
       report_error(__FILE__, __LINE__, settings, "Could not redirect standard input");
       return -1;
     }
     stdin_redirected = 1;
-  }
+  } else startup_info.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
 
-  startup_info.hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
   if (is_defined(settings->stdout_filename))
   {
-    DWORD desired_access = settings->append ? FILE_APPEND_DATA : GENERIC_WRITE;
-    DWORD share_mode = FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE;
-    SECURITY_ATTRIBUTES security_attributes;
-    DWORD creation_disposition = settings->append ? OPEN_ALWAYS : CREATE_ALWAYS;
-    DWORD flags_and_attributes = FILE_ATTRIBUTE_NORMAL;
-    HANDLE template_file = NULL;
-    security_attributes.nLength = sizeof(SECURITY_ATTRIBUTES);
-    security_attributes.lpSecurityDescriptor = NULL;
-    security_attributes.bInheritHandle = TRUE;
-    startup_info.hStdOutput = CreateFile
-    (
-      settings->stdout_filename,
-      desired_access,
-      share_mode,
-      &security_attributes, 
-      creation_disposition,
-      flags_and_attributes,
-      template_file
+    startup_info.hStdOutput = create_output_handle(
+      settings->stdout_filename, settings->append
     );
     if (startup_info.hStdOutput == INVALID_HANDLE_VALUE)
     {
@@ -237,9 +247,8 @@ int run_command(const command_settings *settings)
       return -1;
     }
     stdout_redirected = 1;
-  }
+  } else startup_info.hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
 
-  startup_info.hStdError = GetStdHandle(STD_ERROR_HANDLE);
   if (is_defined(settings->stderr_filename))
   {
     if (stdout_redirected)
@@ -254,24 +263,9 @@ int run_command(const command_settings *settings)
     
     if (! stderr_redirected)
     {
-      DWORD desired_access = settings->append? FILE_APPEND_DATA : GENERIC_WRITE;
-      DWORD share_mode = FILE_SHARE_READ;
-      SECURITY_ATTRIBUTES security_attributes;
-      DWORD creation_disposition = settings->append ? OPEN_ALWAYS : CREATE_ALWAYS;
-      DWORD flags_and_attributes = FILE_ATTRIBUTE_NORMAL;
-      HANDLE template_file = NULL;
-      security_attributes.nLength = sizeof(SECURITY_ATTRIBUTES);
-      security_attributes.lpSecurityDescriptor = NULL;
-      security_attributes.bInheritHandle = TRUE;
-      startup_info.hStdError = CreateFile
+      startup_info.hStdError = create_output_handle
       (
-        settings->stderr_filename,
-        desired_access,
-        share_mode,
-        &security_attributes, 
-        creation_disposition,
-        flags_and_attributes,
-        template_file
+        settings->stderr_filename, settings->append
       );
       if (startup_info.hStdError == INVALID_HANDLE_VALUE)
       {
@@ -280,7 +274,7 @@ int run_command(const command_settings *settings)
       }
       stderr_redirected = 1;
     }
-  }
+  } else startup_info.hStdError = GetStdHandle(STD_ERROR_HANDLE);
 
   startup_info.cb = sizeof(STARTUPINFO);
   startup_info.dwFlags = STARTF_USESTDHANDLES;
