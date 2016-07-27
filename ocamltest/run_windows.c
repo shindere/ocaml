@@ -17,7 +17,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <wtypes.h>
 #include <windows.h>
 #include <process.h>
