@@ -57,13 +57,13 @@ ocamllex := ../byterun/ocamlrun ../lex/ocamllex
 
 ocamlyacc := ../yacc/ocamlyacc
 
-ocamltest.byte: $(modules)
+ocamltest.byte$(EXE): $(modules)
 	$(ocamlc) -custom ocamlcommon.cma -o $@ $^
 
 %.cmo: %.ml %.cmi
 	$(ocamlc) -c $<
 
-ocamltest.opt: $(optmodules)
+ocamltest.opt$(EXE): $(optmodules)
 	$(ocamlopt) ocamlcommon.cmxa -o $@ $^
 
 %.cmx: %.ml %.cmi
@@ -87,7 +87,7 @@ main.cmx: main.ml
 .PHONY: clean
 
 clean:
-	rm -rf *.cm* *.$O ocamltest.byte ocamltest.opt
+	rm -rf *.cm* *.$O ocamltest.byte$(EXE) ocamltest.opt$(EXE)
 	rm -rf tsl_parser.ml tsl_parser.mli tsl_lexer.ml
 
 
