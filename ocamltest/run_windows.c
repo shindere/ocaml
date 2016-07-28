@@ -118,7 +118,7 @@ static char *commandline_of_arguments(char **arguments)
     *commandline_p = ' ';
     commandline_p++;
   }
-  commandline[commandline_length] = '\0';
+  commandline[commandline_length-1] = '\0';
   return commandline;
 }
 
