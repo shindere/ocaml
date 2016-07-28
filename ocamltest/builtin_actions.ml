@@ -725,7 +725,7 @@ let compare_programs backend comparison_tool log env =
   } in
   let comparison_tool =
     if backend=Sys.Native && (Sys.os_type="Win32" || Sys.os_type="Cygwin")
-      then let bytes_to_ignore = 256 (* comparison_start_address program *) in
+      then let bytes_to_ignore = 512 (* comparison_start_address program *) in
       Filecompare.make_cmp_tool bytes_to_ignore
     else comparison_tool in
   match Filecompare.compare_files ~tool:comparison_tool files with
