@@ -21,8 +21,8 @@ CC := $(BYTECC)
 
 CFLAGS = -I ../byterun -I ../stdlib -g -O0
 modules :=\
-  $(run).o \
-  run_stubs.o \
+  $(run).$O \
+  run_stubs.$O \
   testlib.cmo \
   run_command.cmo \
   filetype.cmo \
@@ -87,7 +87,7 @@ main.cmx: main.ml
 .PHONY: clean
 
 clean:
-	rm -rf *.cm* *.o ocamltest.byte ocamltest.opt
+	rm -rf *.cm* *.$O ocamltest.byte ocamltest.opt
 	rm -rf tsl_parser.ml tsl_parser.mli tsl_lexer.ml
 
 
