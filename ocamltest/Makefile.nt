@@ -18,6 +18,3 @@
 run := run_windows
 
 include Makefile.shared
-
-%.$(O): %.c
-	$(CC) $(CFLAGS) $(BYTECCCOMPOPTS) -c $<

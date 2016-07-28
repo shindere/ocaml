@@ -19,7 +19,7 @@ include ../config/Makefile
 
 CC := $(BYTECC)
 
-#CFLAGS = -I ../byterun -I ../stdlib -g -O0
+CFLAGS = -I ../byterun -I ../stdlib
 modules :=\
   $(run).$O \
   run_stubs.$O \
@@ -83,6 +83,9 @@ main.cmx: main.ml
 
 %.ml: %.mll
 	$(ocamllex) -q $<
+
+%.$(O): %.c
+	$(CC) $(CFLAGS) $(BYTECCCOMPOPTS) -c $<
 
 .PHONY: clean
 
