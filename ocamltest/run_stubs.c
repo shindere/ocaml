@@ -65,7 +65,6 @@ static void logToChannel(void *voidchannel, const char *fmt, va_list ap)
 CAMLprim value caml_run_command(value caml_settings)
 {
   int res;
-  array argv, envp;
   command_settings settings;
 
   CAMLparam1(caml_settings);
