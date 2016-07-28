@@ -213,7 +213,7 @@ static int handle_process_termination(
 
 static int run_command_parent(const command_settings *settings, pid_t child_pid)
 {
-  int waiting = 1, status, code, child_code;
+  int waiting = 1, status, code, child_code = 0;
   pid_t pid;
 
   if (settings->timeout>0)
