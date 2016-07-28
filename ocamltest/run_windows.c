@@ -169,7 +169,7 @@ if ( (condition) ) \
 
 int run_command(const command_settings *settings)
 {
-  BOOL process_created;
+  BOOL process_created = FALSE;
   int stdin_redirected = 0, stdout_redirected = 0, stderr_redirected = 0;
   int combined = 0; /* 1 if stdout and stderr are redirected to the same file */
   int wait_again = 0;
