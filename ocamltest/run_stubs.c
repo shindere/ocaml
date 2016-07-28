@@ -53,12 +53,21 @@ array cstringvect(value arg)
 static void logToChannel(void *voidchannel, const char *fmt, va_list ap)
 {
   struct channel *channel = (struct channel *) voidchannel;
-  char *text;
-  int res;
-  res = vasprintf(&text, fmt, ap);
-  if (res <= 0) return;
-  caml_putblock(channel, text, res);
+  int length, initialTextLength = 512;
+  char *text = malloc(512);
+  if (text == NULL) return;
+  length = vsnprintf(text, initialTextLength, fmt, ap);
+  if (length <= 0) return;
+  if (length > initialTextLength)
+  {
+    free(text);
+    text = malloc(length);
+    if (text == NULL) return;
+    if (vsnprintf(text, length, fmt, ap) != length) goto end;
+  }
+  caml_putblock(channel, text, length);
   caml_flush(channel);
+end:
   free(text);
 }
 
