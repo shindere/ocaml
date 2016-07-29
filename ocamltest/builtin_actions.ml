@@ -151,6 +151,13 @@ let stdlib_flags ocamlsrcdir =
   let stdlib_path = stdlib ocamlsrcdir in
   "-nostdlib -I " ^ stdlib_path
 
+let c_includes ocamlsrcdir =
+  make_path [ocamlsrcdir; "byterun"]
+
+let c_includes_flags ocamlsrcdir =
+  let dir = c_includes ocamlsrcdir in
+  "-I " ^ dir
+
 let use_runtime backend ocamlsrcdir = match backend with
   | Sys.Bytecode ->
     let ocamlrun = ocamlrun ocamlsrcdir in
@@ -313,7 +320,7 @@ let rec compile_module
   let expected_exit_status = expected_compiler_exit_status env compiler in
   let what = Printf.sprintf "%s for file %s (expected exit status: %d)"
     (action_of_filetype module_filetype) filename (expected_exit_status) in
-  let compile_commandline input_file output_file =
+  let compile_commandline input_file output_file optional_flags =
     let compile = "-c " ^ input_file in
     let output = match output_file with
       | None -> ""
@@ -324,6 +331,7 @@ let rec compile_module
       stdlib_flags ocamlsrcdir;
       flags env;
       backend_flags env backend;
+      optional_flags;
       compile;
       output;
     ] in
@@ -341,7 +349,7 @@ let rec compile_module
     | Filetype.Interface ->
       let interface_name =
         Filetype.make_filename module_basename Filetype.Interface in
-      let commandline = compile_commandline interface_name None in
+      let commandline = compile_commandline interface_name None "" in
       exec commandline ""
     | Filetype.Implementation ->
       (* First see if the module has an interface. *)
@@ -360,13 +368,14 @@ let rec compile_module
           let module_extension = Backends.module_extension backend in
           let module_output_name = make_file_name module_basename module_extension in
           let commandline =
-            compile_commandline filename (Some module_output_name) in
+            compile_commandline filename (Some module_output_name) "" in
           exec commandline module_output_name
       end
     | Filetype.C ->
       let object_extension = Config.ext_obj in
       let object_filename = module_basename ^ object_extension in
-      let commandline = compile_commandline filename None in
+      let commandline =
+        compile_commandline filename None (c_includes_flags ocamlsrcdir) in
       exec commandline object_filename
     | _ ->
       let reason = Printf.sprintf "File %s of type %s not supported yet"
