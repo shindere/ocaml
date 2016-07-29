@@ -51,13 +51,9 @@ let tsl_block_of_file_safe test_filename =
 let print_usage () =
   Printf.printf "%s\n%!" Options.usage
 
-let rec run_test log path ancestor_result = function
+let rec run_test log common_prefix path ancestor_result = function
   Node (testenvspec, test, subtrees) ->
-  (*
-    Printf.printf "Running test %s (%s) ... %!"
-      path test.Tests.test_name;
-  *)
-  Printf.printf "%s %s => %!" path test.Tests.test_name;
+  Printf.printf "%s %s (%s) => %!" common_prefix path test.Tests.test_name;
   let print_test_result str = Printf.printf "%s\n%!" str in
   let test_result = match ancestor_result with
     | Actions.Pass env -> (* Ancestor succeded, really run the test *)
@@ -75,13 +71,11 @@ let rec run_test log path ancestor_result = function
     | Actions.Skip _ ->
       print_test_result "skipped";
       ancestor_result in
-  List.iteri (run_test_i log path result_to_pass) subtrees
-and run_test_i log path ancestor_result _i test_tree =
-  (*
-    let prefix = if path="" then "" else path ^ "." in
-    le t new_path = Printf.sprintf "%s%d" prefix (i+1) in
-  *)
-  run_test log path ancestor_result test_tree
+  List.iteri (run_test_i log common_prefix path result_to_pass) subtrees
+and run_test_i log common_prefix path ancestor_result i test_tree =
+  let path_prefix = if path="" then "" else path ^ "." in
+  let new_path = Printf.sprintf "%s%d" path_prefix (i+1) in
+  run_test log common_prefix new_path ancestor_result test_tree
 
 let get_test_source_directory test_dirname =
   if not (Filename.is_relative test_dirname) then test_dirname
@@ -139,8 +133,8 @@ let main () =
   Sys.chdir test_build_directory;
   let log_filename = test_prefix ^ ".log" in
   let log = open_out log_filename in
-  let prefix = " ... testing '" ^ test_basename ^ "':" in
-  List.iteri (run_test_i log prefix (Actions.Pass rootenv)) test_trees;
+  let common_prefix = " ... testing '" ^ test_basename ^ "' with" in
+  List.iteri (run_test_i log common_prefix "" (Actions.Pass rootenv)) test_trees;
   close_out log
 
 let _ = main()
