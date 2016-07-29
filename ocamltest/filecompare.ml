@@ -72,7 +72,10 @@ let compare_files ?(tool = default_comparison_tool) files =
         files.reference_filename;
         files.output_filename
       ] in
-      let status = Run_command.run_commandline commandline in
+      let dev_null = "/dev/null" in
+      let settings = Run_command.settings_of_commandline
+        ~stdout_fname:dev_null ~stderr_fname:dev_null commandline in
+      let status = Run_command.run settings in
       tool.result_of_exitcode commandline status
     | _ -> Error (commandline, status)
 
