@@ -20,7 +20,7 @@ open Builtin_variables
 
 let expect =
 [
-  Replace (script, "${OCAMLSRCDIR}/testsuite/tools/expect");
+  Replace (script, "bash ${OCAMLSRCDIR}/testsuite/tools/expect");
 ]
 
 let principal =
