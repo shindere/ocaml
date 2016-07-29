@@ -27,7 +27,10 @@ type settings = {
   log : out_channel;
 }
 
-val settings_of_commandline : string -> settings
+val settings_of_commandline :
+  ?stdout_fname:string ->
+  ?stderr_fname:string ->
+  string -> settings
 
 val run : settings -> int
 

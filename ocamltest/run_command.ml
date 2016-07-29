@@ -27,14 +27,14 @@ type settings = {
   log : out_channel;
 }
 
-let settings_of_commandline commandline =
+let settings_of_commandline ?(stdout_fname="") ?(stderr_fname="") commandline =
   let words = Testlib.words commandline in
   {
     progname = List.hd words;
     argv = Array.of_list words;
     stdin_filename = "";
-    stdout_filename = "";
-    stderr_filename = "";
+    stdout_filename = stdout_fname;
+    stderr_filename = stderr_fname;
     append = false;
     timeout = 0;
     log = stderr
