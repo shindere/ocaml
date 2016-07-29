@@ -604,8 +604,7 @@ let script = {
 }
 
 let run_expect log env =
-  let modifier = Environments.Include "expect" in
-  let newenv = Environments.apply_modifier env modifier in
+  let newenv = Environments.apply_modifiers env Builtin_modifiers.expect in
   run_script log newenv
 
 let expect = {
