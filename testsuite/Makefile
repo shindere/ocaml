@@ -30,6 +30,12 @@ else # Windows
   find := /usr/bin/find
 endif
 
+ifeq "$(TOOLCHAIN)" "msvc"
+  CPP := $(BYTECC) -E
+else
+  CPP := cpp
+endif
+
 .PHONY: default
 default:
 	@echo "Available targets:"
@@ -83,7 +89,7 @@ new-without-report: lib tools
 	  dir=`dirname $$file`; \
 	  echo Running tests from \'$$dir\' ... ; \
 	  while read testfile; do \
-	    TERM=dumb OCAMLRUNPARAM= ../ocamltest/ocamltest.byte$(EXE) $$dir/$$testfile; \
+	    CPP="$(CPP)" TERM=dumb OCAMLRUNPARAM= ../ocamltest/ocamltest.byte$(EXE) $$dir/$$testfile; \
 	  done < $$file; \
 	done 2>&1 | tee -a _log
 
