@@ -364,7 +364,8 @@ let rec compile_module
           exec commandline module_output_name
       end
     | Filetype.C ->
-      let object_filename = make_file_name module_basename "o" in
+      let object_extension = Config.ext_obj in
+      let object_filename = module_basename ^ object_extension in
       let commandline = compile_commandline filename None in
       exec commandline object_filename
     | _ ->
