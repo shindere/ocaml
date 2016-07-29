@@ -20,6 +20,16 @@ NO_PRINT=`$(MAKE) empty --no-print-directory >/dev/null 2>&1 \
 FIND=find
 include ../config/Makefile
 
+ifeq "$(UNIX_OR_WIN32)" "unix"
+  ifeq "$(SYSTEM)" "cygwin"
+    find := /usr/bin/find
+  else # Non-cygwin Unix
+    find := find
+  endif
+else # Windows
+  find := /usr/bin/find
+endif
+
 .PHONY: default
 default:
 	@echo "Available targets:"
@@ -69,7 +79,7 @@ new:
 	@$(MAKE) $(NO_PRINT) report
 
 new-without-report: lib tools
-	@for file in `find tests -name ocamltests`; do \
+	@for file in `$(find) tests -name ocamltests`; do \
 	  dir=`dirname $$file`; \
 	  echo Running tests from \'$$dir\' ... ; \
 	  while read testfile; do \
