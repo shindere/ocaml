@@ -40,11 +40,15 @@ module Exterior :
       end
     val print : unit -> unit
   end
+<<<<<<< HEAD:testsuite/tests/typing-pattern_open/pattern_open.compilers.reference
 <<<<<<< HEAD:testsuite/tests/typing-pattern_open/pattern_open.ml.reference
 #                                   Right function print
 =======
 Right function print
 >>>>>>> 58bcfaf... OCamltest in one commit.:testsuite/tests/typing-pattern_open/pattern_open.compilers.reference
+=======
+#                                         Right function print
+>>>>>>> 0b4fbc2... fix whitespace, long lines, headers:testsuite/tests/typing-pattern_open/pattern_open.ml.reference
 Right function print
 val eval : 't Exterior.Gadt.t -> 't = <fun>
 module Existential :
