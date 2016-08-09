@@ -40,11 +40,7 @@ module Exterior :
       end
     val print : unit -> unit
   end
-<<<<<<< 390c5ae7647439976f539033b770637d96a50a52:testsuite/tests/typing-pattern_open/pattern_open.ml.reference
-#                                         Right function print
-=======
 Right function print
->>>>>>> Migrate testsuite/tests/typing-pattern_open to ocamltest:testsuite/tests/typing-pattern_open/pattern_open.compilers.reference
 Right function print
 val eval : 't Exterior.Gadt.t -> 't = <fun>
 module Existential :
