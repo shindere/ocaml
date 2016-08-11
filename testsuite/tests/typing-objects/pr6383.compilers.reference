@@ -1,0 +1,10 @@
+<<<<<<< HEAD:testsuite/tests/typing-objects/pr6383.ml.reference
+
+# Characters 10-16:
+=======
+Characters 36-41:
+>>>>>>> 58bcfaf... OCamltest in one commit.:testsuite/tests/typing-objects/pr6383.compilers.reference
+  let f (x: #M.foo) = 0;;
+            ^^^^^^
+Error: Unbound module M
+
