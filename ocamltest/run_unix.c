@@ -91,6 +91,36 @@ static void handle_alarm(int sig)
   timeout_expired = 1;
 }
 
+static int paths_same_file(const command_settings *settings, const char * path1, const char * path2)
+{
+  int same_file = 0;
+#ifdef __GLIBC__
+  char *realpath1, *realpath2;
+  realpath1 = realpath(path1, NULL);
+  if (realpath1 == NULL)
+    realpath_error(path1);
+  realpath2 = realpath(path2, NULL);
+  if ( (realpath2 == NULL)  && (errno != ENOENT) )
+  {
+    free(realpath1);
+    realpath_error(path2);
+  }
+#else
+  char realpath1[PATH_MAX], realpath2[PATH_MAX];
+  if (realpath(path1, realpath1) == NULL)
+    realpath_error(path1);
+    if ((realpath(path2, realpath2) == NULL) && (errno != ENOENT))
+      realpath_error(path2);
+#endif /* __GLIBC__ */
+  if (strcmp(realpath1, realpath2) == 0)
+    same_file = 1;
+#ifdef __GLIBC__
+  free(realpath1);
+  free(realpath2);
+#endif /* __GLIBC__ */
+  return same_file;
+}
+
 static int run_command_child(const command_settings *settings)
 {
   int res;
@@ -123,30 +153,8 @@ static int run_command_child(const command_settings *settings)
   {
     if (stdout_fd != -1)
     {
-#ifdef __GLIBC__
-      char *stdout_realpath, *stderr_realpath;
-      stdout_realpath = realpath(settings->stdout_filename, NULL);
-      if (stdout_realpath == NULL)
-        realpath_error(settings->stdout_filename);
-      stderr_realpath = realpath(settings->stderr_filename, NULL);
-      if ( (stderr_realpath == NULL)  && (errno != ENOENT) )
-      {
-        free(stdout_realpath);
-        realpath_error(settings->stderr_filename);
-      }
-#else
-      char stdout_realpath[PATH_MAX], stderr_realpath[PATH_MAX];
-      if (realpath(settings->stdout_filename, stdout_realpath) == NULL)
-        realpath_error(settings->stdout_filename);
-      if ((realpath(settings->stderr_filename, stderr_realpath) == NULL) && (errno != ENOENT))
-        realpath_error(settings->stderr_filename);
-#endif /* __GLIBC__ */
-      if (strcmp(stdout_realpath, stderr_realpath) == 0)
+      if (paths_same_file(settings, settings->stdout_filename,settings->stderr_filename))
         stderr_fd = stdout_fd;
-#ifdef __GLIBC__
-      free(stdout_realpath);
-      free(stderr_realpath);
-#endif /* __GLIBC__ */
     }
     if (stderr_fd == -1)
     {
