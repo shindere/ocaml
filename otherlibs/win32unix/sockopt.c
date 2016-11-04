@@ -140,7 +140,7 @@ unix_getsockopt_aux(char * name,
     if (optval.lg.l_onoff == 0) {
       return Val_int(0);        /* None */
     } else {
-      value res = alloc_small(1, 0); /* Some */
+      value res = caml_alloc_small(1, 0); /* Some */
       Field(res, 0) = Val_int(optval.lg.l_linger);
       return res;
     }
@@ -154,7 +154,7 @@ unix_getsockopt_aux(char * name,
       value err, res;
       err = unix_error_of_code(optval.i);
       Begin_root(err);
-        res = alloc_small(1, 0); /* Some */
+        res = caml_alloc_small(1, 0); /* Some */
         Field(res, 0) = err;
       End_roots();
       return res;

@@ -42,7 +42,7 @@ CAMLprim value win_findfirst(value name)
     }
     valname = copy_string(fileinfo.cFileName);
     valh = win_alloc_handle(h);
-    v = alloc_small(2, 0);
+    v = caml_alloc_small(2, 0);
     Field(v,0) = valname;
     Field(v,1) = valh;
   End_roots();
