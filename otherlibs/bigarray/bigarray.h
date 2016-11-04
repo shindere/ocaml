@@ -16,9 +16,6 @@
 #ifndef CAML_BIGARRAY_H
 #define CAML_BIGARRAY_H
 
-#ifndef CAML_NAME_SPACE
-#include "caml/compatibility.h"
-#endif
 #include "caml/config.h"
 #include "caml/mlvalues.h"
 
