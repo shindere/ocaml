@@ -31,10 +31,10 @@ CAMLprim value unix_accept(sock)
   DWORD err = 0;
 
   addr_len = sizeof(sock_addr);
-  enter_blocking_section();
+  caml_enter_blocking_section();
   snew = accept(sconn, &addr.s_gen, &addr_len);
   if (snew == INVALID_SOCKET) err = WSAGetLastError ();
-  leave_blocking_section();
+  caml_leave_blocking_section();
   if (snew == INVALID_SOCKET) {
     win32_maperr(err);
     uerror("accept", Nothing);

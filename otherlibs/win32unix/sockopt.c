@@ -145,7 +145,7 @@ unix_getsockopt_aux(char * name,
       return res;
     }
   case TYPE_TIMEVAL:
-    return copy_double((double) optval.tv.tv_sec
+    return caml_copy_double((double) optval.tv.tv_sec
                        + (double) optval.tv.tv_usec / 1e6);
   case TYPE_UNIX_ERROR:
     if (optval.i == 0) {

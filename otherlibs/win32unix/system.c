@@ -33,10 +33,10 @@ CAMLprim value win_system(cmd)
   len = caml_string_length (cmd);
   buf = caml_stat_alloc (len + 1);
   memmove (buf, String_val (cmd), len + 1);
-  enter_blocking_section();
+  caml_enter_blocking_section();
   _flushall();
   ret = system(buf);
-  leave_blocking_section();
+  caml_leave_blocking_section();
   caml_stat_free(buf);
   if (ret == -1) uerror("system", Nothing);
   st = caml_alloc_small(1, 0); /* Tag 0: Exited */
