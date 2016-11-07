@@ -358,7 +358,7 @@ esac
 
 case "$ccfamily" in
   clang-*)
-    bytecccompopts="-O2 -fno-strict-aliasing -fwrapv $gcc_warnings";;
+    bytecccompopts="-DCAML_NAME_SPACE -O2 -fno-strict-aliasing -fwrapv $gcc_warnings";;
   gcc-[012]-*)
     # Some versions known to miscompile OCaml, e,g, 2.7.2.1, some 2.96.
     # Plus: C99 support unknown.
@@ -368,13 +368,13 @@ case "$ccfamily" in
     # Known problems with -fwrapv fixed in 4.2 only.
     wrn "This version of GCC is rather old.  Reducing optimization level."
     wrn "Consider using GCC version 4.2 or above."
-    bytecccompopts="-std=gnu99 -O $gcc_warnings";;
+    bytecccompopts="-DCAML_NAME_SPACE -std=gnu99 -O $gcc_warnings";;
   gcc-4-*)
-    bytecccompopts="-std=gnu99 -O2 -fno-strict-aliasing -fwrapv $gcc_warnings";;
+    bytecccompopts="-DCAML_NAME_SPACE -std=gnu99 -O2 -fno-strict-aliasing -fwrapv $gcc_warnings";;
   gcc-*)
-    bytecccompopts="-O2 -fno-strict-aliasing -fwrapv $gcc_warnings";;
+    bytecccompopts="-DCAML_NAME_SPACE -O2 -fno-strict-aliasing -fwrapv $gcc_warnings";;
   *)
-    bytecccompopts="-O";;
+    bytecccompopts="-DCAML_NAME_SPACE -O";;
 esac
 
 # Adjust according to target
