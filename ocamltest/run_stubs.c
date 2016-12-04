@@ -25,7 +25,6 @@
 
 #include "run.h"
 
-#define CAML_NAME_SPACE
 #define CAML_INTERNALS
 
 #include "caml/mlvalues.h"
