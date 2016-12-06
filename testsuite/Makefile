@@ -78,9 +78,12 @@ legacy-without-report: lib tools
 	done 2>&1 | tee -a _log
 	@$(MAKE) $(NO_PRINT) retries
 
+message = "The OCAMLSRCDIR environment variable is not defined"
+
 .PHONY: new
 new:
 	@rm -f _log
+	@if [ "$OCAMLSRCDIR" = "" ]; then $(error $(message)); fi
 	@$(MAKE) $(NO_PRINT) new-without-report
 	@$(MAKE) $(NO_PRINT) report
 
