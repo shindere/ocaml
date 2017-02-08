@@ -426,8 +426,7 @@ cleanboot:
 
 # Compile the native-code compiler
 .PHONY: opt-core
-opt-core:
-	$(MAKE) runtimeopt
+opt-core: runtimeopt
 	$(MAKE) ocamlopt
 	$(MAKE) libraryopt
 
