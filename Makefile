@@ -1129,9 +1129,6 @@ partialclean::
 alldepend::
 	$(MAKE) -C tools depend
 
-#config/Makefile: configure
-#	./configure $(CONFIGURE_ARGS)
-
 ## Test compilation of backend-specific parts
 
 partialclean::
