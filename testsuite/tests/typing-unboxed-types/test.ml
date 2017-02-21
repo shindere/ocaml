@@ -1,3 +1,6 @@
+(* TEST
+  * toplevel
+*)
 (* Check the unboxing *)
 
 (* For concrete types *)
