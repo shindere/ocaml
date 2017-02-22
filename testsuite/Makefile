@@ -83,7 +83,7 @@ message = "The OCAMLSRCDIR environment variable is not defined"
 .PHONY: new
 new:
 	@rm -f _log
-	@if [ "$OCAMLSRCDIR" = "" ]; then $(error $(message)); fi
+	@if [ "$$OCAMLSRCDIR" = "" ]; then echo $(message); exit 2; fi
 	@$(MAKE) $(NO_PRINT) new-without-report
 	@$(MAKE) $(NO_PRINT) report
 
