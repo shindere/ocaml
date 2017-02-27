@@ -71,9 +71,14 @@ let string_of_file filename =
   if filesize > Sys.max_string_length then
   begin
     close_in chan;
-    filename
+    failwith
+      ("The fle " ^ filename ^ " is too large t be loaded into a string")
   end else begin
-    let result = really_input_string chan filesize in
+    let result =
+      try really_input_string chan filesize
+      with End_of_file ->
+        close_in chan;
+        failwith ("Got unexpected end of file while reading " ^ filename) in
     close_in chan;
     result
   end
