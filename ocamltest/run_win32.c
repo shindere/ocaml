@@ -32,13 +32,18 @@
 static void report_error(
   char *file, int line,
   const command_settings *settings,
-  char *message)
+  char *message, char *argument)
 {
   char error_message[1024];
   DWORD error = GetLastError();
   FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, NULL, error, 0,
     (LPTSTR) &error_message, sizeof(error_message), NULL);
-  error_with_location(file, line, settings, "%s: %s", message, error_message);
+  if ( is_defined(argument) )
+    error_with_location(file, line,
+      settings, "%s %s: %s", message, argument, error_message);
+  else
+    error_with_location(file, line,
+      settings, "%s: %s", message, error_message);
 }
 
 static char *find_program(const char *program_name)
@@ -159,10 +164,10 @@ static HANDLE create_output_handle(const char *filename, int append)
   );
 }
 
-#define checkerr(condition, message) \
+#define checkerr(condition, message, argument) \
 if ( (condition) ) \
 { \
-  report_error(__FILE__, __LINE__, settings, message); \
+  report_error(__FILE__, __LINE__, settings, message, argument); \
   status = -1; \
   goto cleanup; \
 } else { }
@@ -188,7 +193,11 @@ int run_command(const command_settings *settings)
   startup_info.dwFlags = STARTF_USESTDHANDLES;
 
   program = find_program(settings->program);
-  checkerr( (program == NULL), "Could not find program to execute");
+  checkerr(
+    (program == NULL),
+    "Could not find program to execute",
+     settings->program
+  );
 
   commandline = commandline_of_arguments(settings->argv);
 
@@ -196,7 +205,8 @@ int run_command(const command_settings *settings)
   {
     startup_info.hStdInput = create_input_handle(settings->stdin_filename);
     checkerr( (startup_info.hStdInput == INVALID_HANDLE_VALUE),
-      "Could not redirect standard input");
+      "Could not redirect standard input",
+      settings->stdin_filename);
     stdin_redirected = 1;
   } else startup_info.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
 
@@ -206,7 +216,8 @@ int run_command(const command_settings *settings)
       settings->stdout_filename, settings->append
     );
     checkerr( (startup_info.hStdOutput == INVALID_HANDLE_VALUE),
-      "Could not redirect standard output");
+      "Could not redirect standard output",
+      settings->stdout_filename);
     stdout_redirected = 1;
   } else startup_info.hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
 
@@ -229,7 +240,8 @@ int run_command(const command_settings *settings)
         settings->stderr_filename, settings->append
       );
       checkerr( (startup_info.hStdError == INVALID_HANDLE_VALUE),
-        "Could not redirect standard error");
+        "Could not redirect standard error",
+        settings->stderr_filename);
       stderr_redirected = 1;
     }
   } else startup_info.hStdError = GetStdHandle(STD_ERROR_HANDLE);
@@ -246,7 +258,7 @@ int run_command(const command_settings *settings)
     &startup_info,
     &process_info
   );
-  checkerr( (! process_created), "CreateProcess failed");
+  checkerr( (! process_created), "CreateProcess failed", NULL);
 
   CloseHandle(process_info.hThread); /* Not needed so closed ASAP */
 
@@ -255,16 +267,17 @@ int run_command(const command_settings *settings)
   {
     /* The child has terminated before the timeout has expired */
     checkerr( (! GetExitCodeProcess(process_info.hProcess, &status)),
-      "GetExitCodeProcess failed");
+      "GetExitCodeProcess failed", NULL);
   } else if (wait_result == WAIT_TIMEOUT) {
     /* The timeout has expired, terminate the process */
     checkerr( (! TerminateProcess(process_info.hProcess, 0)),
-      "TerminateProcess failed");
+      "TerminateProcess failed", NULL);
     status = -1;
     wait_again = 1;
   } else {
     error_with_location(__FILE__, __LINE__, settings, "WaitForSingleObject failed\n");
-    report_error(__FILE__, __LINE__, settings, "Failure while waiting for process termination");
+    report_error(__FILE__, __LINE__,
+      settings, "Failure while waiting for process termination", NULL);
     status = -1;
   }
 
