@@ -184,5 +184,7 @@ fi
 $make -f $makefile install
 
 rm -rf "$instdir"
+export OCAMLSRCDIR=`pwd`
+export OCAMLTESTDIR=/tmp
 cd testsuite
 $make all
