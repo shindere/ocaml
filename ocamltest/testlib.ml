@@ -66,7 +66,7 @@ let rec make_directory dir =
   else (make_directory (Filename.dirname dir); mkdir dir)
 
 let string_of_file filename =
-  let chan = open_in filename in
+  let chan = open_in_bin filename in
   let filesize = in_channel_length chan in
   if filesize > Sys.max_string_length then
   begin
