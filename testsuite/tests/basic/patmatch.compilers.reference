@@ -1,3 +1,0 @@
-File "patmatch.ml", line 160, characters 2-15:
-Warning 3: deprecated: String.set
-Use Bytes.set instead.
