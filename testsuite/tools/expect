@@ -41,4 +41,8 @@ file=$1
 ${call_expect} ${file}
 ${call_expect} -principal ${file}.corrected
 mv ${file}.corrected.corrected ${file}.corrected
+
+# Ensure the lines in the generated file have a Unix-style terminator
+sed -i -e "s/\\r$//" ${file}.corrected
+
 cmp -s ${file} ${file}.corrected
