@@ -20,6 +20,15 @@ let is_blank c =
 
 let string_of_char = String.make 1
 
+(* This function comes from otherlibs/win32unix/unix.ml *)
+let maybe_quote f =
+  if String.contains f ' ' ||
+     String.contains f '\"' ||
+     String.contains f '\t' ||
+     f = ""
+  then Filename.quote f
+  else f
+
 let words s =
   let l = String.length s in
   let rec f quote w ws i =

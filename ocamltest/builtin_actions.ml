@@ -34,10 +34,14 @@ let run_command
       Printf.fprintf log "  Redirecting %s to %s \n%!" std filename
     end in
   let lst = Testlib.words cmd in
-  let cmd' = String.concat " " lst in
+  let quoted_lst =
+    if Sys.os_type="Win32"
+    then List.map Testlib.maybe_quote lst
+    else lst in
+  let cmd' = String.concat " " quoted_lst in
   Printf.fprintf log "Commandline: %s\n" cmd';
-  let progname = List.hd lst in
-  let arguments = Array.of_list lst in
+  let progname = List.hd quoted_lst in
+  let arguments = Array.of_list quoted_lst in
   (*
   let environment =
     try [|Sys.getenv "PATH" |]
