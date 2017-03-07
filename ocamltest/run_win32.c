@@ -111,7 +111,7 @@ static char *commandline_of_arguments(char **arguments)
   }
   commandline_length += args; /* args-1 ' ' between arguments + final '\0' */
 
-  /* Allocate memore andy accumulate arguments separated by spaces */
+  /* Allocate memory and accumulate arguments separated by spaces */
   commandline = malloc(commandline_length);
   if (commandline == NULL) return NULL;
   commandline_p = commandline;
