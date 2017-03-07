@@ -15,6 +15,8 @@
 
 (* Miscellaneous library functions *)
 
+val is_blank : char -> bool
+
 val words : string -> string list
 
 val file_is_empty : string -> bool

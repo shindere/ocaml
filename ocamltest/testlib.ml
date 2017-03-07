@@ -18,23 +18,31 @@
 let is_blank c =
   c = ' ' || c = '\012' || c = '\n' || c = '\r' || c =  '\t'
 
+let string_of_char = String.make 1
+
 let words s =
   let l = String.length s in
-  let i = ref (l-1) and j = ref (l-1) in
-  let find_word () =
-    while !j >= 0 && (is_blank s.[!j]) do decr j; done;
-    if !j>=0 then begin
-      i := !j - 1;
-      while !i >= 0 && (not (is_blank s.[!i])) do decr i; done;
-      let word = String.sub s (!i+1) (!j - !i) in
-      j := !i - 1;
-      Some word
-    end else None in
-  let rec f words_acc = match find_word() with
-    | None -> words_acc
-    | Some word -> f (word :: words_acc) in
-  f []
-
+  let rec f quote w ws i =
+    if i>=l then begin
+      if w<>"" then List.rev (w::ws)
+      else List.rev ws
+    end else begin
+      let j = i+1 in
+      match s.[i] with
+        | '\'' -> f (not quote) w ws j
+        | ' ' ->
+          begin
+            if quote
+            then f true (w ^ (string_of_char ' ')) ws j
+            else begin
+              if w=""
+              then f false w ws j
+              else f false "" (w::ws) j
+            end
+          end
+        | _ as c -> f quote (w ^ (string_of_char c)) ws j
+    end in 
+  if l=0 then [] else f false "" [] 0
 
 let file_is_empty filename =
   let ic = open_in filename in
