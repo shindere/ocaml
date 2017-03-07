@@ -1,5 +1,5 @@
 (* TEST
-  flags = "-pp ${CPP}"
+  flags = "-pp '${CPP}'"
 *)
 
 (* Test constant propagation through inlining *)
