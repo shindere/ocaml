@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*                                 OCaml                                  *)
 (*                                                                        *)
-(*             Sébastien Hinderer, projet Gallium, INRIA Paris            *)
+(*             Sebastien Hinderer, projet Gallium, INRIA Paris            *)
 (*                                                                        *)
 (*   Copyright 2016 Institut National de Recherche en Informatique et     *)
 (*     en Automatique.                                                    *)
@@ -13,7 +13,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Definition of a few builtin actions *)
+(* Definition of a few built-in actions *)
 
 val compile_bytecode_with_bytecode_compiler : Actions.t
 val compile_bytecode_with_nativecode_compiler : Actions.t

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*                                 OCaml                                  *)
 (*                                                                        *)
-(*             Sébastien Hinderer, projet Gallium, INRIA Paris            *)
+(*             Sebastien Hinderer, projet Gallium, INRIA Paris            *)
 (*                                                                        *)
 (*   Copyright 2016 Institut National de Recherche en Informatique et     *)
 (*     en Automatique.                                                    *)
@@ -13,7 +13,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Definitions of builtin tests *)
+(* Definitions of built-in tests *)
 
 open Tests
 open Builtin_actions

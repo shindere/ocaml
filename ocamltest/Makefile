@@ -2,9 +2,9 @@
 #*                                                                        *
 #*                                 OCaml                                  *
 #*                                                                        *
-#*            Sébastien Hinderer, projet Gallium, INRIA Paris             *
+#*            Sebastien Hinderer, projet Gallium, INRIA Paris             *
 #*                                                                        *
-#*   Copyright 1999 Institut National de Recherche en Informatique et     *
+#*   Copyright 2016 Institut National de Recherche en Informatique et     *
 #*     en Automatique.                                                    *
 #*                                                                        *
 #*   All rights reserved.  This file is distributed under the terms of    *

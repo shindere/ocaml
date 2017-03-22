@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*                                 OCaml                                  *)
 (*                                                                        *)
-(*             Sébastien Hinderer, projet Gallium, INRIA Paris            *)
+(*             Sebastien Hinderer, projet Gallium, INRIA Paris            *)
 (*                                                                        *)
 (*   Copyright 2016 Institut National de Recherche en Informatique et     *)
 (*     en Automatique.                                                    *)
@@ -30,7 +30,7 @@ rule token = parse
   | "(*" blank* "TEST" { TSL_BEGIN }
   | "*)" { TSL_END }
   | '*'+ { TEST_DEPTH (String.length (Lexing.lexeme lexbuf)) }
-  | "=" { EQUAL }  
+  | "=" { EQUAL }
   | identchar *
     { let s = Lexing.lexeme lexbuf in
       if s="include" then INCLUDE else IDENTIFIER s

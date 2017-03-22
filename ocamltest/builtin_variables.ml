@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*                                 OCaml                                  *)
 (*                                                                        *)
-(*             Sébastien Hinderer, projet Gallium, INRIA Paris            *)
+(*             Sebastien Hinderer, projet Gallium, INRIA Paris            *)
 (*                                                                        *)
 (*   Copyright 2016 Institut National de Recherche en Informatique et     *)
 (*     en Automatique.                                                    *)
@@ -13,7 +13,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Definition of variables used by builtin actions *)
+(* Definition of variables used by built-in actions *)
 
 (* The variables are listed in alphabetical order *)
 

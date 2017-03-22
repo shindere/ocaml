@@ -2,7 +2,7 @@
 /*                                                                        */
 /*                                 OCaml                                  */
 /*                                                                        */
-/*             Sébastien Hinderer, projet Gallium, INRIA Paris            */
+/*             Sebastien Hinderer, projet Gallium, INRIA Paris            */
 /*                                                                        */
 /*   Copyright 2016 Institut National de Recherche en Informatique et     */
 /*     en Automatique.                                                    */
@@ -54,7 +54,7 @@ static char *find_program(const char *program_name)
   char **filepart = NULL;
   char *fullpath = malloc(max_path_length);
   if (fullpath == NULL) return NULL;
-  
+
   result = SearchPath
   (
     searchpath,
@@ -77,7 +77,7 @@ static char *find_program(const char *program_name)
 
   /* fullpath was too small, allocate a bigger one */
   free(fullpath);
-  
+
   result++; /* Take '\0' into account */
 
   fullpath = malloc(result);
@@ -94,7 +94,7 @@ static char *find_program(const char *program_name)
   return fullpath;
 }
 
-static char *commandline_of_arguments(char **arguments) 
+static char *commandline_of_arguments(char **arguments)
 {
   char *commandline = NULL, **arguments_p, *commandline_p;
   int args = 0; /* Number of arguments */
@@ -140,7 +140,7 @@ static HANDLE create_input_handle(const char *filename)
     filename,
     GENERIC_READ, /* DWORD desired_access */
     FILE_SHARE_READ, /* DWORD share_mode */
-    &security_attributes, 
+    &security_attributes,
     OPEN_EXISTING, /* DWORD creation_disposition */
     FILE_ATTRIBUTE_NORMAL, /* DWORD flags_and_attributes */
     NULL /* HANDLE template_file */
@@ -157,7 +157,7 @@ static HANDLE create_output_handle(const char *filename, int append)
     filename,
     desired_access,
     share_mode,
-    &security_attributes, 
+    &security_attributes,
     creation_disposition,
     FILE_ATTRIBUTE_NORMAL, /* DWORD flags_and_attributes */
     NULL /* HANDLE template_file */
@@ -232,7 +232,7 @@ int run_command(const command_settings *settings)
         combined = 1;
       }
     }
-    
+
     if (! stderr_redirected)
     {
       startup_info.hStdError = create_output_handle

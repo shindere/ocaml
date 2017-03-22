@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*                                 OCaml                                  *)
 (*                                                                        *)
-(*             Sébastien Hinderer, projet Gallium, INRIA Paris            *)
+(*             Sebastien Hinderer, projet Gallium, INRIA Paris            *)
 (*                                                                        *)
 (*   Copyright 2016 Institut National de Recherche en Informatique et     *)
 (*     en Automatique.                                                    *)
@@ -50,7 +50,7 @@ let words s =
             end
           end
         | _ as c -> f quote (w ^ (string_of_char c)) ws j
-    end in 
+    end in
   if l=0 then [] else f false "" [] 0
 
 let file_is_empty filename =
@@ -74,12 +74,12 @@ let run_system_command command = match Sys.command command with
     exit 3
 
 let mkdir dir =
-  if not (Sys.file_exists dir) then 
+  if not (Sys.file_exists dir) then
     let quoted_dir = "\"" ^ dir ^ "\"" in
     run_system_command ("mkdir " ^ quoted_dir)
 
 let rec make_directory dir =
-  if Sys.file_exists dir then ()  
+  if Sys.file_exists dir then ()
   else (make_directory (Filename.dirname dir); mkdir dir)
 
 let string_of_file filename =
@@ -128,4 +128,3 @@ let copy_file src dest =
       copy_chan ic oc
     end
   end
-

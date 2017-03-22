@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*                                 OCaml                                  *)
 (*                                                                        *)
-(*             Sébastien Hinderer, projet Gallium, INRIA Paris            *)
+(*             Sebastien Hinderer, projet Gallium, INRIA Paris            *)
 (*                                                                        *)
 (*   Copyright 2016 Institut National de Recherche en Informatique et     *)
 (*     en Automatique.                                                    *)
@@ -27,7 +27,7 @@ let expand value =
   let subst s = try Sys.getenv s with Not_found -> "" in
   let b = Buffer.create 100 in
   try Buffer.add_substitute b subst value; Buffer.contents b with _ -> value
-  
+
 let lookup variable env =
   try Some (expand (VariableMap.find variable env)) with Not_found -> None
 
@@ -45,7 +45,7 @@ let add variable value env =
 
 let replace variable value environment =
   VariableMap.add variable value environment
-  
+
 let append variable appened_value environment =
   let previous_value = safe_lookup variable environment in
   let new_value = previous_value ^ appened_value in

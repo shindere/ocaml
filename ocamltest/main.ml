@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*                                 OCaml                                  *)
 (*                                                                        *)
-(*             Sébastien Hinderer, projet Gallium, INRIA Paris            *)
+(*             Sebastien Hinderer, projet Gallium, INRIA Paris            *)
 (*                                                                        *)
 (*   Copyright 2016 Institut National de Recherche en Informatique et     *)
 (*     en Automatique.                                                    *)
@@ -134,7 +134,8 @@ let main () =
   let log_filename = test_prefix ^ ".log" in
   let log = open_out log_filename in
   let common_prefix = " ... testing '" ^ test_basename ^ "' with" in
-  List.iteri (run_test_i log common_prefix "" (Actions.Pass rootenv)) test_trees;
+  List.iteri (run_test_i log common_prefix "" (Actions.Pass rootenv))
+             test_trees;
   close_out log
 
 let _ = main()

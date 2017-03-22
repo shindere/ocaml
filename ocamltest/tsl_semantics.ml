@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*                                 OCaml                                  *)
 (*                                                                        *)
-(*             Sébastien Hinderer, projet Gallium, INRIA Paris            *)
+(*             Sebastien Hinderer, projet Gallium, INRIA Paris            *)
 (*                                                                        *)
 (*   Copyright 2016 Institut National de Recherche en Informatique et     *)
 (*     en Automatique.                                                    *)
@@ -96,7 +96,7 @@ let test_trees_of_tsl_block tsl_block =
               let (env, rem) = env_of_lines remaining_lines in
               let (trees, rem) = trees_of_lines (depth+1) rem in
               match Tests.lookup name with
-                | None -> 
+                | None ->
                   begin match Actions.lookup name with
                     | None -> no_such_test_or_action located_name
                     | Some action ->

@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*                                 OCaml                                  *)
 (*                                                                        *)
-(*             Sébastien Hinderer, projet Gallium, INRIA Paris            *)
+(*             Sebastien Hinderer, projet Gallium, INRIA Paris            *)
 (*                                                                        *)
 (*   Copyright 2016 Institut National de Recherche en Informatique et     *)
 (*     en Automatique.                                                    *)
@@ -13,7 +13,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Definition of a few builtin environment modifiers *)
+(* Definition of a few built-in environment modifiers *)
 
 open Environments
 open Builtin_variables

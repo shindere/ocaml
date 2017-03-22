@@ -2,7 +2,7 @@
 (*                                                                        *)
 (*                                 OCaml                                  *)
 (*                                                                        *)
-(*             Sébastien Hinderer, projet Gallium, INRIA Paris            *)
+(*             Sebastien Hinderer, projet Gallium, INRIA Paris            *)
 (*                                                                        *)
 (*   Copyright 2016 Institut National de Recherche en Informatique et     *)
 (*     en Automatique.                                                    *)
@@ -13,7 +13,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Definition of a few builtin actions *)
+(* Definition of a few built-in actions *)
 
 open Actions
 
@@ -22,12 +22,13 @@ open Actions
 let env_id env = env
 
 let run_command
-  ?(stdin_variable=Builtin_variables.stdin)
-  ?(stdout_variable=Builtin_variables.stdout)
-  ?(stderr_variable=Builtin_variables.stderr)
-  ?(append=false)
-  ?(timeout=0)
-  log env cmd =
+      ?(stdin_variable=Builtin_variables.stdin)
+      ?(stdout_variable=Builtin_variables.stdout)
+      ?(stderr_variable=Builtin_variables.stderr)
+      ?(append=false)
+      ?(timeout=0)
+      log env cmd
+  =
   let log_redirection std filename =
     if filename<>"" then
     begin
@@ -253,7 +254,7 @@ let ocamlnat = {
 let expected_compiler_exit_status env compiler =
   try int_of_string
     (Environments.safe_lookup compiler.compiler_exit_status_variabe env)
-  with _ -> 0 
+  with _ -> 0
 
 let compiler_reference_filename env prefix compiler =
   let compiler_reference_suffix =
@@ -341,10 +342,10 @@ let rec compile_module
     ] in
   let exec commandline output =
     Printf.fprintf log "%s\n%!" what;
-    let exit_status = 
+    let exit_status =
       run_command
         ~stdout_variable:compileroutput
-        ~stderr_variable:compileroutput 
+        ~stderr_variable:compileroutput
         ~append:true log env commandline in
     if exit_status=expected_exit_status
     then Ok output
@@ -473,7 +474,7 @@ let setup_build_environment testfile source_directory build_directory env =
   setup_symlinks source_directory build_directory (files env);
   Sys.chdir build_directory;
   modules
-  
+
 let compile_test_program program_variable compiler log env =
   let backend = compiler.compiler_backend in
   let testfile = testfile env in
@@ -573,7 +574,7 @@ let exec log_message redirect_output prog_variable args_variable log env =
       Builtin_variables.stderr, output
     ] in
     let execution_env =
-      if redirect_output then Environments.add_bindings bindings env 
+      if redirect_output then Environments.add_bindings bindings env
       else env in
     match run_command log execution_env commandline with
       | 0 ->
@@ -626,7 +627,7 @@ let expect = {
   action_environment = env_id;
   action_body = run_expect
 }
-  
+
 let check_output kind_of_output output_variable reference_variable log env =
   let reference_filename = Environments.safe_lookup reference_variable env in
   let output_filename = Environments.safe_lookup output_variable env in
@@ -655,7 +656,8 @@ let check_output kind_of_output output_variable reference_variable log env =
       let unexpected_output_with_banners = Printf.sprintf
         "%s\n%s%s\n" banner unexpected_output banner in
       let reason = Printf.sprintf
-        "The file %s was expected to be empty because there is no reference file %s but it is not:\n%s\n"
+        "The file %s was expected to be empty because there is no reference \
+         file %s but it is not:\n%s\n"
         output_filename reference_filename unexpected_output_with_banners in
       (Actions.Fail reason)
     | Filecompare.Error (commandline, exitcode) ->

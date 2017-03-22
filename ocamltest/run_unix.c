@@ -2,7 +2,7 @@
 /*                                                                        */
 /*                                 OCaml                                  */
 /*                                                                        */
-/*             Sébastien Hinderer, projet Gallium, INRIA Paris            */
+/*             Sebastien Hinderer, projet Gallium, INRIA Paris            */
 /*                                                                        */
 /*   Copyright 2016 Institut National de Recherche en Informatique et     */
 /*     en Automatique.                                                    */
@@ -189,7 +189,7 @@ static int handle_process_termination(
   if (WIFEXITED(status)) return WEXITSTATUS(status);
 
   if ( !WIFSIGNALED(status) )
-    error("Process with pid %d neither terminated normally nor received a signal!?", pid);
+    error("Process %d neither terminated normally nor received a signal!?", pid);
 
   /* From here we know that the process terminated due to a signal */
   signal = WTERMSIG(status);
