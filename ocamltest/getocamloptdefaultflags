@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# This script provides command-line options to use by default
+# when invoking ocamlopt
+
+# It is used to add that disable annoying linker warnings on some versions
+# of OpenBSD
+
+case "$1" in
+  i386-*-openbsd5.[5-9]*|i386-*-openbsd[6-9].*)
+    echo "-ccopt -nopie";;
+esac

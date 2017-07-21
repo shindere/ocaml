@@ -1,0 +1,10 @@
+let c_preprocessor = "@@CPP@@"
+
+let ocamlsrcdir = "@@OCAMLSRCDIR@@"
+
+let flambda = @@FLAMBDA@@
+
+let ocamlc_default_flags = "@@OCAMLCDEFAULTFLAGS@@"
+let ocamlopt_default_flags = "@@OCAMLOPTDEFAULTFLAGS@@"
+
+let safe_string = @@SAFE_STRING@@
