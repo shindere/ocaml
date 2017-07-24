@@ -29,6 +29,7 @@ libraries_man_section=3
 host_type=unknown
 target_type=""
 ccoption=''
+cpp=''
 asoption=''
 asppoption=''
 cclibs=''
@@ -347,8 +348,10 @@ if test -z "$ccoption"; then
       cc="cc"
     fi
   fi
+  cpp=cpp
 else
   cc="$ccoption"
+  cpp="\$(CC) -E"
 fi
 
 inf "Using compiler $cc."
@@ -2014,6 +2017,7 @@ fi
 cclibs="$cclibs $mathlib"
 
 config CC "$cc"
+config CPP "$cpp"
 config CFLAGS "$common_cflags $internal_cflags"
 config CPPFLAGS "$common_cppflags $internal_cppflags"
 config OCAMLC_CFLAGS "$common_cflags $sharedcccompopts"
