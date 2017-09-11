@@ -1,3 +1,8 @@
+(* TEST
+  include testing
+  ocamlopt_flags = "-inline 20"
+*)
+
 (* GPR#1271 *)
 
 module F (X : sig val x : int end) = struct

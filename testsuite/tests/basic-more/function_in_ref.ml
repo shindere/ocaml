@@ -1,3 +1,7 @@
+(* TEST
+  include testing
+  ocamlopt_flags = "-inline 20"
+*)
 
 let f x = x + 1
 let g x = x - 1
