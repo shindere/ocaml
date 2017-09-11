@@ -1,3 +1,8 @@
+(* TEST
+  include testing
+  ocamlopt_flags = "-inline 20"
+*)
+
 let r = ref 0
 
 let true_effect () =

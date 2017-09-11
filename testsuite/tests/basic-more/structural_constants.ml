@@ -1,3 +1,7 @@
+(* TEST
+  include testing
+  ocamlopt_flags = "-inline 20"
+*)
 
 type t1 =
   | A | B | C of t1 | D of float

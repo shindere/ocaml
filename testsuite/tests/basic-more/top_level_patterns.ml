@@ -1,3 +1,7 @@
+(* TEST
+  include testing
+  ocamlopt_flags = "-inline 20"
+*)
 
 type t =
   | A of (int * int * int)

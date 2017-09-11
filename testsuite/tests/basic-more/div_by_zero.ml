@@ -1,3 +1,7 @@
+(* TEST
+  include testing
+  ocamlopt_flags = "-inline 20"
+*)
 
 let check f n =
   assert (

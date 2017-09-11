@@ -1,3 +1,7 @@
+(* TEST
+  include testing
+  ocamlopt_flags = "-inline 20"
+*)
 
 let sequor b1 b2 =
   let b1 = ref b1 in

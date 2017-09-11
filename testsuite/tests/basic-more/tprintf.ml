@@ -1,3 +1,8 @@
+(* TEST
+  include testing
+  ocamlopt_flags = "-inline 20"
+*)
+
 open Testing;;
 
 open Printf;;

@@ -1,3 +1,12 @@
+(* TEST
+  include testing
+  (* ocamlopt_flags = "-inline 20" *)
+  (* At the moment, the binaries produced by ocamlopt.byte and ocamlopt.opt
+     are different when the inlining level is >=5.
+     The line above should be uncommented when this is fixed.
+   *)
+*)
+
 (**************************************************************)
 (*  This suite tests the pattern-matching compiler            *)
 (*  it should just compile and run.                           *)
