@@ -1,3 +1,9 @@
+(* TEST
+  * if_not_safe_string
+  ** bytecode
+  ** native
+*)
+
 (* No string sharing PR#6322. This test is not applicable when OCaml is compiled with -safe-string. *)
 
 let test x = match x with
