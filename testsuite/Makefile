@@ -28,11 +28,19 @@ ifeq "$(UNIX_OR_WIN32)" "unix"
   endif
 else # Windows
   find := /usr/bin/find
+  ifeq "$(FLEXLINK)" ""
+    FLEXLINK_PREFIX=
+  else
+    ROOT:=$(shell cd .. && pwd| cygpath -m -f -)
+    EMPTY=
+    FLEXLINK_PREFIX:=OCAML_FLEXLINK="$(ROOT)/boot/ocamlrun \
+                                     $(ROOT)/flexdll/flexlink.exe" $(EMPTY)
+  endif
 endif
 
 ocamltestdir := ../ocamltest
 
-ocamltest := $(or \
+ocamltest := $(FLEXLINK_PREFIX)$(or \
   $(wildcard $(ocamltestdir)/ocamltest.opt$(EXE)),\
   $(wildcard $(ocamltestdir)/ocamltest$(EXE)))
 
