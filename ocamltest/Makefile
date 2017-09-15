@@ -17,7 +17,11 @@
 
 include ../config/Makefile
 
-ocamlsrcdir := $(abspath $(shell pwd)/..)
+ifeq "$(UNIX_OR_WIN32)" "win32"
+  ocamlsrcdir := $(shell echo "$(abspath $(shell pwd)/..)"|cygpath -m -f -)
+else
+  ocamlsrcdir := $(abspath $(shell pwd)/..)
+endif
 
 CPPFLAGS += -I../byterun -DCAML_INTERNALS
 
