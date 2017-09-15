@@ -98,9 +98,19 @@ flags = -g -nostdlib $(include_directories) \
   -strict-sequence -safe-string -strict-formats \
   -w +a-4-9-41-42-44-45-48 -warn-error A
 
-ocamlc := ../byterun/ocamlrun ../ocamlc $(flags)
+ifeq "$(UNIX_OR_WIN32)" "unix"
+FLEXLINK_ENV=
+else # Windows
+  ifeq "$(wildcard ../flexdll/Makefile)" ""
+    FLEXLINK_ENV=
+  else
+    FLEXLINK_ENV=OCAML_FLEXLINK="../boot/ocamlrun ../flexdll/flexlink.exe"
+  endif
+endif
 
-ocamlopt := ../byterun/ocamlrun ../ocamlopt $(flags)
+ocamlc := $(FLEXLINK_ENV) ../byterun/ocamlrun ../ocamlc $(flags)
+
+ocamlopt := $(FLEXLINK_ENV) ../byterun/ocamlrun ../ocamlopt $(flags)
 
 ocamldep := ../byterun/ocamlrun ../tools/ocamldep -slash
 
