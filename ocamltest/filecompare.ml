@@ -53,16 +53,16 @@ type files = {
   output_filename : string;
 }
 
-let unixify_end_of_lines filename =
+(*let unixify_end_of_lines filename =
   let commandline = "sed -i -e s/\\r$// " ^ filename in
   let status = Run_command.run_commandline commandline in
-  (status, commandline)
+  (status, commandline)*)
 
 let compare_files ?(tool = default_comparison_tool) files =
   let (status, commandline) =
-    if files.filetype = Text && Sys.os_type="Win32"
+    (*if files.filetype = Text && Sys.os_type="Win32"
     then unixify_end_of_lines files.output_filename
-    else (0, "") in
+    else*) (0, "") in
   match status with
     | 0 ->
       let commandline = String.concat " "
