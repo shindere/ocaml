@@ -13,27 +13,47 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Backends of the OCaml compiler and their properties *)
+(* A few extensions to OCaml's standard library *)
 
-type t = Sys.backend_type
+(* Pervasive *)
 
-let string_of_backend = function
-  | Sys.Bytecode -> "bytecode"
-  | Sys.Native -> "native"
-  | Sys.Other backend_name -> backend_name
+val input_line_opt : in_channel -> string option
 
-(* Creates a function that returns its first argument for Bytecode,          *)
-(* its second argument for Native code and fails for other backends          *)
-let make_backend_function bytecode_value native_value = function
-  | Sys.Bytecode -> bytecode_value
-  | Sys.Native -> native_value
-  | Sys.Other backend_name ->
-    let error_message =
-      ("Other backend " ^ backend_name ^ " not supported") in
-    raise (Invalid_argument error_message)
+module Char : sig
+  include module type of Char
+  val is_blank : char -> bool
+end
 
-let module_extension = make_backend_function "cmo" "cmx"
+module Filename  : sig
+  include module type of Filename
+  val maybe_quote : string -> string
+  val make_filename : string -> string -> string
+  val make_path : string list -> string
+  val mkexe : string -> string
+end
 
-let library_extension = make_backend_function "cma" "cmxa"
+module List : sig
+  include module type of List
+  val concatmap : ('a -> 'b list) -> 'a list -> 'b list
+end
 
-let executable_extension = make_backend_function "byte" "opt"
+module String : sig
+  include module type of String
+  val words : string -> string list
+end
+
+module Sys : sig
+  include module type of Sys
+  val file_is_empty : string -> bool
+  val run_system_command : string -> unit
+  val make_directory : string -> unit
+  val string_of_file : string -> string
+  val copy_file : string -> string -> unit
+end
+
+module StringSet : sig
+  include Set.S with type elt = string
+  val string_of_stringset : t -> string
+end
+
+module StringMap : Map.S with type key = string

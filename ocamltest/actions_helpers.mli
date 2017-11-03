@@ -13,35 +13,39 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Definition of actions, basic blocks for tests *)
+(* Helper functions when writing actions *)
 
-type result =
-  | Pass of Environments.t
-  | Fail of string
-  | Skip of string
+val mkreason : string -> string -> int -> string
 
-val string_of_result : result -> string
+val testfile : Environments.t -> string
 
-type code = out_channel -> Environments.t -> result
+val test_build_directory : Environments.t -> string
 
-type t
+val test_source_directory : Environments.t -> string
 
-val action_name : t -> string
+val words_of_variable : Environments.t -> Variables.t -> string list
 
-val make : string -> code -> t
+val files : Environments.t -> string list
 
-val compare : t -> t -> int
+val setup_symlinks : string -> string -> string list -> unit
 
-val register : t -> unit
+val setup_build_env : bool -> string list -> Actions.code
 
-val get_registered_actions : unit -> t list
+val run_cmd :
+  ?environment : string array ->
+  ?stdin_variable : Variables.t ->
+  ?stdout_variable : Variables.t ->
+  ?stderr_variable : Variables.t ->
+  ?append : bool ->
+  ?timeout : int ->
+  out_channel -> Environments.t -> string list -> int
 
-val lookup : string -> t option
+val run : string -> bool -> bool -> Variables.t -> Variables.t -> Actions.code
 
-val set_hook : string -> code -> unit
-val clear_hook : string -> unit
-val clear_all_hooks : unit -> unit
+val run_program : Actions.code
 
-val run : out_channel -> Environments.t -> t -> result
+val run_script : Actions.code
 
-module ActionSet : Set.S with type elt = t
+val run_hook : string -> Actions.code
+
+val check_output : string -> Variables.t -> Variables.t -> Actions.code

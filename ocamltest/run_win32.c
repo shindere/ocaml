@@ -132,6 +132,61 @@ static WCHAR *commandline_of_arguments(WCHAR **arguments)
   return commandline;
 }
 
+static LPVOID prepare_environment(WCHAR **localenv)
+{
+  LPTCH p, r, env, process_env = NULL;
+  WCHAR **q;
+  int l, process_env_length, localenv_length, env_length;
+
+  if (localenv == NULL) return NULL;
+
+  process_env = GetEnvironmentStrings();
+  if (process_env == NULL) return NULL;
+
+  /* Compute length of process environment */
+  process_env_length = 0;
+  p = process_env;
+  while (*p != L'\0') {
+    l = wcslen(p) + 1; /* also count terminating '\0' */
+    process_env_length += l;
+    p += l;
+  }
+
+  /* Compute length of local environment */
+  localenv_length = 0;
+  q = localenv;
+  while (*q != NULL) {
+    localenv_length += wcslen(*q) + 1;
+    q++;
+  }
+
+  /* Build new env that contains both process and local env */
+  env_length = process_env_length + localenv_length + 1;
+  env = malloc(env_length * sizeof(WCHAR));
+  if (env == NULL) {
+    FreeEnvironmentStrings(process_env);
+    return NULL;
+  }
+  r = env;
+  p = process_env;
+  while (*p != L'\0') {
+    l = wcslen(p) + 1; /* also count terminating '\0' */
+    memcpy(r, p, l * sizeof(WCHAR));
+    p += l;
+    r += l;
+  }
+  FreeEnvironmentStrings(process_env);
+  q = localenv;
+  while (*q != NULL) {
+    l = wcslen(*q) + 1;
+    memcpy(r, *q, l * sizeof(WCHAR));
+    r += l;
+    q++;
+  }
+  *r = L'\0';
+  return env;
+}
+
 static SECURITY_ATTRIBUTES security_attributes = {
   sizeof(SECURITY_ATTRIBUTES), /* nLength */
   NULL, /* lpSecurityDescriptor */
@@ -206,6 +261,8 @@ int run_command(const command_settings *settings)
 
   commandline = commandline_of_arguments(settings->argv);
 
+  environment = prepare_environment(settings->envp);
+
   if (is_defined(settings->stdin_filename))
   {
     startup_info.hStdInput = create_input_handle(settings->stdin_filename);
@@ -258,7 +315,7 @@ int run_command(const command_settings *settings)
     NULL, /* SECURITY_ATTRIBUTES thread_attributes */
     TRUE, /* BOOL inherit_handles */
     CREATE_UNICODE_ENVIRONMENT, /* DWORD creation_flags */
-    NULL, /* LPVOID environment */
+    environment,
     NULL, /* LPCSTR current_directory */
     &startup_info,
     &process_info
