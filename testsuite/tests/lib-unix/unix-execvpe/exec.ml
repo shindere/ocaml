@@ -1,3 +1,11 @@
+(* TEST
+   include unix
+   script = "${test_source_directory}/has-execvpe"
+   * script
+   ** bytecode
+   ** native
+*)
+
 open Printf
 
 let _ =
