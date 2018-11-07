@@ -103,7 +103,7 @@ set -ex
 # compiler to use. However with the introduction of autoconf the way
 # to do that has changed. Once all the branches on which we do CI will use
 # autoconf, the variable shall be updated on the host. But until then,
-# we leave it with its legacy value andoverride it here.
+# we leave it with its legacy value and override it here.
 CCOMP=
 case $NODE_NAME in
   ocaml-ppc-32)

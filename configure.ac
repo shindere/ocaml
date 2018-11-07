@@ -173,13 +173,13 @@ AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 
 AS_CASE([$host],
-  [*-pc-windows], 
+  [*-pc-windows],
     [CC=cl
     ccomptype=msvc
     S=asm
     SO=dll
     outputexe=-Fe
-    mkexedebugflag=''    
+    mkexedebugflag=''
     syslib='$(1).lib'],
   [ccomptype=cc
   S=s
@@ -198,7 +198,7 @@ AC_ARG_VAR([PARTIALLD], [how to build partial (relocatable) object files])
 AC_ARG_ENABLE([debug-runtime],
   [AS_HELP_STRING([--disable-debug-runtime],
     [do not build runtime with debugging support])])
-  
+
 AC_ARG_ENABLE([debugger],
   [AS_HELP_STRING([--enable-debugger],
     [build the debugger @<:@default=yes@:>@])],
@@ -207,7 +207,7 @@ AC_ARG_ENABLE([debugger],
 
 AC_ARG_WITH([dllibs],
   [AS_HELP_STRING([--with-dllibs=LIBS],
-    [use LIBS (in addition to dl) to load dynamic libraries @<:@default=""@:>@])],
+    [use LIBS (in addition to dl) to load dynamic libs @<:@default=""@:>@])],
   [otherdllibs=$withval],
   [otherdllibs=""])
 
@@ -274,7 +274,7 @@ AC_ARG_ENABLE([flambda],
 
 AC_ARG_ENABLE([flambda-invariants],
   [AS_HELP_STRING([--enable-flambda-invariants],
-    [enable invariants checks in flmabda])])
+    [enable invariants checks in flambda])])
 
 AC_ARG_WITH([target-bindir],
   [AS_HELP_STRING([--with-target-bindir],
@@ -286,7 +286,7 @@ AC_ARG_WITH([reserved-header-bits],
 
 # There are two configure-time string safety options,
 # --(enable|disable)-force-safe-string and
-# --with-default-string=safe|unsaf that
+# --with-default-string=safe|unsafe that
 # interact with a compile-time (un)safe-string option.
 #
 # If --enable-force-safe-string is set at configure time, then the compiler
@@ -313,7 +313,7 @@ AC_ARG_ENABLE([force-safe-string],
 
 AC_ARG_WITH([default-string],
   [AS_HELP_STRING([--with-default-string=mode],
-    [wether strings should be safe or unsafe @<:@default=safe@:>@])])
+    [whether strings should be safe or unsafe @<:@default=safe@:>@])])
 
 AC_ARG_ENABLE([flat-float-array],
   [AS_HELP_STRING([--disable-flat-float-array],
@@ -336,7 +336,7 @@ AS_CASE([$host],
   # In config/Makefile.mingw*, we had:
   # TARGET=i686-w64-mingw32 and x86_64-w64-mingw32
   # TOOLPREF=$(TARGET)-
-  # ARCMD=$(TOOLPREF)AR
+  # ARCMD=$(TOOLPREF)ar
   # RANLIB=$(TOOLPREF)ranlib
   # RANLIBCMD=$(TOOLPREF)ranlib
   # However autoconf and libtool seem to use ar and ranlib
@@ -368,7 +368,7 @@ AS_CASE([$host],
     exeext=".exe"
     unixlib="win32unix"
     graphlib="win32graph"
-    cc_profile=''],      
+    cc_profile=''],
   [unix_or_win32="unix"
   unixlib="unix"
   graphlib="graph"
@@ -386,7 +386,7 @@ AS_IF(
   [test "x$interpval" = "xyes"],
     [AS_CASE([$host],
       [*-cygwin|*-*-mingw32|*-pc-windows],
-        [hashbangscripts=false],      
+        [hashbangscripts=false],
       [hashbangscripts=true]
     )],
   [hashbangscripts=false]
@@ -396,7 +396,7 @@ AS_IF(
 
 AS_IF(
   [test x"$host" = x"$target"],
-    [cross_compiler=false], 
+    [cross_compiler=false],
     [cross_compiler=true])
 
 # Checks for programs
@@ -428,7 +428,7 @@ AS_CASE([$ocaml_cv_cc_vendor],
 #   (the OCaml runtime assumes Java-style behavior of signed integer arith.)
 # Concerning optimization level, -O3 is somewhat risky, so take -O2.
 # Concerning language version, gnu99 is ISO C99 plus GNU extensions
-# that are often used in standard headersu.  Older GCC versions
+# that are often used in standard headers.  Older GCC versions
 # defaults to gnu89, which is not C99.  Clang defaults to gnu99 or
 # gnu11, which is fine.
 
@@ -440,7 +440,7 @@ AS_CASE([$ocaml_cv_cc_vendor],
 AS_CASE([$host],
   [*-*-mingw32],
     [internal_cflags="-Wno-unused $gcc_warnings"
-    # TODO: see whether the code can be fixed to avoid -Wno-unused 
+    # TODO: see whether the code can be fixed to avoid -Wno-unused
     common_cflags="-O -mms-bitfields"
     internal_cppflags='-DUNICODE -D_UNICODE'
     internal_cppflags="$internal_cppflags -DWINDOWS_UNICODE="
@@ -715,7 +715,7 @@ AS_IF([test x"$enable_shared" != "no"],
 
 # Try to work around the Skylake/Kaby Lake processor bug.
 AS_CASE(["$CC,$host"],
-  [*gcc*,x86_64-*|*gcc*,i686-*], 
+  [*gcc*,x86_64-*|*gcc*,i686-*],
     [OCAML_CC_HAS_FNO_TREE_VRP
     AS_IF([$cc_has_fno_tree_vrp],
       [internal_cflags="$internal_cflags -fno-tree-vrp"])])
@@ -809,7 +809,7 @@ AS_CASE([$host],
 
 AS_IF([test x"$enable_native_compiler" = "xno"],
   [arch=none; model=default; system=unknown; native_compiler=false
-  AC_MSG_NOTICE([the native compiler is disalbed])],
+  AC_MSG_NOTICE([the native compiler is disabled])],
   [native_compiler=true])
 
 AS_IF([! $native_compiler], [natdynlink=false])
@@ -819,7 +819,7 @@ AS_IF([$natdynlink], [cmxs="cmxs"], [cmxs="cmx"])
 AC_DEFINE_UNQUOTED([OCAML_OS_TYPE], ["$ostype"])
 
 AS_IF([test -z "$PARTIALLD"],
-  [AS_CASE(["$arch,$CC,$system,$model"], 
+  [AS_CASE(["$arch,$CC,$system,$model"],
     [amd64,gcc*,macosx,*], [PARTIALLD="ld -r -arch x86_64"],
     [amd64,gcc*,solaris,*], [PARTIALLD="ld -r -m elf_x86_64"],
     [power,gcc*,elf,ppc], [PARTIALLD="ld -r -m elf32ppclinux"],
@@ -850,7 +850,8 @@ AS_CASE(["$arch,$system"],
   [power,bsd*], [profiling=true],
   [power,netbsd], [profiling=true],
   [profiling=false])
-# Assmebler
+
+# Assembler
 
 AS_CASE([$host],
   [*-*-mingw32|*-pc-windows], [asppprofflags=''],
@@ -905,7 +906,7 @@ AS_CASE(["$arch,$system"],
     AS_CASE([$ccfamily],
       [clang-*], [default_aspp="${toolpref}clang -c -Wno-trigraphs"],
       [default_aspp="${toolpref}gcc -c"])])
-  
+
 AS_IF([test -z "$AS"], [AS="$default_as"])
 
 AS_IF([test -z "$ASPP"], [ASPP="$default_aspp"])
@@ -961,7 +962,7 @@ AC_CHECK_FUNC([issetugid], [AC_DEFINE([HAS_ISSETUGID])])
 ## Note: on MinGW, configure finds a clock_gettime and thus the build
 # system tries to build the instrumented runtime, which causes
 # warnings. For the moment we simply disable it on MinGW
-# but this owuld need to be further investigated
+# but this would need to be further investigated
 AS_CASE([$host],
   [*-*-mingw32], [instrumented_runtime=false],
   [AS_IF([test "x$enable_instrumented_runtime" = "xno" ],
@@ -1072,7 +1073,7 @@ AC_CHECK_FUNC([truncate],
 
 ## select
 AC_CHECK_FUNC([select],
-  [AC_CHECK_TYPE([fd_set], 
+  [AC_CHECK_TYPE([fd_set],
     [AC_DEFINE([HAS_SELECT])
     select=true], [select=false], [
 #include <sys/types.h>
@@ -1080,7 +1081,7 @@ AC_CHECK_FUNC([select],
   ])])
 
 AC_CHECK_FUNC([nanosleep], [AC_DEFINE([HAS_NANOSLEEP])])
-  
+
 AC_CHECK_FUNC([symlink],
   [AC_CHECK_FUNC([readlink],
     [AC_CHECK_FUNC([lstat], [AC_DEFINE([HAS_SYMLINK])])])])
@@ -1187,7 +1188,7 @@ AC_CHECK_FUNC([setitimer],
   [setitimer=false])
 
 ## gethostname
-# Note: detection fails on Winodws so hardcoding the result
+# Note: detection fails on Windows so hardcoding the result
 # (should be debugged later)
 AS_CASE([$host],
   [*-*-mingw32|*-pc-windows], [AC_DEFINE([HAS_GETHOSTNAME])],
@@ -1354,7 +1355,7 @@ AC_CHECK_FUNC([getauxval], [AC_DEFINE([HAS_GETAUXVAL])])
 
 AC_CHECK_FUNC([execvpe], [AC_DEFINE([HAS_EXECVPE])])
 
-## Determine wether the debugger should/can be built
+## Determine whether the debugger should/can be built
 
 AS_CASE([$enable_debugger],
   [no],
@@ -1371,7 +1372,7 @@ AS_CASE([$enable_debugger],
 AS_CASE([$enable_debug_runtime],
   [no], [debug_runtime=false],
   [debug_runtime=true])
-  
+
 ## Determine if system stack overflows can be detected
 
 AC_MSG_CHECKING([whether stack overflows can be detected])
@@ -1444,15 +1445,15 @@ AS_IF([test x"$enable_graph_lib" = "xno" ],
 AC_CHECK_HEADER([bfd.h],
   [libbfd_ling=""
   AC_CHECK_LIB([bfd], [bfd_openr], [libbfd_link="-lbfd"])
-  AS_IF([test -z "$libbfd_link"], 
+  AS_IF([test -z "$libbfd_link"],
     [AC_CHECK_LIB([bfd], [bfd_openr], [libbfd_link="-lbfd -ldl"], [], [-ldl])])
-  AS_IF([test -z "$libbfd_link"], 
+  AS_IF([test -z "$libbfd_link"],
     [AC_CHECK_LIB([bfd], [bfd_openr],
       [libbfd_link="-lbfd -ldl -liberty"], [], [-ldl -liberty])])
-  AS_IF([test -z "$libbfd_link"], 
+  AS_IF([test -z "$libbfd_link"],
     [AC_CHECK_LIB([bfd], [bfd_openr],
       [libbfd_link="-lbfd -ldl -liberty -lz"], [], [-ldl -liberty -lz])])
-  AS_IF([test -z "$libbfd_link"], 
+  AS_IF([test -z "$libbfd_link"],
     [AC_CHECK_LIB([bfd], [bfd_openr],
       [libbfd_link="-lbfd -ldl -liberty -lz -lintl"], [],
       [-ldl -liberty -lz -lintl])])
@@ -1539,7 +1540,7 @@ AS_IF([test x"$enable_spacetime" != "xyes" ],
   ])
 
 
-    
+
 AC_DEFINE_UNQUOTED([PROFINFO_WIDTH], [$profinfo_width])
 AS_IF([$profinfo], [AC_DEFINE([WITH_PROFINFO])])
 
@@ -1645,7 +1646,7 @@ AS_IF([test x"$prefix" = "xNONE"],
     [x86_64-pc-windows], [prefix='C:/ocamlms64'])])
 
 # Define a few macros that were defined in config/m-nt.h
-# but whose value is not guessed properly bo configure
+# but whose value is not guessed properly by configure
 # (all this should be understood and fixed)
 AS_CASE([$host],
   [*-*-mingw32|*-pc-windows],

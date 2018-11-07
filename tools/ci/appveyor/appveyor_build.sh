@@ -33,7 +33,7 @@ function run {
     fi
 }
 
-# Funciton: set_configuration
+# Function: set_configuration
 # Takes 3 arguments
 # $1:the Windows port. Recognized values: mingw, msvc and msvc64
 # $2: the prefix to use to install
