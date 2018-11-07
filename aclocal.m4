@@ -175,7 +175,7 @@ camlPervasives__loop_1128:
       ])],
       [aspp_ok=true],
       [aspp_ok=false])
-  
+
     AS_IF([test "$AS" = "$ASPP"],
       [as_ok="$aspp_ok"],
       [CC="$AS"
