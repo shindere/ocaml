@@ -1537,7 +1537,7 @@ Optional Packages:
                           reserve BITS bits in block headers for profiling
                           info
   --with-default-string=mode
-                          whether strings should be safe or unsafe
+                          whether strings should be safe or unsafe by default
                           [default=safe]
   --with-afl              use the AFL fuzzer
   --with-pic[=PKGS]       try to use only PIC/non-PIC objects [default=use
