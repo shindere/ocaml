@@ -1516,7 +1516,7 @@ Optional Features:
   --enable-flambda-invariants
                           enable invariants checks in flambda
   --disable-force-safe-string
-                          do not provide the -force-safe-string option
+                          do not force strings to be safe
   --disable-flat-float-array
                           do not use flat float arrays
   --enable-shared[=PKGS]  build shared libraries [default=yes]
