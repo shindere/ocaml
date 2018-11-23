@@ -1531,7 +1531,8 @@ Optional Packages:
   --with-dllibs=LIBS      use LIBS (in addition to dl) to load dynamic libs
                           [default=""]
   --with-libunwind        location of the libunwind package
-  --with-libunwindlib     location of binary files for libunwind
+  --with-libunwind-include-dir
+                          location of header files for libunwind
   --with-target-bindir    location of binary programs on target system
   --with-reserved-header-bits=BITS
                           reserve BITS bits in block headers for profiling
