@@ -304,12 +304,12 @@ AC_ARG_WITH([reserved-header-bits],
 #
 # The configure-time behavior of OCaml 4.05 and older was equivalent
 # to --disable-force-safe-string --with-default-string=unsafe. OCaml 4.06
-# uses --disable-force-safe-string --with-default-string=safe. We
+# and later uses --disable-force-safe-string --with-default-string=safe. We
 # expect --enable-force-safe-string to become the default in the future.
 
 AC_ARG_ENABLE([force-safe-string],
   [AS_HELP_STRING([--disable-force-safe-string],
-    [do not provide the -force-safe-string option])])
+    [do not force strings to be safe])])
 
 AC_ARG_WITH([default-string],
   [AS_HELP_STRING([--with-default-string=mode],
