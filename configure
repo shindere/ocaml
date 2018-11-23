@@ -1500,7 +1500,7 @@ Optional Features:
   --disable-pthread       disable the POSIX thread library
   --disable-graph-lib     do not build the graphics library
   --disable-ocamldoc      do not build the ocamldoc documentation system
-  --enable-frame-pointers build the runtime system with frame pointers
+  --enable-frame-pointers use frame pointers in runtime and generated code
   --disable-naked-pointers
                           do not use naked pointers
   --enable-spacetime      build the spacetime profiler
@@ -1514,7 +1514,7 @@ Optional Features:
                           do not build the native compiler
   --enable-flambda        enable flmabda optimizations
   --enable-flambda-invariants
-                          enable invariants checks in flmabda
+                          enable invariants checks in flambda
   --disable-force-safe-string
                           do not provide the -force-safe-string option
   --disable-flat-float-array
@@ -1528,8 +1528,8 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-dllibs=LIBS      use LIBS (in addition to dl) to load dynamic
-                          libraries [default=""]
+  --with-dllibs=LIBS      use LIBS (in addition to dl) to load dynamic libs
+                          [default=""]
   --with-libunwind        location of the libunwind package
   --with-libunwindlib     location of binary files for libunwind
   --with-target-bindir    location of binary programs on target system
@@ -1537,7 +1537,7 @@ Optional Packages:
                           reserve BITS bits in block headers for profiling
                           info
   --with-default-string=mode
-                          wether strings should be safe or unsafe
+                          whether strings should be safe or unsafe
                           [default=safe]
   --with-afl              use the AFL fuzzer
   --with-pic[=PKGS]       try to use only PIC/non-PIC objects [default=use
@@ -3100,7 +3100,7 @@ fi
 
 # There are two configure-time string safety options,
 # --(enable|disable)-force-safe-string and
-# --with-default-string=safe|unsaf that
+# --with-default-string=safe|unsafe that
 # interact with a compile-time (un)safe-string option.
 #
 # If --enable-force-safe-string is set at configure time, then the compiler
@@ -12006,7 +12006,7 @@ case $host in #(
   # In config/Makefile.mingw*, we had:
   # TARGET=i686-w64-mingw32 and x86_64-w64-mingw32
   # TOOLPREF=$(TARGET)-
-  # ARCMD=$(TOOLPREF)AR
+  # ARCMD=$(TOOLPREF)ar
   # RANLIB=$(TOOLPREF)ranlib
   # RANLIBCMD=$(TOOLPREF)ranlib
   # However autoconf and libtool seem to use ar and ranlib
@@ -12174,7 +12174,7 @@ esac
 #   (the OCaml runtime assumes Java-style behavior of signed integer arith.)
 # Concerning optimization level, -O3 is somewhat risky, so take -O2.
 # Concerning language version, gnu99 is ISO C99 plus GNU extensions
-# that are often used in standard headersu.  Older GCC versions
+# that are often used in standard headers.  Older GCC versions
 # defaults to gnu89, which is not C99.  Clang defaults to gnu99 or
 # gnu11, which is fine.
 
@@ -13323,8 +13323,8 @@ esac
 
 if test x"$enable_native_compiler" = "xno"; then :
   arch=none; model=default; system=unknown; native_compiler=false
-  { $as_echo "$as_me:${as_lineno-$LINENO}: the native compiler is disalbed" >&5
-$as_echo "$as_me: the native compiler is disalbed" >&6;}
+  { $as_echo "$as_me:${as_lineno-$LINENO}: the native compiler is disabled" >&5
+$as_echo "$as_me: the native compiler is disabled" >&6;}
 else
   native_compiler=true
 fi
@@ -13403,7 +13403,8 @@ case "$arch,$system" in #(
   *) :
     profiling=false ;;
 esac
-# Assmebler
+
+# Assembler
 
 case $host in #(
   *-*-mingw32|*-pc-windows) :
@@ -13636,7 +13637,7 @@ fi
 ## Note: on MinGW, configure finds a clock_gettime and thus the build
 # system tries to build the instrumented runtime, which causes
 # warnings. For the moment we simply disable it on MinGW
-# but this owuld need to be further investigated
+# but this would need to be further investigated
 case $host in #(
   *-*-mingw32) :
     instrumented_runtime=false ;; #(
@@ -14156,7 +14157,7 @@ fi
 
 
 ## gethostname
-# Note: detection fails on Winodws so hardcoding the result
+# Note: detection fails on Windows so hardcoding the result
 # (should be debugged later)
 case $host in #(
   *-*-mingw32|*-pc-windows) :
@@ -14931,7 +14932,7 @@ if test "x$ac_cv_func_execvpe" = xyes; then :
 fi
 
 
-## Determine wether the debugger should/can be built
+## Determine whether the debugger should/can be built
 
 case $enable_debugger in #(
   no) :
@@ -16607,7 +16608,7 @@ esac
 fi
 
 # Define a few macros that were defined in config/m-nt.h
-# but whose value is not guessed properly bo configure
+# but whose value is not guessed properly by configure
 # (all this should be understood and fixed)
 case $host in #(
   *-*-mingw32|*-pc-windows) :
