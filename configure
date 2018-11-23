@@ -1502,7 +1502,7 @@ Optional Features:
   --disable-ocamldoc      do not build the ocamldoc documentation system
   --enable-frame-pointers use frame pointers in runtime and generated code
   --disable-naked-pointers
-                          do not use naked pointers
+                          do not allow naked pointers
   --enable-spacetime      build the spacetime profiler
   --disable-call-counts   disable the call counts in spacetime
   --disable-cfi           disable the CFI directives in assembly files

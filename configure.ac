@@ -239,11 +239,11 @@ AC_ARG_ENABLE([ocamldoc],
 
 AC_ARG_ENABLE([frame-pointers],
   [AS_HELP_STRING([--enable-frame-pointers],
-    [build the runtime system with frame pointers])])
+    [use frame pointers in runtime and generated code])])
 
 AC_ARG_ENABLE([naked-pointers],
   [AS_HELP_STRING([--disable-naked-pointers],
-    [do not use naked pointers])])
+    [do not allow naked pointers])])
 
 AC_ARG_ENABLE([spacetime],
   [AS_HELP_STRING([--enable-spacetime],
