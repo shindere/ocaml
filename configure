@@ -3118,7 +3118,7 @@ fi
 #
 # The configure-time behavior of OCaml 4.05 and older was equivalent
 # to --disable-force-safe-string --with-default-string=unsafe. OCaml 4.06
-# uses --disable-force-safe-string --with-default-string=safe. We
+# and later uses --disable-force-safe-string --with-default-string=safe. We
 # expect --enable-force-safe-string to become the default in the future.
 
 # Check whether --enable-force-safe-string was given.
