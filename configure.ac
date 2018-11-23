@@ -313,7 +313,8 @@ AC_ARG_ENABLE([force-safe-string],
 
 AC_ARG_WITH([default-string],
   [AS_HELP_STRING([--with-default-string=mode],
-    [whether strings should be safe or unsafe @<:@default=safe@:>@])])
+    [whether strings should be safe or unsafe by default
+      @<:@default=safe@:>@])])
 
 AC_ARG_ENABLE([flat-float-array],
   [AS_HELP_STRING([--disable-flat-float-array],
