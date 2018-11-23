@@ -226,8 +226,8 @@ AC_ARG_WITH([libunwind],
     [location of the libunwind package])])
 
 AC_ARG_WITH([libunwind-include-dir],
-  [AS_HELP_STRING([--with-libunwindlib],
-    [location of binary files for libunwind])])
+  [AS_HELP_STRING([--with-libunwind-include-dir],
+    [location of header files for libunwind])])
 
 AC_ARG_ENABLE([graph-lib],
   [AS_HELP_STRING([--disable-graph-lib],
