@@ -885,11 +885,16 @@ AS_CASE(["$arch,$system"],
     [default_as="${toolpref}as"
     default_aspp="${toolpref}gcc -c"],
   [power,elf],
-    [AS_IF([$arch64],
-      [default_as="${toolpref}as -a64 -mppc64"
-      default_aspp="${toolpref}gcc -m64 -c"],
-      [default_as="${toolpref}as -mppc"
-      default_aspp="${toolpref}gcc -m32 -c"])],
+    [AS_CASE([$model])
+      [ppc64le],
+        [default_as="${toolpref}as -a64 -mpower8"
+        default_aspp="${toolpref}gcc -m64 -mcpu=powerpc64le -c"],
+      [ppc64],
+        [default_as="${toolpref}as -a64 -mppc64"
+        default_aspp="${toolpref}gcc -m64 -c"],
+      [ppc],
+        [default_as="${toolpref}as -mppc"
+        default_aspp="${toolpref}gcc -m32 -c"])],
   [s390x,elf],
     [default_as="${toolpref}as -m 64 -march=$model"
     default_aspp="${toolpref}gcc -c -Wa,-march=$model"],
