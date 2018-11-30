@@ -885,7 +885,7 @@ AS_CASE(["$arch,$system"],
     [default_as="${toolpref}as"
     default_aspp="${toolpref}gcc -c"],
   [power,elf],
-    [AS_CASE([$model])
+    [AS_CASE([$model],
       [ppc64le],
         [default_as="${toolpref}as -a64 -mpower8"
         default_aspp="${toolpref}gcc -m64 -mcpu=powerpc64le -c"],
