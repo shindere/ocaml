@@ -13439,7 +13439,7 @@ case "$arch,$system" in #(
   *) :
     default_as="${toolpref}as -arch x86_64"
       default_aspp="${toolpref}gcc -arch x86_64 -c" ;;
-    esac ;; #(
+esac ;; #(
   amd64,solaris) :
     default_as="${toolpref}as --64"
     default_aspp="${toolpref}gcc -m64 -c" ;; #(
@@ -13447,17 +13447,19 @@ case "$arch,$system" in #(
     default_as="${toolpref}as"
     default_aspp="${toolpref}gcc -c" ;; #(
   power,elf) :
-    case "$model" in #(
-      ppc64le):
-        default_as="${toolpref}as -a64 -mpower8"
-        default_aspp="${toolpref}gcc -m64 -mcpu=powerpc64le -c";;
-      ppc64):
-        default_as="${toolpref}as -a64 -mppc64"
-        default_aspp="${toolpref}gcc -m64 -c";;
-      ppc):
-        default_as="${toolpref}as -mppc"
+    case $model in #(
+  ppc64le) :
+    default_as="${toolpref}as -a64 -mpower8"
+        default_aspp="${toolpref}gcc -m64 -mcpu=powerpc64le -c" ;; #(
+  ppc64) :
+    default_as="${toolpref}as -a64 -mppc64"
+        default_aspp="${toolpref}gcc -m64 -c" ;; #(
+  ppc) :
+    default_as="${toolpref}as -mppc"
         default_aspp="${toolpref}gcc -m32 -c" ;; #(
-    esac ;; 
+  *) :
+     ;;
+esac ;; #(
   s390x,elf) :
     default_as="${toolpref}as -m 64 -march=$model"
     default_aspp="${toolpref}gcc -c -Wa,-march=$model" ;; #(
