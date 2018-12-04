@@ -357,9 +357,10 @@ AS_CASE([$host],
 
 # C preprocessor: we do not rely on AC_PROG_CPP because it returns
 # 'fcc -E' while we really need cpp
+AC_CHECK_TOOL([DIRECT_CPP],[cpp])
 AS_CASE([$host],
   [*-pc-windows], [CPP="$CC -nologo -EP"],
-  [CPP=cpp])
+  [CPP=$DIRECT_CPP])
 
 # Libraries to build depending on the host
 
