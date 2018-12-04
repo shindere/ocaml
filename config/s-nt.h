@@ -38,7 +38,3 @@
 #define HAS_NICE 1
 #define SUPPORT_DYNAMIC_LINKING 1
 #define HAS_EXECVPE 1
-#if defined(_MSC_VER) && _MSC_VER < 1300
-#define LACKS_SANE_NAN
-#define LACKS_VSCPRINTF
-#endif
