@@ -17,8 +17,8 @@
 
 ROOTDIR = .
 
-include Makefile.config
-include Makefile.common
+-include Makefile.config
+-include Makefile.common
 
 # For users who don't read the INSTALL file
 .PHONY: defaultentry
