@@ -311,6 +311,9 @@ reconfigure:
 	./configure $(CONFIGURE_ARGS)
 endif
 
+configure: configure.ac aclocal.m4
+	autoconf -W all,error
+
 .PHONY: partialclean
 partialclean::
 	rm -f utils/config.ml

@@ -138,7 +138,6 @@ menhir-bench.bash typo.missing-header typo.utf8
 
 configure text eol=lf
 configure.ac text eol=lf
-autogen text eol=lf
 build-aux/compile text eol=lf
 build-aux/config.guess text eol=lf
 build-aux/config.sub text eol=lf
