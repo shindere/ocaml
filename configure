@@ -13057,9 +13057,10 @@ _ACEOF
 
 if ! $arch64; then :
   if test x"$ac_cv_alignof_double" = "x8" ; then :
+  if  "$target_cpu" != "i386" ; then :
   $as_echo "#define ARCH_ALIGN_DOUBLE 1" >>confdefs.h
 
-
+fi
 fi
   if test x"$ac_cv_alignof_long" = "x8" ; then :
   $as_echo "#define ARCH_ALIGN_INT64 1" >>confdefs.h
