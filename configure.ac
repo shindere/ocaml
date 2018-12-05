@@ -626,8 +626,8 @@ AC_CHECK_ALIGNOF([long])
 
 AS_IF([! $arch64],
   [AS_IF([test x"$ac_cv_alignof_double" = "x8" ],
-    [AC_DEFINE([ARCH_ALIGN_DOUBLE], [1])]
-  )
+    [AS_IF([test "$target_cpu" != "i686" ],
+      [AC_DEFINE([ARCH_ALIGN_DOUBLE], [1])])])
   AS_IF([test x"$ac_cv_alignof_long" = "x8" ],
     [AC_DEFINE([ARCH_ALIGN_INT64], [1])]
   )
