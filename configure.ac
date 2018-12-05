@@ -355,12 +355,6 @@ AS_CASE([$host],
     mklib="rm -f \$(1) && ${AR} rc \$(1) \$(2) && ${RANLIB} \$(1)"
   ])
 
-# C preprocessor: we do not rely on AC_PROG_CPP because it returns
-# 'fcc -E' while we really need cpp
-AS_CASE([$host],
-  [*-pc-windows], [CPP="$CC -nologo -EP"],
-  [CPP=cpp])
-
 # Libraries to build depending on the host
 
 AS_CASE([$host],
@@ -1604,6 +1598,14 @@ ocamlc_cppflags="$common_cppflags"
 ocamlopt_cflags="$common_cflags"
 ocamlopt_cppflags="$common_cppflags"
 cclibs="$cclibs $mathlib"
+
+# C preprocessor: we do not rely on AC_PROG_CPP because it returns
+# 'gcc -E' while we really need cpp
+AS_CASE([$host],
+  [*-pc-windows], [CPP="$CC -nologo -EP"],
+  [CPP=cpp])
+
+
 
 AS_CASE([$host],
   [*-*-mingw32],
