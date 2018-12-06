@@ -672,14 +672,15 @@ AS_CASE([$host],
   [*-*-cygwin*],
     [mksharedlib="$flexlink"
     mkmaindll="$flexlink -maindll"
-    shared_libraries_supported=true],
+    shared_libraries_supported=$with_sharedlibs],
   [*-*-mingw32],
     [mksharedlib='$(FLEXLINK)'
     mkmaindll='$(FLEXLINK) -maindll'
-    shared_libraries_supported=true],
+    shared_libraries_supported=$with_sharedlibs],
   [*-pc-windows],
     [mksharedlib='$(FLEXLINK)'
-    mkmaindll='$(FLEXLINK) -maindll'])
+    mkmaindll='$(FLEXLINK) -maindll'
+    shared_libraries_supported=$with_sharedlibs])
 
 AS_IF([test -z "$mkmaindll"], [mkmaindll=$mksharedlib])
 
@@ -1262,7 +1263,7 @@ AS_CASE([$host],
 ## shared library support
 AS_CASE([$host],
   [*-*-mingw32|*-pc-windows],
-    [supports_shared_libraries=true; dllibs=""],
+    [supports_shared_libraries=$shared_libraries_supported; dllibs=""],
   [AC_CHECK_FUNC([dlopen],
     [supports_shared_libraries=true dllibs=""],
     [AC_CHECK_LIB([dl], [dlopen],

@@ -13210,14 +13210,15 @@ case $host in #(
   *-*-cygwin*) :
     mksharedlib="$flexlink"
     mkmaindll="$flexlink -maindll"
-    shared_libraries_supported=true ;; #(
+    shared_libraries_supported=$with_sharedlibs ;; #(
   *-*-mingw32) :
     mksharedlib='$(FLEXLINK)'
     mkmaindll='$(FLEXLINK) -maindll'
-    shared_libraries_supported=true ;; #(
+    shared_libraries_supported=$with_sharedlibs ;; #(
   *-pc-windows) :
     mksharedlib='$(FLEXLINK)'
-    mkmaindll='$(FLEXLINK) -maindll' ;; #(
+    mkmaindll='$(FLEXLINK) -maindll'
+    shared_libraries_supported=$with_sharedlibs ;; #(
   *) :
      ;;
 esac
@@ -14503,7 +14504,7 @@ esac
 ## shared library support
 case $host in #(
   *-*-mingw32|*-pc-windows) :
-    supports_shared_libraries=true; dllibs="" ;; #(
+    supports_shared_libraries=$shared_libraries_supported; dllibs="" ;; #(
   *) :
     ac_fn_c_check_func "$LINENO" "dlopen" "ac_cv_func_dlopen"
 if test "x$ac_cv_func_dlopen" = xyes; then :
