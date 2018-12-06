@@ -207,15 +207,7 @@ OCAMLOPT_CFLAGS=@ocamlopt_cflags@
 OCAMLOPT_CPPFLAGS=@ocamlopt_cppflags@
 NATIVECCLIBS=@nativecclibs@
 SYSTHREAD_SUPPORT=@systhread_support@
-PARTIALLD=@PARTIALLD@
-# PACKLD is defined here rather than in configure because it is hard to
-# generate the comment that is required under Windows
-# TODO: find another solution than this commento to avoid the space
-ifeq "$(UNIX_OR_WIN32)" "win32"
-  PACKLD=$(PARTIALLD) -out:# there must be no space after this '-out:'
-else # unix
-  PACKLD = $(PARTIALLD) -o $(EMPTY)
-endif
+PACKLD=@PACKLD@
 IFLEXDIR=@iflexdir@
 EXTRALIBS=@extralibs@
 CCOMPTYPE=@ccomptype@

@@ -639,6 +639,7 @@ PTHREAD_CFLAGS
 PTHREAD_LIBS
 PTHREAD_CC
 ax_pthread_config
+DIRECT_LD
 INSTALL_DATA
 INSTALL_SCRIPT
 INSTALL_PROGRAM
@@ -671,6 +672,7 @@ CPPFLAGS
 LDFLAGS
 CFLAGS
 LIBTOOL
+PARTIALLD
 target_os
 target_vendor
 target_cpu
@@ -683,7 +685,7 @@ build_os
 build_vendor
 build_cpu
 build
-PARTIALLD
+PACKLD
 flexlink_flags
 flexdll_chain
 default_safe_string
@@ -13439,23 +13441,123 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
+if test -n "$ac_tool_prefix"; then
+  # Extract the first word of "${ac_tool_prefix}ld", so it can be a program name with args.
+set dummy ${ac_tool_prefix}ld; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_DIRECT_LD+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$DIRECT_LD"; then
+  ac_cv_prog_DIRECT_LD="$DIRECT_LD" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_DIRECT_LD="${ac_tool_prefix}ld"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+DIRECT_LD=$ac_cv_prog_DIRECT_LD
+if test -n "$DIRECT_LD"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $DIRECT_LD" >&5
+$as_echo "$DIRECT_LD" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+fi
+if test -z "$ac_cv_prog_DIRECT_LD"; then
+  ac_ct_DIRECT_LD=$DIRECT_LD
+  # Extract the first word of "ld", so it can be a program name with args.
+set dummy ld; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_prog_ac_ct_DIRECT_LD+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  if test -n "$ac_ct_DIRECT_LD"; then
+  ac_cv_prog_ac_ct_DIRECT_LD="$ac_ct_DIRECT_LD" # Let the user override the test.
+else
+as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_prog_ac_ct_DIRECT_LD="ld"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+fi
+fi
+ac_ct_DIRECT_LD=$ac_cv_prog_ac_ct_DIRECT_LD
+if test -n "$ac_ct_DIRECT_LD"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_ct_DIRECT_LD" >&5
+$as_echo "$ac_ct_DIRECT_LD" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+  if test "x$ac_ct_DIRECT_LD" = x; then
+    DIRECT_LD=""
+  else
+    case $cross_compiling:$ac_tool_warned in
+yes:)
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: using cross tools not prefixed with host triplet" >&5
+$as_echo "$as_me: WARNING: using cross tools not prefixed with host triplet" >&2;}
+ac_tool_warned=yes ;;
+esac
+    DIRECT_LD=$ac_ct_DIRECT_LD
+  fi
+else
+  DIRECT_LD="$ac_cv_prog_DIRECT_LD"
+fi
+
 if test -z "$PARTIALLD"; then :
+  # The string for PACKLD must be capable of being concatenated with the
+  # output filename. Don't assume that all C compilers understand GNU -ofoo
+  # form, so ensure that the definition includes a space at the end (which is
+  # achieved using the $(EMPTY) expansion trick).
   case "$arch,$CC,$system,$model" in #(
   amd64,gcc*,macosx,*) :
-    PARTIALLD="ld -r -arch x86_64" ;; #(
+    PACKLD='ld -r -arch x86_64 -o $(EMPTY)' ;; #(
   amd64,gcc*,solaris,*) :
-    PARTIALLD="ld -r -m elf_x86_64" ;; #(
+    PACKLD='ld -r -m elf_x86_64 -o $(EMPTY)' ;; #(
   power,gcc*,elf,ppc) :
-    PARTIALLD="ld -r -m elf32ppclinux" ;; #(
+    PACKLD='ld -r -m elf32ppclinux -o $(EMPTY)' ;; #(
   power,gcc*,elf,ppc64) :
-    PARTIALLD="ld -r -m elf64ppc" ;; #(
+    PACKLD='ld -r -m elf64ppc -o $(EMPTY)' ;; #(
   power,gcc*,elf,ppc64le) :
-    PARTIALLD="ld -r -m elf64lppc" ;; #(
-  *,cl,*,*) :
-    PARTIALLD="link -lib -nologo" ;; #(
+    PACKLD='ld -r -m elf64lppc -o $(EMPTY)' ;; #(
+  # For the Microsoft C compiler there must be no space at the end of the
+    # string.
+    *,cl,*,*) :
+    PACKLD="link -lib -nologo $machine -out:" ;; #(
   *) :
-    PARTIALLD="ld -r" ;;
+    PACKLD="$DIRECT_LD -r -o \$(EMPTY)" ;;
 esac
+else
+  PACKLD="$PARTIALLD -o \$(EMPTY)"
 fi
 
 if test $arch != "none" && $arch64 ; then :
