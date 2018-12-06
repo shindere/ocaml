@@ -325,6 +325,9 @@ AC_ARG_WITH([afl],
     [use the AFL fuzzer])])
 
 # Initialization of libtool
+# Allow the MSVC linker to be found even if ld isn't installed.
+# User-specified LD still takes precedence.
+AC_CHECK_TOOLS([LD],[ld link])
 LT_INIT
 
 # Extracting information from libtool's configuration
