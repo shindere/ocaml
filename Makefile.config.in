@@ -62,6 +62,7 @@ HASHBANGSCRIPTS=@hashbangscripts@
 LIBTOOL = $(TOP_BUILDDIR)/libtool
 
 ### Which C compiler to use
+TOOLPREF=@ac_tool_prefix@
 CC=@CC@
 
 CC_HAS_DEBUG_PREFIX_MAP=@cc_has_debug_prefix_map@

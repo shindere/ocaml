@@ -70,6 +70,10 @@ AC_CONFIG_AUX_DIR([build-aux])
 AC_SUBST([CONFIGURE_ARGS])
 AC_SUBST([VERSION], [AC_PACKAGE_VERSION])
 AC_SUBST([CC])
+# Note: This is present for the flexdll bootstrap where it exposed as the old
+# TOOLPREF variable. It would be better if flexdll where updated to require
+# WINDRES instead.
+AC_SUBST([ac_tool_prefix])
 AC_SUBST([exeext])
 AC_SUBST([OBJEXT])
 AC_SUBST([libext])
@@ -531,7 +535,6 @@ AS_CASE([$CC,$host],
       flexdir=`$flexlink -where | tr -d '\015'`
       AS_IF([test -z "$flexdir"], [flexdir='$(ROOTDIR)/flexdll'])
       iflexdir="-I\"$flexdir\""
-      mkexe="$flexlink -exe"
       mkexedebugflag="-link -g"])
     ostype="Win32"
     toolchain="mingw"
@@ -549,13 +552,9 @@ AS_CASE([$CC,$host],
     AS_IF([$with_sharedlibs],
       [flexlink="flexlink -chain $flexdll_chain -merge-manifest -stack 16777216"
       flexdir=`$flexlink -where | tr -d '\015'`
-      AS_IF([test -z "$flexdir"],
-        [AC_MSG_WARN(
-          [flexlink not found: native shared libraries won't be available.]
-        )
-        with_sharedlibs=false],
-        [iflexdir="-I\"$flexdir\""
-        mkexedebugflag="-link -g"])])],
+      AS_IF([test -z "$flexdir"], [flexdir='$(ROOTDIR)/flexdll'])
+      iflexdir="-I\"$flexdir\""
+      mkexedebugflag="-link -g"])],
   [*,x86_64-*-linux*],
     AC_DEFINE([HAS_ARCH_CODE32], [1])
 )

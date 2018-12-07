@@ -774,6 +774,7 @@ S
 libext
 OBJEXT
 exeext
+ac_tool_prefix
 CC
 VERSION
 CONFIGURE_ARGS
@@ -2728,6 +2729,10 @@ ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
 
 VERSION=4.08.0+dev0-2018-04-09
 
+
+# Note: This is present for the flexdll bootstrap where it exposed as the old
+# TOOLPREF variable. It would be better if flexdll where updated to require
+# WINDRES instead.
 
 
 
@@ -12499,7 +12504,6 @@ esac
   flexdir='$(ROOTDIR)/flexdll'
 fi
       iflexdir="-I\"$flexdir\""
-      mkexe="$flexlink -exe"
       mkexedebugflag="-link -g"
 fi
     ostype="Win32"
@@ -12524,15 +12528,10 @@ esac
   flexlink="flexlink -chain $flexdll_chain -merge-manifest -stack 16777216"
       flexdir=`$flexlink -where | tr -d '\015'`
       if test -z "$flexdir"; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: flexlink not found: native shared libraries won't be available.
-        " >&5
-$as_echo "$as_me: WARNING: flexlink not found: native shared libraries won't be available.
-        " >&2;}
-        with_sharedlibs=false
-else
-  iflexdir="-I\"$flexdir\""
-        mkexedebugflag="-link -g"
+  flexdir='$(ROOTDIR)/flexdll'
 fi
+      iflexdir="-I\"$flexdir\""
+      mkexedebugflag="-link -g"
 fi ;; #(
   *,x86_64-*-linux*) :
     $as_echo "#define HAS_ARCH_CODE32 1" >>confdefs.h
