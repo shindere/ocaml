@@ -36,6 +36,23 @@ let mkreason what commandline exitcode =
   Printf.sprintf "%s: command\n%s\nfailed with exit code %d"
     what commandline exitcode
 
+let mkreason_with_output what commandline exitcode stdout stderr =
+  let banner = String.make 40 '=' in
+  let eol s = s ^ "\n" in
+  let log_file description file_name =
+    let file_content = Sys.string_of_file file_name in
+    Printf.sprintf "%s:\n%s\n%s%s\n" description banner file_content banner
+  in
+  let r1 = eol (mkreason what commandline exitcode) in
+  let r2 =
+    if stdout=stderr
+    then log_file "Command output" stdout
+    else
+      (log_file "Command stdout" stdout) ^
+      (log_file "Command stderr" stderr)
+  in
+  r1 ^ r2
+  
 let testfile env =
   match Environments.lookup Builtin_variables.test_file env with
   | None -> assert false
@@ -159,6 +176,7 @@ let run
     begin if arguments="" then "without any argument"
     else "with arguments " ^ arguments
     end in
+    let output = Environments.safe_lookup Builtin_variables.output env in
     let env =
       if redirect_output
       then begin
@@ -176,7 +194,15 @@ let run
     if exit_status=expected_exit_status
     then (Result.pass, env)
     else begin
-      let reason = mkreason what (String.concat " " commandline) exit_status in
+      let commandstr = (String.concat " " commandline) in
+      let reason =
+        if redirect_output && output<>""
+        then mkreason_with_output
+          what commandstr exit_status
+          (Environments.safe_lookup Builtin_variables.stdout env)
+          (Environments.safe_lookup Builtin_variables.stderr env)
+        else mkreason what commandstr exit_status
+      in
       if exit_status = 125 && can_skip
       then (Result.skip_with_reason reason, env)
       else (Result.fail_with_reason reason, env)
