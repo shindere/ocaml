@@ -262,3 +262,6 @@ _build
 /yacc/ocamlyacc
 /yacc/version.h
 /yacc/.gdb_history
+
+# Ignore toy ppx executable file
+/ppx/printexc_ppx
