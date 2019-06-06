@@ -462,6 +462,7 @@ bootstrap: coreboot
 .PHONY: world
 world: coldstart
 	$(MAKE) all
+	cd ppx;	make build
 
 # Compile also native code compiler and libraries, fast
 .PHONY: world.opt
