@@ -3,7 +3,7 @@ ROOTDIR = ..
 include $(ROOTDIR)/Makefile.config
 include $(ROOTDIR)/Makefile.common
 
-directories := $(addprefix $(ROOTDIR)/, )
+directories := $(addprefix $(ROOTDIR)/, stdlib compilerlibs)
 
 include_directories := $(addprefix -I , $(directories))
 

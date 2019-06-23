@@ -475,7 +475,7 @@ world.opt: checknative
 # Compile ocamlc with bisect_ppx
 .PHONY: world.bisected
 world.bisected:
-	rm -f typing/typetexp.cmo
+	rm -f $(shell find . -wholename "**/*.cmo" ! -path "./compilerlibs/*.cmo" ! -path "./stdlib/*.cmo" ! -path "./boot/std_exit.cmo")
 	$(MAKE) PPX="-ppx ./ppx/bisect_ppx" ocamlc
 
 # FlexDLL sources missing error messages
