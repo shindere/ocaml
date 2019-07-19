@@ -1317,6 +1317,7 @@ distclean: clean
 	rm -f Makefile.config runtime/caml/m.h runtime/caml/s.h
 	rm -f tools/*.bak
 	rm -f ocaml ocamlc
+	rm -f ocamltest/run-ocamltest.sh
 	rm -f testsuite/_log*
 
 include .depend

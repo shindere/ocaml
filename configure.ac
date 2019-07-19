@@ -168,6 +168,8 @@ AC_SUBST([PACKLD])
 
 AC_CONFIG_FILES([Makefile.common])
 AC_CONFIG_FILES([Makefile.config])
+AC_CONFIG_FILES(
+  [ocamltest/run-ocamltest.sh], [chmod 755 ocamltest/run-ocamltest.sh])
 AC_CONFIG_HEADERS([runtime/caml/m.h])
 AC_CONFIG_HEADERS([runtime/caml/s.h])
 

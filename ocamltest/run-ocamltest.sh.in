@@ -1,0 +1,49 @@
+#!/bin/sh
+# @configure_input@
+#**************************************************************************
+#*                                                                        *
+#*                                 OCaml                                  *
+#*                                                                        *
+#*            Sebastien Hinderer, projet Gallium, INRIA Paris             *
+#*                                                                        *
+#*   Copyright 2019 Institut National de Recherche en Informatique et     *
+#*     en Automatique.                                                    *
+#*                                                                        *
+#*   All rights reserved.  This file is distributed under the terms of    *
+#*   the GNU Lesser General Public License version 2.1, with the          *
+#*   special exception on linking described in the file LICENSE.          *
+#*                                                                        *
+#**************************************************************************
+
+# Helper script to find which version of ocamltest to run
+
+# If called with the --program argument, prints the name of the ocamltest
+# program to invoke on its standard output and exits
+# Otherwise, calls the ocamltest program it has found and passes it its
+# arguments
+
+# This script can be used to call ocamltest interactively and also from the
+# testsuite's Makefile to find out once and for all which program needs
+# to be called.
+
+EXE=@exeext@
+OCAMLSRCDIR=@abs_top_srcdir@
+OCAMLTESTDIR=${OCAMLSRCDIR}/ocamltest
+OCAMLTEST=${OCAMLTESTDIR}/ocamltest${EXE}
+OCAMLTEST_OPT=${OCAMLTESTDIR}/ocamltest.opt${EXE}
+
+if [ -x ${OCAMLTEST_OPT} ]; then
+  OCAMLTEST_PROGRAM=${OCAMLTEST_OPT}
+elif [ -x ${OCAMLTEST} ]; then
+  OCAMLTEST_PROGRAM=${OCAMLTEST}
+else
+  echo Neither ${OCAMLTEST_OPT} nor ${OCAMLTEST} exist
+  exit 2
+fi
+
+case "$1" in
+  --program)
+    echo ${OCAMLTEST_PROGRAM};;
+  *)
+    ${OCAMLTEST_PROGRAM} $*;;
+esac
