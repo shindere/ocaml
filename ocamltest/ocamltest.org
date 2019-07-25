@@ -3,6 +3,8 @@
 #+title: The ocamltest reference manual
 #+language: en
 
+#+HTML_HEAD: <style> body { font-size: 1rem; max-width: 900px; margin: 0 auto; } </style>
+
 * Introduction
 
 This is =verbatim= and this is ~code~.
