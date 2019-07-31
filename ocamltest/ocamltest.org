@@ -41,7 +41,7 @@ distribution such as the ~Unix~ library.
 
 *** Test types
 
-As has been noted above, ocamltest has been developed to run the already
+As it has been noted above, ocamltest has been developed to run the already
 existing integration tests of the OCaml compiler's test suite, which
 were previously run by a set of makefiles. This context explains
 several design decisions which could otherwise seem rather arbitrary.
@@ -261,7 +261,7 @@ quite similar):
    /variables/.
 
 3. =check-ocamlc.byte-output=:: this action compares the compiler's
-   output to a reference file, if one exists. As has been mentioned
+   output to a reference file, if one exists. As it has been mentioned
    earlier, the absence of such a reference file specifies that the
    compiler's output is expected to be empty -- if it is not, this
    causes a failure of this action and thus of the whole =bytecode=
@@ -304,7 +304,7 @@ quite similar):
 
 ** Customizing the default tests
 
-As has been briefly mentioned, the precise behavior of actions (and
+As it has been briefly mentioned, the precise behavior of actions (and
 thus of tests) may depend on /variables/ whose value can be adjusted in
 the =(* TEST ... *)= blocks. In ocamltest, all the values of variables
 are strings. Here are a few examples of things that can be achieved just
@@ -324,7 +324,7 @@ open Format
 let _ = print_endline "Hello, world!"
 #+end_src
 
-As may be verified, this program still passes the default tests. It is
+As it may be verified, this program still passes the default tests. It is
 however not as minimal as our previous version, because the =Format=
 module is opened but not used. Fortunately, OCaml has a warning to
 detect such unused =open= directives, namely warning 33, which is
@@ -490,7 +490,7 @@ achieved if spaces were implicitly added, whereas with a literal
 concatenation it is always possible to include spaces explicitly. This is
 exactly what happens in the ocamltest annotation block above, where the
 strings added to the =libraries= and =directories= variables are
-surrounded by spaces. As should be clear to the reader by now, these
+surrounded by spaces. As it should be clear to the reader by now, these
 spaces are mandatory. Without them, the added values would be glued to
 the last word of the variable and would thus be misinterpreted.
 
@@ -501,7 +501,7 @@ several, perhaps many test programs that need to be linked with =Str=?
 Will we have to repeat these lines everywhere, thus creating code that
 is going to be tedious to maintain? Well, fortunately not. Actually,
 ocamltest has a much more elegant way to deal with such issues, namely
-/environment modifiers/. As will be explained in chapter [[#concepts]], an
+/environment modifiers/. As it will be explained in chapter [[#concepts]], an
 /environment modifier/ is an object that gathers several variable
 definitions that can then be included in an ocamltest block at once.
 Environment modifiers have to be defined in ocamltest itself and can
@@ -535,7 +535,7 @@ that it is run only on Unix platforms:
 *)
 #+end_src
 
-As can be understood from this example, lines starting with an asterisk
+As it can be understood from this example, lines starting with an asterisk
 describe which tests should be executed. In addition, the number of
 asterisks allows to specify the nesting level of each test or action.
 Here for instance, =bytecode= and =native= are sub-tests that will be
@@ -670,7 +670,7 @@ being defined by the =script= variable. In this case, the script is run
 in an environment where all the variables defined in ocamltest have been
 exported. The script uses its exit status to report its result and can
 write a response to a dedicated file to modify its environment or
-explain why it failed or skipped, as will be explained in chapter
+explain why it failed or skipped, as it will be explained in chapter
 [[#builtins]]. For the moment, let's see how to use a script to "test" our
 original =hello.ml= example. Our annotated program would look as
 follows:
