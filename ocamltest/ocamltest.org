@@ -50,10 +50,11 @@ For example, the reason why ocamltest has no support for running unit tests
 is that there were no such tests in the OCaml compiler's test suite.
 
 Indeed, the OCaml compiler's test suite is composed mainly of complete
-programs. In this context, the most current meaning of "testing" a program
-is that the program needs to be compiled and executed. The test will
-be considered successful if the program compiles as expected and, when run,
-returns the expected value.
+programs. In this context, the most current meaning for a "test" is a
+program that the compiler needs to compile, and the resulting object
+is then executed.  The test will be considered successful if the
+program compiles as expected and, when run, returns the expected
+value.
 
 Since this scenario is the most frequent one, it was of particular
 importance to make writing tests of this form as simple as possible.
