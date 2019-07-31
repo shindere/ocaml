@@ -28,7 +28,7 @@ should be written. It may indeed seem odd to write a test-driver for a
 compiler in the language it compiles, since the compiler itself
 is yet untested and thus not trustworthy.
 
-It can however be observed that the OCaml compiler is /boostrapped/,
+It can however be observed that the OCaml compiler is /bootstrapped/,
 meaning that it is itself written in OCaml. A newer version of the
 compiler can thus be produced from an existing one and the (OCaml)
 source code of that newer version. Practically, this means that the
@@ -37,7 +37,7 @@ consider that it is okay to write a test-driver like ocamltest in OCaml,
 as long as it uses only code that has been used to bootstrap the
 compiler. In particular, this is why we prefer not to rely on any
 external dependency, not even the libraries included in the compiler
-distribution such as the '~Unix'~ library.
+distribution such as the ~Unix~ library.
 
 *** Test types
 
@@ -66,8 +66,8 @@ etc.
 
 To fulfill these requirements and make it as easy as possible to turn a
 program into a test, it has been chosen to design a Domain-Specific
-Language (DSL) used to annotate the program to test and specify,
-in a =(* TEST *)= block at the top of the program to specify how
+Language (DSL) used to annotate the program to test and to specify,
+in a =(* TEST *)= block at the top of the program, how
 the test should be performed.
 
 
@@ -77,7 +77,7 @@ The next chapter explains through examples how to write simple tests. We
 then introduce the key concepts used by ocamltest to provide a better
 understanding of how it works and can be used to write more complex
 tests. The two last chapters give an in-depth description of the
-built-in tests and actions and of the test and actions that are specific
+built-in tests and actions and of the tests and actions that are specific
 to the OCaml compiler.
 
 * Writing simple tests
@@ -188,11 +188,11 @@ above into a test usable by ocamltest to verify this:
 
 *** What exactly is going on during the test
 
-the only thing we know from ocamltest's output when run on =hello.ml= is
+The only thing we know from ocamltest's output when run on =hello.ml= is
 that it is running two tests named =bytecode= and =native= and that the two of
 them succeed. This can seem rather uninformative, and in a way it is, but
 it has to be kept in mind that this information is the one passed by the
-test-driver)(ocamltest) to the test infrastructure. In that respect,
+test-driver (ocamltest) to the test infrastructure. In that respect,
 this is enough. For us users, though, it is not. That's why
 ocamltest logs much more details about what is going on in a per-test
 log file, which should be located in the =_ocamltest/hello/hello.log= file
@@ -225,7 +225,7 @@ Source modules: hello.ml
 #+end_src
 
 The first line lists the names of the modules the test consists of. The
-second line is almost similar but if some modules would have separate
+second line is almost similar but if some modules have separate
 interface files, they would be listed here, too, without the user
 having to specify them in the list of modules (for each specified =.ml=
 file, ocamltest looks whether a corresponding =.mli= file exists and, if
@@ -236,7 +236,7 @@ similar to each other: one for the =native= test and one for the =bytecode=
 test. Among other things, we learn that each of these tests is composed
 of nine actions. Before diving into the details of what each of these
 actions does, let us take this opportunity to introduce a bit of
-ocamltest terminology. An /action/ is anything that can =pass=, =skip= of
+ocamltest terminology. An /action/ is anything that can =pass=, =skip= or
 =fail=. A =test= is a sequence of such actions. Running
 a test thus means running each of its actions, in sequence, until all the
 actions have been run or one of them returns =pass= or =skip=. Whatever
@@ -299,7 +299,7 @@ quite similar):
    output, we compare it to the one produced in action 2. Such a check
    may seem string, because what it requires is that =ocamlc.byte= and
    =ocamlc.opt= produce exactly the same binary and not two binaries
-   than perform similarly when they are run, but it has proven useful in
+   that perform similarly when they are run, but it has been proven useful in
    the past and has permitted to detect a subtle bug in the compiler.
 
 ** Customizing the default tests
@@ -345,7 +345,7 @@ required steps to achieve this:
    store the expected output in a file, namely =hello.compilers.output=
    besides to =hello.ml= and =hello.reference=. To figure out what
    this file shall contain, we can run ocamltest even before it
-   has been created. Of course, the action that check compiler output
+   has been created. Of course, the action that checks compiler output
    will fail, but in this way we will get the compiler's output
    which we will just have to check (to
    make sure it is what we expect) and to move to the reference file.
@@ -354,7 +354,7 @@ required steps to achieve this:
    which fails, unsurprisingly, and shows us the paths to the file
    containing the output produced by the compiler and the path to the
    expected reference file. We also see what the compiler produced as
-   output but we can double-check that the output is was we expect as a
+   output but we can double-check that the output is what we expect as a
    reference:
    : $ cat _ocamltest/hello/ocamlc.byte/ocamlc.byte.output
    which shows the warning we expect from the compiler. We can thus move
@@ -473,7 +473,7 @@ ocamltest test program and, doing so, one may notice that the two tests
 pass. There are however a few other things worth pointing out here
 regarding the ocamltest DSL. For a start, the notation =${variable}=
 inside a string means to replace =variable= by its value, as happens in
-may other languages, like the bash shell. Moreover, it is the first
+many other languages, like the bash shell. Moreover, it is the first
 time we meet the ~+=~ operator which concatenates a value to a variable.
 More precisely,
 : foo += "bar"
@@ -624,7 +624,7 @@ Two tests are provided to make sure that the OCaml top-level behaves as
 expected: =toplevel= and =expect=. These tests are similar in that they
 both allow to test how the OCaml top-level reacts to some user input,
 but they are different in the way one specifies the expected output and
-also in what they can test. The =toplevel) test behaves in a spirit
+also in what they can test. The =toplevel= test behaves in a spirit
 similar to the compiler tests described above, meaning that the expected
 output has to be stored in its own, separate file. Since this test
 invokes the real OCaml top-level, it is useful to test advanced features
@@ -653,7 +653,7 @@ type point = { x : int; y : int; }
 #+end_src
 
 The first line after the test block is the input phrase, while the line
-that appears between =[%%expect{|= and ==|}];;= is the corresponding
+that appears between =[%%expect{|= and =|}];;= is the corresponding
 expected output. The =expect= test can also be used to test the output
 in presence of the =-principal= command-line flag. In such cases, the
 expected output should be written in a =|}, Principal{|= block (to be
