@@ -701,14 +701,14 @@ make the script test fail gracefully:
 
 #+begin_src
 #!/bin/sh
-echo Why should this pass in the first place > ${ocamltest_response}
+echo Why should this pass in the first place? > ${ocamltest_response}
 exit ${TEST_FAIL}
 #+end_src
 
 Running ocamltest on our =hello.ml= program again produces the following
 output:
 #+begin_src
- ... testing 'hello.ml' with 1 (script) => failed (Why should this pass in the first place)
+ ... testing 'hello.ml' with 1 (script) => failed (Why should this pass in the first place?)
 #+end_src
 
 * Key concepts
