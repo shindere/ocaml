@@ -837,6 +837,7 @@ OBJEXT
 exeext
 ac_tool_prefix
 DIRECT_CPP
+LDLIBS
 CC
 VERSION
 native_compiler
@@ -2843,6 +2844,7 @@ ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
 
 
 VERSION=4.12.0+dev0-2020-04-22
+
 
 
 # Note: This is present for the flexdll bootstrap where it exposed as the old
