@@ -629,7 +629,7 @@ AS_CASE([$host],
       internal_cppflags="$internal_cppflags -DWINDOWS_UNICODE="
       internal_cppflags="${internal_cppflags}\$(WINDOWS_UNICODE)"],
     [xlc-*],
-      [common_cflags="-O5 -qtune=balanced -qnoipa -qinline $CFLAGS";
+      [common_cflags="-O5 -qtune=balanced -qnoipa -qinline";
       internal_cflags="$cc_warnings"],
     [common_cflags="-O"])])
 
