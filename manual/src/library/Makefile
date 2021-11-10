@@ -18,3 +18,6 @@ all: etex-files
 .PHONY: clean
 clean:
 	rm -f *.tex ocamldoc.out ocamldoc.sty
+
+.PHONY: distclean
+distclean: clean
