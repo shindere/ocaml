@@ -52,6 +52,8 @@ ocamlc_cflags=""
 ocamlc_cppflags=""
 oc_ldflags=""
 oc_dll_ldflags=""
+CSC=""
+CSCFLAGS=""
 ostype="Unix"
 SO="so"
 toolchain="cc"
@@ -84,6 +86,9 @@ AC_SUBST([OCAML_VERSION_EXTRA], [OCAML__VERSION_EXTRA])
 AC_SUBST([OCAML_VERSION_SHORT], [OCAML__VERSION_SHORT])
 AC_SUBST([CC])
 AC_SUBST([DIFF_FLAGS])
+# The C# compiler
+AC_SUBST([CSC])
+AC_SUBST([CSCFLAGS])
 # Note: This is present for the flexdll bootstrap where it exposed as the old
 # TOOLPREF variable. It would be better if flexdll where updated to require
 # WINDRES instead.
@@ -216,8 +221,11 @@ If your host is 64 bits, you can try with './configure CC="gcc -m64"' \
 
 AS_CASE([$host],
   [*-pc-windows],
+    AS_CASE([$host_cpu], [i*86], [CSCFLAGS=/platform:x86])
     [CC=cl
     ccomptype=msvc
+    CSC=csc
+    CSCFLAGS="$CSCFLAGS /nologo /nowarn:1668"
     S=asm
     SO=dll
     outputexe=-Fe

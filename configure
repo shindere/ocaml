@@ -833,6 +833,8 @@ libext
 OBJEXT
 exeext
 ac_tool_prefix
+CSCFLAGS
+CSC
 DIFF_FLAGS
 CC
 OCAML_VERSION_SHORT
@@ -2804,6 +2806,8 @@ ocamlc_cflags=""
 ocamlc_cppflags=""
 oc_ldflags=""
 oc_dll_ldflags=""
+CSC=""
+CSCFLAGS=""
 ostype="Unix"
 SO="so"
 toolchain="cc"
@@ -2870,6 +2874,9 @@ OCAML_VERSION_EXTRA=dev0-2021-11-05
 
 OCAML_VERSION_SHORT=5.0
 
+
+
+# The C# compiler
 
 
 # Note: This is present for the flexdll bootstrap where it exposed as the old
@@ -3130,8 +3137,16 @@ esac
 
 case $host in #(
   *-pc-windows) :
+    case $host_cpu in #(
+  i*86) :
+    CSCFLAGS=/platform:x86 ;; #(
+  *) :
+     ;;
+esac
     CC=cl
     ccomptype=msvc
+    CSC=csc
+    CSCFLAGS="$CSCFLAGS /nologo /nowarn:1668"
     S=asm
     SO=dll
     outputexe=-Fe
