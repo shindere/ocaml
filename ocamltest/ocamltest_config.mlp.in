@@ -68,9 +68,9 @@ let shared_library_cflags = "%%SHAREDLIB_CFLAGS%%"
 
 let sharedobjext = "%%SO%%"
 
-let csc = "%%CSC%%"
+let csc = "@CSC@"
 
-let csc_flags = "%%CSCFLAGS%%"
+let csc_flags = "@CSCFLAGS@"
 
 let exe = "%%EXE%%"
 
