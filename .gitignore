@@ -122,6 +122,7 @@ _build
 /ocamldoc/test
 
 /ocamltest/.dep
+/ocamltest/Makefile.config
 /ocamltest/ocamltest
 /ocamltest/ocamltest.opt
 /ocamltest/ocamltest_config.ml

@@ -19,36 +19,7 @@ ROOTDIR = ..
 
 include $(ROOTDIR)/Makefile.common
 include $(ROOTDIR)/Makefile.best_binaries
-
-ifeq "$(filter str,$(OTHERLIBRARIES))" ""
-  str := false
-else
-  str := true
-endif
-
-ifeq "$(filter systhreads,$(OTHERLIBRARIES))" ""
-  systhreads := false
-else
-  systhreads := true
-endif
-
-ifeq "$(filter $(UNIXLIB),$(OTHERLIBRARIES))" ""
-  ocamltest_unix := dummy
-  unix_name :=
-  unix_path :=
-  unix := None
-  unix_include :=
-else
-  ocamltest_unix := real
-  unix_name := unix
-  unix_path := $(ROOTDIR)/otherlibs/$(UNIXLIB)
-  unix_include := -I $(unix_path) $(EMPTY)
-  ifeq "$(UNIX_OR_WIN32)" "win32"
-    unix := Some false
-  else
-    unix := Some true
-  endif
-endif
+include Makefile.config
 
 mkexe := $(MKEXE)
 
@@ -207,18 +178,15 @@ ocamltest.opt$(EXE): $(deps_opt) $(native_modules)
 %.cmi: %.mli $(deps_byte)
 	$(ocamlc) -c $<
 
-ocamltest_unix.ml: ocamltest_unix_$(ocamltest_unix).ml
-	echo '# 1 "$^"' > $@
-	cat $^ >> $@
+ocamltest_unix.ml: ocamltest_unix_$(unix_impl).ml
+	echo '# 1 "$<"' > $@
+	cat $< >> $@
 
 ocamltest_config.ml: ocamltest_config.mlp Makefile ../Makefile.config
 	sed $(call SUBST,AFL_INSTRUMENT) \
 	    $(call SUBST,INSTRUMENTED_RUNTIME) \
 	    $(call SUBST,ARCH) \
 	    $(call SUBST,SUPPORTS_SHARED_LIBRARIES) \
-	    $(call SUBST,unix) \
-	    $(call SUBST,systhreads) \
-	    $(call SUBST,str) \
 	    $(call SUBST,SYSTEM) \
 	    $(call SUBST_STRING,CPP) \
 	    $(call SUBST,FLAMBDA) \
@@ -274,7 +242,7 @@ endif
 
 .PHONY: distclean
 distclean: clean
-	rm -f ocamltest_config.mlp
+	rm -f ocamltest_config.mlp Makefile.config
 
 $(DEPDIR)/%.$(D): %.c | $(DEPDIR)
 	$(DEP_CC) $(OC_CPPFLAGS) $(CPPFLAGS) $< -MT '$*.$(O)' -MF $@

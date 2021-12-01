@@ -29,11 +29,11 @@ let ccomptype = "%%CCOMPTYPE%%"
 
 let shared_libraries = %%SUPPORTS_SHARED_LIBRARIES%%
 
-let libunix = %%unix%%
+let libunix = @ocamltest_libunix@
 
-let systhreads = %%systhreads%%
+let systhreads = @lib_systhreads@
 
-let str = %%str%%
+let str = @lib_str@
 
 let objext = "%%O%%"
 

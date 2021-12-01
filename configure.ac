@@ -60,6 +60,13 @@ extralibs=
 instrumented_runtime=false
 instrumented_runtime_libs=""
 bootstrapping_flexdll=false
+lib_bigarray=false
+lib_dynlink=false
+lib_str=false
+lib_systhreads=fals
+lib_unix=false
+lib_win32unix=false
+ocamltest_libunix=None
 
 # Information about the package
 
@@ -103,6 +110,7 @@ AC_SUBST([systhread_support])
 AC_SUBST([ocamlsrcdir])
 AC_SUBST([unix_or_win32])
 AC_SUBST([unixlib])
+AC_SUBST([ocamltest_libunix])
 AC_SUBST([outputexe])
 AC_SUBST([outputobj])
 AC_SUBST([syslib])
@@ -137,6 +145,12 @@ AC_SUBST([instrumented_runtime])
 AC_SUBST([instrumented_runtime_libs])
 AC_SUBST([has_monotonic_clock])
 AC_SUBST([otherlibraries])
+AC_SUBST([lib_bigarray])
+AC_SUBST([lib_dynlink])
+AC_SUBST([lib_str])
+AC_SUBST([lib_systhreads])
+AC_SUBST([lib_unix])
+AC_SUBST([lib_win32unix])
 AC_SUBST([cc_has_debug_prefix_map])
 AC_SUBST([as_has_debug_prefix_map])
 AC_SUBST([build_ocamldebug])
@@ -184,6 +198,7 @@ AC_CONFIG_FILES([Makefile.config])
 AC_CONFIG_FILES([stdlib/sys.ml])
 AC_CONFIG_FILES([manual/src/version.tex])
 AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
+AC_CONFIG_FILES([ocamltest/Makefile.config])
 AC_CONFIG_FILES([ocamltest/ocamltest_config.mlp])
 AC_CONFIG_FILES([tools/eventlog_metadata])
 AC_CONFIG_HEADERS([runtime/caml/m.h])
@@ -552,24 +567,31 @@ AS_CASE([$host],
   [*-*-mingw32|*-pc-windows],
     [unix_or_win32="win32"
     unixlib="win32unix"
+    lib_win32unix=true
+    ocamltest_libunix="Some false"
     ocamlsrcdir=`echo "$ocamlsrcdir" | cygpath -w -f - \
       | sed -e 's%\\\\%\\\\\\\\%g'`
     ],
   [unix_or_win32="unix"
-  unixlib="unix"])
+  unixlib="unix"
+  lib_unix=true
+  ocamltest_libunix="Some true"])
 AS_CASE([$host],
   [*-*-cygwin*|*-*-mingw32|*-pc-windows],
     [exeext=".exe"],
   [exeext=''])
 
 otherlibraries="dynlink"
+lib_dynlink=true
 AS_IF([test x"$enable_unix_lib" != "xno"],
   [enable_unix_lib=yes
   AS_IF([test x"$enable_bigarray_lib" != "xno"],
-    [otherlibraries="$otherlibraries $unixlib bigarray"],
+    [otherlibraries="$otherlibraries $unixlib bigarray"
+    lib_bigarray=true],
     [otherlibraries="$otherlibraries $unixlib"])])
 AS_IF([test x"$enable_str_lib" != "xno"],
-  [otherlibraries="$otherlibraries str"])
+  [otherlibraries="$otherlibraries str"
+  lib_str=true])
 
 # Checks for system services
 
@@ -1821,10 +1843,12 @@ AS_CASE([$enable_systhreads,$enable_unix_lib],
     [*-*-mingw32|*-pc-windows],
       [systhread_support=true
       otherlibraries="$otherlibraries systhreads"
+      lib_systhreads=true
       AC_MSG_NOTICE([the Win32 threads library is supported])],
     [AX_PTHREAD(
       [systhread_support=true
       otherlibraries="$otherlibraries systhreads"
+      lib_systhreads=true
       common_cflags="$common_cflags $PTHREAD_CFLAGS"
       AC_MSG_NOTICE([the POSIX threads library is supported])
       saved_CFLAGS="$CFLAGS"

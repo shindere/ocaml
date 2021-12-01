@@ -1,0 +1,33 @@
+# @configure_input@
+
+#**************************************************************************
+#*                                                                        *
+#*                                 OCaml                                  *
+#*                                                                        *
+#*            Sebastien Hinderer, projet Gallium, INRIA Paris             *
+#*                                                                        *
+#*   Copyright 2016 Institut National de Recherche en Informatique et     *
+#*     en Automatique.                                                    *
+#*                                                                        *
+#*   All rights reserved.  This file is distributed under the terms of    *
+#*   the GNU Lesser General Public License version 2.1, with the          *
+#*   special exception on linking described in the file LICENSE.          *
+#*                                                                        *
+#**************************************************************************
+
+# The configuration Makefile for ocamltest
+
+ifeq "$(filter $(UNIXLIB),$(OTHERLIBRARIES))" ""
+  unix_impl := dummy
+  unix_name :=
+  unix_path :=
+  unix_include :=
+else
+  unix_impl := real
+  unix_name := unix
+  unix_path := $(ROOTDIR)/otherlibs/$(UNIXLIB)
+  unix_include := -I $(unix_path) $(EMPTY)
+  ifeq "$(UNIX_OR_WIN32)" "win32"
+  else
+  endif
+endif
