@@ -49,7 +49,7 @@ endif
 
 core := \
   $(run_source) run_stubs.c \
-  ocamltest_config.mli ocamltest_config.mlp \
+  ocamltest_config.mli ocamltest_config.ml \
   ocamltest_unix.mli ocamltest_unix.ml \
   ocamltest_stdlib.mli ocamltest_stdlib.ml \
   run_command.mli run_command.ml \
@@ -182,39 +182,6 @@ ocamltest_unix.ml: ocamltest_unix_$(unix_impl).ml
 	echo '# 1 "$<"' > $@
 	cat $< >> $@
 
-ocamltest_config.ml: ocamltest_config.mlp Makefile ../Makefile.config
-	sed $(call SUBST,AFL_INSTRUMENT) \
-	    $(call SUBST,INSTRUMENTED_RUNTIME) \
-	    $(call SUBST,ARCH) \
-	    $(call SUBST,SUPPORTS_SHARED_LIBRARIES) \
-	    $(call SUBST,SYSTEM) \
-	    $(call SUBST_STRING,CPP) \
-	    $(call SUBST,FLAMBDA) \
-	    $(call SUBST,FORCE_SAFE_STRING) \
-	    $(call SUBST,FLAT_FLOAT_ARRAY) \
-	    $(call SUBST,BUILD_OCAMLDOC) \
-	    $(call SUBST,BUILD_OCAMLDEBUG) \
-	    $(call SUBST,O) \
-	    $(call SUBST,A) \
-	    $(call SUBST,S) \
-	    $(call SUBST,NATIVE_COMPILER) \
-	    $(call SUBST,NATDYNLINK) \
-	    $(call SUBST_STRING,SHAREDLIB_CFLAGS) \
-	    $(call SUBST,SO) \
-	    $(call SUBST_STRING,EXE) \
-	    $(call SUBST_STRING,MKDLL) \
-	    $(call SUBST_STRING,mkexe) \
-	    $(call SUBST_STRING,BYTECCLIBS) \
-	    $(call SUBST_STRING,NATIVECCLIBS) \
-	    $(call SUBST_STRING,ASM) \
-	    $(call SUBST_STRING,CC) \
-	    $(call SUBST_STRING,OC_CFLAGS) \
-	    $(call SUBST,CCOMPTYPE) \
-	    $(call SUBST,WINDOWS_UNICODE) \
-	    $(call SUBST,FUNCTION_SECTIONS) \
-	    $(call SUBST,NAKED_POINTERS) \
-	    $< > $@
-
 # Manual
 
 .PHONY: doc
@@ -242,7 +209,7 @@ endif
 
 .PHONY: distclean
 distclean: clean
-	rm -f ocamltest_config.mlp Makefile.config
+	rm -f ocamltest_config.ml Makefile.config
 
 $(DEPDIR)/%.$(D): %.c | $(DEPDIR)
 	$(DEP_CC) $(OC_CPPFLAGS) $(CPPFLAGS) $< -MT '$*.$(O)' -MF $@

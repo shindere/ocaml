@@ -3005,7 +3005,7 @@ ac_config_files="$ac_config_files manual/src/html_processing/src/common.ml"
 
 ac_config_files="$ac_config_files ocamltest/Makefile.config"
 
-ac_config_files="$ac_config_files ocamltest/ocamltest_config.mlp"
+ac_config_files="$ac_config_files ocamltest/ocamltest_config.ml"
 
 ac_config_files="$ac_config_files tools/eventlog_metadata"
 
@@ -18937,7 +18937,7 @@ do
     "manual/src/version.tex") CONFIG_FILES="$CONFIG_FILES manual/src/version.tex" ;;
     "manual/src/html_processing/src/common.ml") CONFIG_FILES="$CONFIG_FILES manual/src/html_processing/src/common.ml" ;;
     "ocamltest/Makefile.config") CONFIG_FILES="$CONFIG_FILES ocamltest/Makefile.config" ;;
-    "ocamltest/ocamltest_config.mlp") CONFIG_FILES="$CONFIG_FILES ocamltest/ocamltest_config.mlp" ;;
+    "ocamltest/ocamltest_config.ml") CONFIG_FILES="$CONFIG_FILES ocamltest/ocamltest_config.ml" ;;
     "tools/eventlog_metadata") CONFIG_FILES="$CONFIG_FILES tools/eventlog_metadata" ;;
     "runtime/caml/m.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/m.h" ;;
     "runtime/caml/s.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/s.h" ;;
