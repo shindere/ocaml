@@ -70,12 +70,6 @@ ifeq "$(TOOLCHAIN)" "msvc"
 CPP := $(CPP) 2> nul
 endif
 
-ifeq "$(WITH_OCAMLDOC)" "ocamldoc"
-WITH_OCAMLDOC := true
-else
-WITH_OCAMLDOC := false
-endif
-
 ifeq "$(WITH_DEBUGGER)" "ocamldebugger"
 WITH_OCAMLDEBUG := true
 else
@@ -251,7 +245,7 @@ ocamltest_config.ml: ocamltest_config.ml.in Makefile ../Makefile.config
 	    $(call SUBST,FLAMBDA) \
 	    $(call SUBST,FORCE_SAFE_STRING) \
 	    $(call SUBST,FLAT_FLOAT_ARRAY) \
-	    $(call SUBST,WITH_OCAMLDOC) \
+	    $(call SUBST,BUILD_OCAMLDOC) \
 	    $(call SUBST,WITH_OCAMLDEBUG) \
 	    $(call SUBST,O) \
 	    $(call SUBST,A) \

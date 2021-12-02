@@ -135,7 +135,7 @@ AC_SUBST([cc_has_debug_prefix_map])
 AC_SUBST([as_has_debug_prefix_map])
 AC_SUBST([with_debugger]) # TODO: rename this variable
 AC_SUBST([with_camltex])
-AC_SUBST([ocamldoc])
+AC_SUBST([build_ocamldoc])
 AC_SUBST([documentation_tool])
 AC_SUBST([documentation_tool_cmd])
 AC_SUBST([ocamltest])
@@ -281,7 +281,7 @@ AC_ARG_ENABLE([ocamldoc],
   [AS_HELP_STRING([--disable-ocamldoc],
     [do not build the ocamldoc documentation system])],
   [],
-  [ocamldoc=auto])
+  [build_ocamldoc=auto])
 
 AC_ARG_WITH([odoc],
   [AS_HELP_STRING([--with-odoc],
@@ -1881,8 +1881,8 @@ AS_IF([test x"$enable_installing_source_artifacts" = "xno"],
   [install_source_artifacts=true])
 
 AS_IF([test x"$enable_ocamldoc" = "xno"],
-  [ocamldoc=""],
-  [ocamldoc=ocamldoc])
+  [build_ocamldoc=false],
+  [build_ocamldoc=true])
 
 documentation_tool_cmd=''
 AC_ARG_WITH([odoc],

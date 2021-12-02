@@ -781,7 +781,7 @@ ASPP
 ocamltest
 documentation_tool_cmd
 documentation_tool
-ocamldoc
+build_ocamldoc
 with_camltex
 with_debugger
 as_has_debug_prefix_map
@@ -3214,7 +3214,7 @@ fi
 if test "${enable_ocamldoc+set}" = set; then :
   enableval=$enable_ocamldoc;
 else
-  ocamldoc=auto
+  build_ocamldoc=auto
 fi
 
 
@@ -17646,9 +17646,9 @@ else
 fi
 
 if test x"$enable_ocamldoc" = "xno"; then :
-  ocamldoc=""
+  build_ocamldoc=false
 else
-  ocamldoc=ocamldoc
+  build_ocamldoc=true
 fi
 
 documentation_tool_cmd=''

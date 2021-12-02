@@ -62,7 +62,14 @@ CAMLDEP=$(OCAMLRUN) boot/ocamlc -depend
 DEPFLAGS=-slash
 DEPINCLUDES=$(INCLUDES)
 
-OCAMLDOC_OPT=$(WITH_OCAMLDOC:=.opt)
+ifeq "$(BUILD_OCAMLDOC)" "true"
+  WITH_OCAMLDOC = ocamldoc
+  OCAMLDOC_OPT = ocamldoc.opt
+else
+  WITH_OCAMLDOC =
+  OCAMLDOC_OPT =
+endif
+
 OCAMLTEST_OPT=$(WITH_OCAMLTEST:=.opt)
 
 BYTESTART=driver/main.cmo
@@ -444,7 +451,7 @@ endif
 	for i in $(OTHERLIBRARIES); do \
 	  $(MAKE) -C otherlibs/$$i install || exit $$?; \
 	done
-ifneq "$(WITH_OCAMLDOC)" ""
+ifeq "$(BUILD_OCAMLDOC)" "true"
 	$(MAKE) -C ocamldoc install
 endif
 ifeq "$(WITH_OCAMLDOC)-$(STDLIB_MANPAGES)" "ocamldoc-true"
@@ -529,7 +536,7 @@ endif
 	$(INSTALL_DATA) \
 	    $(OPTSTART) \
 	    "$(INSTALL_COMPLIBDIR)"
-ifneq "$(WITH_OCAMLDOC)" ""
+ifeq "$(BUILD_OCAMLDOC)" "true"
 	$(MAKE) -C ocamldoc installopt
 endif
 	for i in $(OTHERLIBRARIES); do \

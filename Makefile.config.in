@@ -230,7 +230,7 @@ INSTRUMENTED_RUNTIME=@instrumented_runtime@
 INSTRUMENTED_RUNTIME_LIBS=@instrumented_runtime_libs@
 WITH_DEBUGGER=@with_debugger@
 WITH_CAMLTEX=@with_camltex@
-WITH_OCAMLDOC=@ocamldoc@
+BUILD_OCAMLDOC=@build_ocamldoc@
 WITH_OCAMLTEST=@ocamltest@
 ASM_CFI_SUPPORTED=@asm_cfi_supported@
 WITH_FRAME_POINTERS=@frame_pointers@
@@ -270,6 +270,14 @@ FLEXLINK_CMD=flexlink
 FLEXLINK=$(FLEXLINK_CMD) $(FLEXLINK_FLAGS)
 
 # Deprecated variables
+
+## Variables renamed or changed in OCaml 5.0
+
+ifeq "$(BUILD_OCAMLDOC)" "true"
+WITH_OCAMLDOC=ocamldoc
+else
+WITH_OCAMLDOC=
+endif
 
 ## Variables renamed in OCaml 4.13
 
