@@ -70,6 +70,12 @@ else
   OCAMLDOC_OPT =
 endif
 
+ifeq "$(BUILD_OCAMLDEBUG)" "$(true)"
+  OCAMLDEBUG_TARGET = ocamldebug
+else
+  OCAMLDEBUG_TARGET =
+endif
+
 OCAMLTEST_OPT=$(WITH_OCAMLTEST:=.opt)
 
 BYTESTART=driver/main.cmo
@@ -258,7 +264,7 @@ ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 	$(MAKE) flexlink.opt$(EXE)
 endif
 	$(MAKE) ocamlc.opt
-	$(MAKE) otherlibraries $(WITH_DEBUGGER) $(WITH_OCAMLDOC) \
+	$(MAKE) otherlibraries $(OCAMLDEBUG_TARGET) $(WITH_OCAMLDOC) \
 	  $(WITH_OCAMLTEST)
 	$(MAKE) ocamlopt.opt
 	$(MAKE) otherlibrariesopt
@@ -293,7 +299,7 @@ coreboot:
 .PHONY: all
 all: coreall
 	$(MAKE) ocaml
-	$(MAKE) otherlibraries $(WITH_DEBUGGER) $(WITH_OCAMLDOC) \
+	$(MAKE) otherlibraries $(OCAMLDEBUG_TARGET) $(WITH_OCAMLDOC) \
          $(WITH_OCAMLTEST)
 ifeq "$(WITH_OCAMLDOC)-$(STDLIB_MANPAGES)" "ocamldoc-true"
 	$(MAKE) manpages
@@ -457,9 +463,9 @@ endif
 ifeq "$(WITH_OCAMLDOC)-$(STDLIB_MANPAGES)" "ocamldoc-true"
 	$(MAKE) -C api_docgen install
 endif
-	if test -n "$(WITH_DEBUGGER)"; then \
-	  $(MAKE) -C debugger install; \
-	fi
+ifeq "$(BUILD_OCAMLDEBUG)" "true"
+	$(MAKE) -C debugger install
+endif
 ifeq "$(BOOTSTRAPPING_FLEXDLL)" "true"
 ifeq "$(TOOLCHAIN)" "msvc"
 	$(INSTALL_DATA) $(FLEXDLL_SOURCES)/$(FLEXDLL_MANIFEST) \

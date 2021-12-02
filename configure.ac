@@ -133,7 +133,7 @@ AC_SUBST([has_monotonic_clock])
 AC_SUBST([otherlibraries])
 AC_SUBST([cc_has_debug_prefix_map])
 AC_SUBST([as_has_debug_prefix_map])
-AC_SUBST([with_debugger]) # TODO: rename this variable
+AC_SUBST([build_ocamldebug])
 AC_SUBST([with_camltex])
 AC_SUBST([build_ocamldoc])
 AC_SUBST([documentation_tool])
@@ -1763,12 +1763,12 @@ AC_CHECK_FUNC([_BitScanForward], [AC_DEFINE([HAS_BITSCANFORWARD])])
 
 AS_CASE([$enable_debugger],
   [no],
-    [with_debugger=""
+    [build_ocamldebug=false
     AC_MSG_NOTICE([replay debugger disabled])],
   [AS_IF([$sockets],
-    [with_debugger="ocamldebugger"
+    [build_ocamldebug=true
     AC_MSG_NOTICE([replay debugger supported])],
-    [with_debugger=""
+    [build_ocamldebug=false
     AC_MSG_NOTICE([replay debugger not supported])])
   ])
 

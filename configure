@@ -783,7 +783,7 @@ documentation_tool_cmd
 documentation_tool
 build_ocamldoc
 with_camltex
-with_debugger
+build_ocamldebug
 as_has_debug_prefix_map
 cc_has_debug_prefix_map
 otherlibraries
@@ -2923,7 +2923,7 @@ OCAML_VERSION_SHORT=5.00
 
 
 
- # TODO: rename this variable
+
 
 
 
@@ -16592,16 +16592,16 @@ fi
 
 case $enable_debugger in #(
   no) :
-    with_debugger=""
+    build_ocamldebug=false
     { $as_echo "$as_me:${as_lineno-$LINENO}: replay debugger disabled" >&5
 $as_echo "$as_me: replay debugger disabled" >&6;} ;; #(
   *) :
     if $sockets; then :
-  with_debugger="ocamldebugger"
+  build_ocamldebug=true
     { $as_echo "$as_me:${as_lineno-$LINENO}: replay debugger supported" >&5
 $as_echo "$as_me: replay debugger supported" >&6;}
 else
-  with_debugger=""
+  build_ocamldebug=false
     { $as_echo "$as_me:${as_lineno-$LINENO}: replay debugger not supported" >&5
 $as_echo "$as_me: replay debugger not supported" >&6;}
 fi
