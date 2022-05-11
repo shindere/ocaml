@@ -99,6 +99,7 @@ AC_SUBST([arch64])
 AC_SUBST([model])
 AC_SUBST([system])
 AC_SUBST([systhread_support])
+AC_SUBST([ocamlsrcdir])
 AC_SUBST([unix_or_win32])
 AC_SUBST([ocamlyacc_wstr_module])
 AC_SUBST([outputexe])
@@ -177,6 +178,7 @@ AC_CONFIG_FILES([Makefile.config])
 AC_CONFIG_FILES([stdlib/sys.ml])
 AC_CONFIG_FILES([manual/src/version.tex])
 AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
+AC_CONFIG_FILES([ocamltest/ocamltest_config.mlp])
 AC_CONFIG_FILES([tools/eventlog_metadata])
 AC_CONFIG_HEADERS([runtime/caml/m.h])
 AC_CONFIG_HEADERS([runtime/caml/s.h])
@@ -522,14 +524,25 @@ AS_CASE([$ocaml_cv_cc_vendor],
 #  TODO: why can we not use $CPP in multicore, fix this?
   [CPP="$CC -E -P"])
 
+# Absolute path to the toplevel source directory
+
+# A sentinelle character (X) is added ad the end of the directory name
+# and then removed, in case it finishes with an odd character.
+
+ocamlsrcdir=$(unset CDPATH; cd -- "$srcdir" && printf %sX "$PWD") || fail
+ocamlsrcdir=${ocamlsrcdir%X}
+
 # Libraries to build depending on the host
 
 AS_CASE([$host],
   [*-*-mingw32|*-pc-windows],
     [unix_or_win32="win32"
-    ocamlyacc_wstr_module="yacc/wstr"],
+    ocamlyacc_wstr_module="yacc/wstr"
+    ocamlsrcdir=`echo "$ocamlsrcdir" | cygpath -w -f - \
+      | sed -e 's%\\\\%\\\\\\\\%g'`],
   [unix_or_win32="unix"
   ocamlyacc_wstr_module=""])
+
 AS_CASE([$host],
   [*-*-cygwin*|*-*-mingw32|*-pc-windows],
     [exeext=".exe"],
