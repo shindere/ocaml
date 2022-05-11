@@ -63,6 +63,15 @@ instrumented_runtime=true
 force_instrumented_runtime=false
 instrumented_runtime_libs=""
 bootstrapping_flexdll=false
+lib_dynlink=false
+lib_str=false
+lib_systhreads=false
+lib_unix=false
+ocamltest_libunix=None
+ocamltest_unix_impl="dummy"
+ocamltest_unix_name=""
+ocamltest_unix_path=""
+ocamltest_unix_include=""
 
 # Information about the package
 
@@ -140,11 +149,22 @@ AC_SUBST([instrumented_runtime])
 AC_SUBST([instrumented_runtime_libs])
 AC_SUBST([has_monotonic_clock])
 AC_SUBST([otherlibraries])
+AC_SUBST([lib_dynlink])
+AC_SUBST([lib_str])
+AC_SUBST([lib_systhreads])
+AC_SUBST([lib_unix])
+AC_SUBST([ocamltest_libunix])
+AC_SUBST([ocamltest_unix_impl])
+AC_SUBST([ocamltest_unix_name])
+AC_SUBST([ocamltest_unix_path])
+AC_SUBST([ocamltest_unix_include])
 AC_SUBST([cc_has_debug_prefix_map])
 AC_SUBST([as_has_debug_prefix_map])
 AC_SUBST([with_debugger]) # TODO: rename this variable
+AC_SUBST([ocamltest_ocamldebug])
 AC_SUBST([with_camltex])
 AC_SUBST([ocamldoc])
+AC_SUBST([ocamltest_ocamldoc])
 AC_SUBST([documentation_tool])
 AC_SUBST([documentation_tool_cmd])
 AC_SUBST([ocamltest])
@@ -183,7 +203,7 @@ AC_CONFIG_FILES([Makefile.config])
 AC_CONFIG_FILES([stdlib/sys.ml])
 AC_CONFIG_FILES([manual/src/version.tex])
 AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
-AC_CONFIG_FILES([ocamltest/ocamltest_config.mlp])
+AC_CONFIG_FILES([ocamltest/ocamltest_config.ml])
 AC_CONFIG_FILES([tools/eventlog_metadata])
 AC_CONFIG_HEADERS([runtime/caml/m.h])
 AC_CONFIG_HEADERS([runtime/caml/s.h])
@@ -557,11 +577,20 @@ AS_CASE([$host],
   [exeext=''])
 
 otherlibraries="dynlink"
+lib_dynlink=true
 AS_IF([test x"$enable_unix_lib" != "xno"],
   [enable_unix_lib=yes
-   otherlibraries="$otherlibraries unix"])
+   otherlibraries="$otherlibraries unix"
+   lib_unix=true
+   ocamltest_libunix="Some true"
+   ocamltest_unix_impl="real"
+   ocamltest_unix_name="unix"
+   ocamltest_unix_path='$(ROOTDIR)/otherlibs/unix'
+   ocamltest_unix_include='-I $(ROOTDIR)/otherlibs/unix $(EMPTY)'])
+
 AS_IF([test x"$enable_str_lib" != "xno"],
-  [otherlibraries="$otherlibraries str"])
+  [otherlibraries="$otherlibraries str"
+  lib_str=true])
 
 # Checks for system services
 
@@ -1805,11 +1834,14 @@ AC_CHECK_FUNC([_BitScanForward], [AC_DEFINE([HAS_BITSCANFORWARD])])
 AS_CASE([$enable_debugger],
   [no],
     [with_debugger=""
+    ocamltest_ocamldebug=false
     AC_MSG_NOTICE([replay debugger disabled])],
   [AS_IF([$sockets],
     [with_debugger="ocamldebugger"
+    ocamltest_ocamldebug=true
     AC_MSG_NOTICE([replay debugger supported])],
     [with_debugger=""
+    ocamltest_ocamldebug=false
     AC_MSG_NOTICE([replay debugger not supported])])
   ])
 
@@ -1857,6 +1889,7 @@ AS_CASE([$enable_systhreads,$enable_unix_lib],
     AC_MSG_NOTICE([the threads library is disabled])],
   [systhread_support=true
   otherlibraries="$otherlibraries systhreads"
+  lib_systhreads=true
   AC_MSG_NOTICE([the threads library is supported])])
 
 ## Does the assembler support debug prefix map and CFI directives
@@ -1897,8 +1930,10 @@ AS_IF([test x"$enable_installing_source_artifacts" = "xno"],
   [install_source_artifacts=true])
 
 AS_IF([test x"$enable_ocamldoc" = "xno"],
-  [ocamldoc=""],
-  [ocamldoc=ocamldoc])
+  [ocamldoc=""
+  ocamltest_ocamldoc=false],
+  [ocamldoc=ocamldoc
+  ocamltest_ocamldoc=true])
 
 documentation_tool_cmd=''
 AC_ARG_WITH([odoc],
