@@ -1,0 +1,5 @@
+# @configure_input@
+
+name = "bytes"
+version = "@VERSION@"
+description = "dummy backward-compatibility package for mutable strings"

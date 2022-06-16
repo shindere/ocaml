@@ -342,6 +342,7 @@ clean:
 
 .PHONY: distclean
 distclean: clean
+	rm -f META
 
 .PHONY: depend
 depend: $(DEPEND_PREREQS)

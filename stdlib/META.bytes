@@ -1,3 +1,0 @@
-name="bytes"
-version="[distributed with OCaml]"
-description="dummy backward-compatibility package for mutable strings"

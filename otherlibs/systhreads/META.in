@@ -1,4 +1,6 @@
-version = "[distributed with OCaml]"
+# @configure_input@
+
+version = "@VERSION@"
 description = "Multi-threading"
 requires(mt,mt_posix) = "threads.posix"
 directory = "+"
@@ -10,10 +12,10 @@ package "posix" (
   exists_if = "threads.cma"
   archive(byte,mt,mt_posix) = "threads.cma"
   archive(native,mt,mt_posix) = "threads.cmxa"
-  version = "[internal]"
+  version = "@VERSION@"
 )
 
 package "none" (
   error = "threading is not supported on this platform"
-  version = "[internal]"
+  version = "@VERSION@"
 )
