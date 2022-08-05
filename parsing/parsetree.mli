@@ -364,6 +364,8 @@ and expression_desc =
   | Pexp_array of expression list  (** [[| E1; ...; En |]] *)
   | Pexp_ifthenelse of expression * expression * expression option
       (** [if E1 then E2 else E3] *)
+  | Pexp_when of (expression * expression) list
+      (** [when C1 -> E1 | ... | Cn -> En] *)
   | Pexp_sequence of expression * expression  (** [E1; E2] *)
   | Pexp_while of expression * expression  (** [while E1 do E2 done] *)
   | Pexp_for of pattern * expression * expression * direction_flag * expression

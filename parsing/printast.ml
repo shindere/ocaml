@@ -308,6 +308,16 @@ and expression i ppf x =
       expression i ppf e1;
       expression i ppf e2;
       option i expression ppf eo;
+  | Pexp_when conditionals ->
+      line i ppf "Pexp_when\n";
+      let conditional (e1, e2) =
+        line i ppf "| ";
+        expression i ppf e1;
+        line i ppf " -> ";
+        expression i ppf e2;
+        line i ppf "\n";
+      in
+      List.iter conditional conditionals
   | Pexp_sequence (e1, e2) ->
       line i ppf "Pexp_sequence\n";
       expression i ppf e1;
