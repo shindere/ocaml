@@ -260,6 +260,8 @@ _build
 /tools/make_opcodes
 /tools/make_opcodes.ml
 /tools/caml-tex
+/tools/lintapidiff
+/tools/lintapidiff.opt
 
 /utils/config.ml
 
