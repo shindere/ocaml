@@ -258,6 +258,8 @@ _build
 /tools/make_opcodes.ml
 /tools/caml-tex
 /tools/eventlog_metadata
+/tools/lintapidiff
+/tools/lintapidiff.opt
 
 /utils/config.ml
 /utils/domainstate.ml
