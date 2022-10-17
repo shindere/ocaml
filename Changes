@@ -1,6 +1,10 @@
 OCaml 5.0 maintenance version
 -----------------------------
 
+- #11634: Dll.open_dll now properly handle opening for execution while already
+  opened for checking
+  (Hugo Heuzard, review by Nicolás Ojeda Bär)
+
 ### Build system:
 
 - #11590: Allow installing to a destination path containing spaces.
