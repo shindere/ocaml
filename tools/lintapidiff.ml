@@ -27,6 +27,10 @@
 open Location
 open Parsetree
 
+type diff_error =
+  | File_not_found
+  | Other_error
+
 (* oldest Ocaml version that we show missing @since errors for *)
 let oldest = "4.00.0"
 
@@ -125,12 +129,13 @@ module Ast = struct
       let self = add_item ~f path inherits in
       match ty.pmty_desc with
       | Pmty_signature lst -> List.fold_left self map lst
-      | Pmty_functor ({txt;_}, _, m) ->
-          let new_name = Ident.create_local txt in
+      | Pmty_functor ((Named ({txt = Some txt0},_)),m) ->
+          let new_name = Ident.create_local txt0 in
           let path = Path.Papply(path, Path.Pident new_name) in
           add_module_type path m (inherits, map)
       | Pmty_ident _ | Pmty_with _ | Pmty_typeof _| Pmty_extension _
-      | Pmty_alias _ -> map
+      | Pmty_alias _ | Pmty_functor (Named ({txt=None; _ }, _), _)
+      | Pmty_functor (Unit, _) -> map
     in
     let enter_path path name ty attrs map =
       let path = Path.Pdot (path, name.txt) in
@@ -138,7 +143,12 @@ module Ast = struct
       add_module_type path ty (inherits, map)
     in
     let add_module map m =
-      enter_path  path m.pmd_name m.pmd_type m.pmd_attributes map
+      let name =
+        match m.pmd_name.txt with
+        | None -> { m.pmd_name with txt = "NONE"}
+        | Some n -> { m.pmd_name with txt = n}
+      in
+      enter_path  path name m.pmd_type m.pmd_attributes map
     in
     match item.psig_desc with
     | Psig_value vd ->
@@ -196,11 +206,11 @@ module Git = struct
     Misc.try_finally (fun () ->
         match Sys.command cmd with
         | 0 -> Ok (f tmp)
-        | 128 -> Error `Not_found
+        | 128 -> Result.Error File_not_found
         | r ->
             Location.errorf ~loc:(in_file obj) "exited with code %d" r |>
             Location.print_report Format.err_formatter;
-            Error `Exit)
+            Result.Error Other_error)
       ~always:(fun () -> Misc.remove_file tmp)
 end
 
@@ -255,8 +265,8 @@ module Diff = struct
     in
     let map = match Git.with_show ~f rev path with
       | Ok r -> r
-      | Error `Not_found -> IdMap.empty
-      | Error `Exit -> raise Exit in
+      | Error File_not_found -> IdMap.empty
+      | Result.Error Other_error -> raise Exit in
     Some first_seen, IdMap.merge merge accum map
 
   let check_changes ~first ~last default k seen latest =
