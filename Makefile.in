@@ -15,7 +15,12 @@
 
 # The main Makefile
 
+# Path to the build tree
 ROOTDIR = .
+
+# Path to the source tree
+SRCDIR = @srcdir@
+
 # NOTE: it is important that the OCAMLDEP and OCAMLLEX variables
 # are defined *before* Makefile.common gets included, so that
 # their local definitions here take precedence over their
@@ -25,7 +30,7 @@ OCAMLLEX ?= $(BOOT_OCAMLLEX)
 include Makefile.common
 
 .PHONY: defaultentry
-defaultentry: $(DEFAULT_BUILD_TARGET)
+defaultentry: @default_build_target@
 
 ifeq "$(UNIX_OR_WIN32)" "win32"
 LN = cp
