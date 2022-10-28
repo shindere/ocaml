@@ -770,7 +770,7 @@ runtime/ld.conf: $(ROOTDIR)/Makefile.config
 # To speed up builds, we avoid changing "primitives" when files
 # containing primitives change but the primitives table does not
 runtime/primitives: \
-  $(shell runtime/gen_primitives.sh > runtime/primitives.new; \
+  $(shell $(SRCDIR)/runtime/gen_primitives.sh > runtime/primitives.new; \
                     cmp -s runtime/primitives runtime/primitives.new || \
                     echo runtime/primitives.new)
 	cp $^ $@
