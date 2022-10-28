@@ -27,7 +27,7 @@ SRCDIR = @srcdir@
 # general shared definitions in Makefile.common.
 OCAMLDEP ?= $(BOOT_OCAMLDEP)
 OCAMLLEX ?= $(BOOT_OCAMLLEX)
-include Makefile.common
+include $(SRCDIR)/Makefile.common
 
 .PHONY: defaultentry
 defaultentry: @default_build_target@
@@ -38,7 +38,7 @@ else
 LN = ln -sf
 endif
 
-include stdlib/StdlibModules
+include $(SRCDIR)/stdlib/StdlibModules
 
 CAMLC = $(BOOT_OCAMLC) $(BOOT_STDLIBFLAGS) -use-prims runtime/primitives
 CAMLOPT=$(OCAMLRUN) ./ocamlopt$(EXE) $(STDLIBFLAGS) -I otherlibs/dynlink
@@ -86,7 +86,7 @@ endif
 expunge := expunge$(EXE)
 
 # targets for the compilerlibs/*.{cma,cmxa} archives
-include compilerlibs/Makefile.compilerlibs
+include $(SRCDIR)/compilerlibs/Makefile.compilerlibs
 
 # The configuration file
 
@@ -1144,7 +1144,7 @@ $(ocamlyacc_OTHER_MODULES:=.$(O)): yacc/defs.h
 # boot/, which require Menhir. The targets in Makefile.menhir
 # (also included here for convenience) must be used after any
 # modification of parser.mly.
-include Makefile.menhir
+include $(SRCDIR)/Makefile.menhir
 
 # To avoid module-name conflicts with compiler-lib users that link
 # with their code with their own MenhirLib module (possibly with
@@ -1383,7 +1383,7 @@ partialclean::
 beforedepend:: bytecomp/opcodes.ml bytecomp/opcodes.mli
 
 ifneq "$(wildcard .git)" ""
-include Makefile.dev
+include $(SRCDIR)/Makefile.dev
 endif
 
 # Default rules
@@ -1674,7 +1674,7 @@ ifeq "$(INSTALL_SOURCE_ARTIFACTS)" "true"
 	   "$(INSTALL_COMPLIBDIR)"
 endif
 
-include .depend
+include $(SRCDIR)/.depend
 
 Makefile.config Makefile.build_config: config.status
 config.status:
