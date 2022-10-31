@@ -819,7 +819,8 @@ SAK_LINK ?= $(MKEXE_VIA_CC)
 $(SAK): runtime/sak.$(O)
 	$(call SAK_LINK,$@,$^)
 
-runtime/sak.$(O): runtime/sak.c runtime/caml/misc.h runtime/caml/config.h
+runtime/sak.$(O): $(addprefix $(SRCDIR)/runtime/,\
+  sak.c caml/misc.h caml/config.h)
 	$(SAK_CC) -c $(SAK_CFLAGS) $(OUTPUTOBJ)$@ $<
 
 C_LITERAL = $(shell $(SAK) encode-C-literal '$(1)')
