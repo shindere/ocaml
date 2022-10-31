@@ -25,7 +25,7 @@
 #define CAML_NAME_SPACE
 #endif
 
-#include "m.h"
+#include "caml/m.h"
 
 /* If supported, tell gcc that we can use 32-bit code addresses for
  * threaded code, unless we are compiled for a shared library (-fPIC option) */
@@ -44,7 +44,7 @@
 #define Caml_inline static inline
 #endif
 
-#include "s.h"
+#include "caml/s.h"
 
 #ifndef CAML_CONFIG_H_NO_TYPEDEFS
 
