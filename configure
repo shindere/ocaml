@@ -13237,7 +13237,7 @@ fi ;; #(
   no) :
     compute_deps=false ;; #(
   *) :
-    if test -e .git
+    if test -e $srcdir/.git
 then :
   if test "$DEP_CC" = "false"
 then :
