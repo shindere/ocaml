@@ -767,10 +767,19 @@ runtime/ld.conf: $(ROOTDIR)/Makefile.config
 # see http://pubs.opengroup.org/onlinepubs/9699919799/utilities/sort.html:
 # "using sort to process pathnames, it is recommended that LC_ALL .. set to C"
 
+PRIM_FILES = ints \
+  alloc array compare extern floats gc_ctrl hash intern interp ints io \
+  lexing md5 meta memprof obj parsing signals str sys callback weak \
+  finalise domain platform fiber memory startup_aux runtime_events sync \
+  dynlink backtrace_byt backtrace afl \
+  bigarray prng
+
 # To speed up builds, we avoid changing "primitives" when files
 # containing primitives change but the primitives table does not
 runtime/primitives: \
-  $(shell $(SRCDIR)/runtime/gen_primitives.sh > runtime/primitives.new; \
+  $(shell $(SRCDIR)/runtime/gen_primitives.sh \
+          $(PRIM_FILES:%=$(SRCDIR)/runtime/%.c) \
+          > runtime/primitives.new; \
                     cmp -s runtime/primitives runtime/primitives.new || \
                     echo runtime/primitives.new)
 	cp $^ $@
