@@ -246,6 +246,7 @@ META
 /toplevel/native/topmain.mli
 
 /utils/config_*.ml*
+/utils/config.common.ml
 /utils/config.ml
 /utils/domainstate.ml
 /utils/domainstate.mli

@@ -88,3 +88,19 @@ m4_define([OCAML__RELEASE_EXTRA],
   m4_if(OCAML__VERSION_EXTRA,[],[None],
       ['Some (]m4_if(OCAML__VERSION_EXTRA_PREFIX,+,[Plus],
       [Tilde])[, "]OCAML__VERSION_EXTRA[")']))]))
+
+# Magic numbers for the different file formats
+
+m4_define([EXEC_MAGIC__NUMBER], [Caml1999X032])
+m4_define([CMI_MAGIC__NUMBER], [Caml1999I032])
+m4_define([CMO_MAGIC__NUMBER], [Caml1999O032])
+m4_define([CMA_MAGIC__NUMBER], [Caml1999A032])
+m4_define([CMX_MAGIC__NUMBER], [Caml1999Y032])
+m4_define([CMX_MAGIC__NUMBER_FLAMBDA], [Caml1999y032])
+m4_define([CMXA_MAGIC__NUMBER], [Caml1999Z032])
+m4_define([CMXA_MAGIC__NUMBER_FLAMBDA], [Caml1999z032])
+m4_define([AST_IMPL_MAGIC__NUMBER], [Caml1999M032])
+m4_define([AST_INTF_MAGIC__NUMBER], [Caml1999N032])
+m4_define([CMXS_MAGIC__NUMBER], [Caml1999D032])
+m4_define([CMT_MAGIC__NUMBER], [Caml1999T032])
+m4_define([LINEAR_MAGIC__NUMBER], [Caml1999L032])

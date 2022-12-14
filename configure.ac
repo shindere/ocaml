@@ -82,6 +82,17 @@ AC_SUBST([OCAML_VERSION_MINOR], [OCAML__VERSION_MINOR])
 AC_SUBST([OCAML_VERSION_PATCHLEVEL], [OCAML__VERSION_PATCHLEVEL])
 AC_SUBST([OCAML_VERSION_EXTRA], [OCAML__VERSION_EXTRA])
 AC_SUBST([OCAML_VERSION_SHORT], [OCAML__VERSION_SHORT])
+AC_SUBST([EXEC_MAGIC_NUMBER], [EXEC_MAGIC__NUMBER])
+AC_SUBST([CMI_MAGIC_NUMBER], [CMI_MAGIC__NUMBER])
+AC_SUBST([CMO_MAGIC_NUMBER], [CMO_MAGIC__NUMBER])
+AC_SUBST([CMA_MAGIC_NUMBER], [CMA_MAGIC__NUMBER])
+AC_SUBST([CMX_MAGIC_NUMBER]) # Computed during configuration
+AC_SUBST([CMXA_MAGIC_NUMBER]) # Computed during configuration
+AC_SUBST([AST_IMPL_MAGIC_NUMBER], [AST_IMPL_MAGIC__NUMBER])
+AC_SUBST([AST_INTF_MAGIC_NUMBER], [AST_INTF_MAGIC__NUMBER])
+AC_SUBST([CMXS_MAGIC_NUMBER], [CMXS_MAGIC__NUMBER])
+AC_SUBST([CMT_MAGIC_NUMBER], [CMT_MAGIC__NUMBER])
+AC_SUBST([LINEAR_MAGIC_NUMBER], [LINEAR_MAGIC__NUMBER])
 AC_SUBST([CC])
 AC_SUBST([DIFF_FLAGS])
 # Note: This is present for the flexdll bootstrap where it exposed as the old
@@ -183,6 +194,7 @@ AC_CONFIG_FILES([Makefile.config])
 AC_CONFIG_FILES([stdlib/sys.ml])
 AC_CONFIG_FILES([manual/src/version.tex])
 AC_CONFIG_FILES([manual/src/html_processing/src/common.ml])
+AC_CONFIG_FILES([utils/config.common.ml])
 AC_CONFIG_HEADERS([runtime/caml/m.h])
 AC_CONFIG_HEADERS([runtime/caml/s.h])
 AC_CONFIG_HEADERS([runtime/caml/version.h])
@@ -2010,6 +2022,12 @@ AS_IF([test x"$enable_flambda" = "xyes"],
     [flambda_invariants=false])],
   [flambda=false
   flambda_invariants=false])
+
+AS_IF([$flambda],
+  [CMX_MAGIC_NUMBER=CMX_MAGIC__NUMBER_FLAMBDA
+  CMXA_MAGIC_NUMBER=CMXA_MAGIC__NUMBER_FLAMBDA],
+  [CMX_MAGIC_NUMBER=CMX_MAGIC__NUMBER
+  CMXA_MAGIC_NUMBER=CMXA_MAGIC__NUMBER])
 
 AS_IF([test x"$enable_cmm_invariants" = "xyes"],
   [cmm_invariants=true],
