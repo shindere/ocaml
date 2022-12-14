@@ -46,7 +46,7 @@ module EvalBase = struct
   let eval_ident id =
     if Ident.persistent id || Ident.global id then begin
       try
-        Symtable.get_global_value id
+        Symtable.get_global_value (Ident.name id)
       with Symtable.Error (Undefined_global name) ->
         raise (Undefined_global name)
     end else begin
@@ -260,7 +260,7 @@ and really_load_file recursive ppf name filename ic =
           (function
             | (Reloc_getglobal id, _)
               when not (Symtable.is_global_defined id) ->
-                let file = Ident.name id ^ ".cmo" in
+                let file = id ^ ".cmo" in
                 begin match Load_path.find_uncap file with
                 | exception Not_found -> ()
                 | file ->

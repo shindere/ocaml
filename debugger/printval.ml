@@ -51,8 +51,9 @@ module EvalPath =
     exception Error
     let rec eval_address = function
     | Env.Aident id ->
+        let name = Ident.name id in
         begin try
-          Debugcom.Remote_value.global (Symtable.get_global_position id)
+          Debugcom.Remote_value.global (Symtable.get_global_position name)
         with Symtable.Error _ ->
           raise Error
         end

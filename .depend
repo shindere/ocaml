@@ -1978,7 +1978,6 @@ bytecomp/bytelink.cmo : \
     parsing/location.cmi \
     utils/load_path.cmi \
     bytecomp/instruct.cmi \
-    typing/ident.cmi \
     bytecomp/emitcode.cmi \
     bytecomp/dll.cmi \
     utils/consistbl.cmi \
@@ -1995,7 +1994,6 @@ bytecomp/bytelink.cmx : \
     parsing/location.cmx \
     utils/load_path.cmx \
     bytecomp/instruct.cmx \
-    typing/ident.cmx \
     bytecomp/emitcode.cmx \
     bytecomp/dll.cmx \
     utils/consistbl.cmx \
@@ -2194,7 +2192,6 @@ bytecomp/symtable.cmx : \
 bytecomp/symtable.cmi : \
     utils/misc.cmi \
     lambda/lambda.cmi \
-    typing/ident.cmi \
     file_formats/cmo_format.cmi
 asmcomp/CSE.cmo : \
     asmcomp/mach.cmi \
@@ -3914,8 +3911,7 @@ file_formats/cmi_format.cmx : \
 file_formats/cmi_format.cmi : \
     typing/types.cmi \
     utils/misc.cmi
-file_formats/cmo_format.cmi : \
-    typing/ident.cmi
+file_formats/cmo_format.cmi :
 file_formats/cmt_format.cmo : \
     typing/types.cmi \
     typing/typedtree.cmi \
@@ -6258,14 +6254,12 @@ toplevel/expunge.cmo : \
     bytecomp/symtable.cmi \
     lambda/runtimedef.cmi \
     utils/misc.cmi \
-    typing/ident.cmi \
     bytecomp/bytesections.cmi \
     toplevel/expunge.cmi
 toplevel/expunge.cmx : \
     bytecomp/symtable.cmx \
     lambda/runtimedef.cmx \
     utils/misc.cmx \
-    typing/ident.cmx \
     bytecomp/bytesections.cmx \
     toplevel/expunge.cmi
 toplevel/expunge.cmi :
@@ -6915,7 +6909,6 @@ tools/dumpobj.cmo : \
     bytecomp/opcodes.cmi \
     parsing/location.cmi \
     bytecomp/instruct.cmi \
-    typing/ident.cmi \
     utils/config.cmi \
     file_formats/cmo_format.cmi \
     bytecomp/bytesections.cmi \
@@ -6926,7 +6919,6 @@ tools/dumpobj.cmx : \
     bytecomp/opcodes.cmx \
     parsing/location.cmx \
     bytecomp/instruct.cmx \
-    typing/ident.cmx \
     utils/config.cmx \
     file_formats/cmo_format.cmi \
     bytecomp/bytesections.cmx \
