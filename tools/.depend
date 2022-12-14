@@ -37,25 +37,21 @@ dumpobj.cmo : \
     opnames.cmo \
     ../bytecomp/opcodes.cmi \
     ../parsing/location.cmi \
-    ../lambda/lambda.cmi \
     ../bytecomp/instruct.cmi \
     ../typing/ident.cmi \
     ../utils/config.cmi \
     ../file_formats/cmo_format.cmi \
-    ../bytecomp/bytesections.cmi \
-    ../parsing/asttypes.cmi
+    ../bytecomp/bytesections.cmi
 dumpobj.cmx : \
     ../bytecomp/symtable.cmx \
     opnames.cmx \
     ../bytecomp/opcodes.cmx \
     ../parsing/location.cmx \
-    ../lambda/lambda.cmx \
     ../bytecomp/instruct.cmx \
     ../typing/ident.cmx \
     ../utils/config.cmx \
     ../file_formats/cmo_format.cmi \
-    ../bytecomp/bytesections.cmx \
-    ../parsing/asttypes.cmi
+    ../bytecomp/bytesections.cmx
 eqparsetree.cmo : \
     ../parsing/parsetree.cmi \
     ../parsing/longident.cmi \

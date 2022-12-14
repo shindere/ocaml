@@ -2055,6 +2055,7 @@ bytecomp/dll.cmx : \
 bytecomp/dll.cmi :
 bytecomp/emitcode.cmo : \
     lambda/translmod.cmi \
+    bytecomp/symtable.cmi \
     typing/primitive.cmi \
     bytecomp/opcodes.cmi \
     utils/misc.cmi \
@@ -2072,6 +2073,7 @@ bytecomp/emitcode.cmo : \
     bytecomp/emitcode.cmi
 bytecomp/emitcode.cmx : \
     lambda/translmod.cmx \
+    bytecomp/symtable.cmx \
     typing/primitive.cmx \
     bytecomp/opcodes.cmx \
     utils/misc.cmx \
@@ -3889,7 +3891,6 @@ file_formats/cmi_format.cmi : \
     utils/misc.cmi
 file_formats/cmo_format.cmi : \
     utils/misc.cmi \
-    lambda/lambda.cmi \
     typing/ident.cmi
 file_formats/cmt_format.cmo : \
     typing/types.cmi \
