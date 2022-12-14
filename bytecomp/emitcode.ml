@@ -154,10 +154,16 @@ let slot_for_literal sc =
   enter (Reloc_literal (Symtable.transl_const sc));
   out_int 0
 and slot_for_getglobal id =
-  enter (Reloc_getglobal id);
+  let name = Ident.name id in
+  let op =
+    if Ident.is_predef id
+    then Reloc_getpredef name
+    else Reloc_getglobal name
+  in
+  enter op;
   out_int 0
 and slot_for_setglobal id =
-  enter (Reloc_setglobal id);
+  enter (Reloc_setglobal (Ident.name id));
   out_int 0
 and slot_for_c_prim name =
   enter (Reloc_primitive name);
@@ -421,6 +427,8 @@ let to_file outchan unit_name objfile ~required_globals code =
       (p, pos_out outchan - p)
     end else
       (0, 0) in
+  let is_not_predef id = not (Ident.is_predef id) in
+  let required_globals = Ident.Set.filter is_not_predef required_globals in
   let compunit =
     { cu_name = unit_name;
       cu_pos = pos_code;
@@ -429,7 +437,8 @@ let to_file outchan unit_name objfile ~required_globals code =
       cu_imports = Env.imports();
       cu_primitives = List.map Primitive.byte_name
                                !Translmod.primitive_declarations;
-      cu_required_globals = Ident.Set.elements required_globals;
+      cu_required_globals = List.map Ident.name
+        (Ident.Set.elements required_globals);
       cu_force_link = !Clflags.link_everything;
       cu_debug = pos_debug;
       cu_debugsize = size_debug } in

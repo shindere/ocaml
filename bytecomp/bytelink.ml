@@ -88,22 +88,23 @@ let add_ccobjs origin l =
 
 (* First pass: determine which units are needed *)
 
-let missing_globals = ref Ident.Map.empty
-let provided_globals = ref Ident.Set.empty
+let missing_globals = ref Misc.Stdlib.String.Map.empty
+let provided_globals = ref Misc.Stdlib.String.Set.empty
 let badly_ordered_dependencies : (string * string) list ref = ref []
 
 let is_required (rel, _pos) =
   match rel with
     Reloc_setglobal id ->
-      Ident.Map.mem id !missing_globals
+      Misc.Stdlib.String.Map.mem id !missing_globals
   | _ -> false
 
 let add_required compunit =
   let add id =
-    if Ident.Set.mem id !provided_globals then
+    if Misc.Stdlib.String.Set.mem id !provided_globals then
       badly_ordered_dependencies :=
-        ((Ident.name id), compunit.cu_name) :: !badly_ordered_dependencies;
-    missing_globals := Ident.Map.add id compunit.cu_name !missing_globals
+        (id, compunit.cu_name) :: !badly_ordered_dependencies;
+    missing_globals :=
+      Misc.Stdlib.String.Map.add id compunit.cu_name !missing_globals
   in
   List.iter add (Symtable.required_globals compunit.cu_reloc);
   List.iter add compunit.cu_required_globals
@@ -111,8 +112,9 @@ let add_required compunit =
 let remove_required (rel, _pos) =
   match rel with
     Reloc_setglobal id ->
-      missing_globals := Ident.Map.remove id !missing_globals;
-      provided_globals := Ident.Set.add id !provided_globals;
+      missing_globals :=
+        Misc.Stdlib.String.Map.remove id !missing_globals;
+      provided_globals := Misc.Stdlib.String.Set.add id !provided_globals;
   | _ -> ()
 
 let scan_file obj_name tolink =
@@ -622,16 +624,14 @@ let link objfiles output_name =
     | _                  -> "stdlib.cma" :: objfiles @ ["std_exit.cmo"]
   in
   let tolink = List.fold_right scan_file objfiles [] in
-  let missing_modules =
-    Ident.Map.filter (fun id _ -> not (Ident.is_predef id)) !missing_globals
-  in
+  let missing_modules = !missing_globals in
   begin
-    match Ident.Map.bindings missing_modules with
+    match Misc.Stdlib.String.Map.bindings missing_modules with
     | [] -> ()
     | (id, cu_name) :: _ ->
         match !badly_ordered_dependencies with
         | [] ->
-            raise (Error (Required_module_unavailable (Ident.name id, cu_name)))
+            raise (Error (Required_module_unavailable (id, cu_name)))
         | l ->
             raise (Error (Wrong_link_order l))
   end;
@@ -794,7 +794,7 @@ let reset () =
   lib_ccobjs := [];
   lib_ccopts := [];
   lib_dllibs := [];
-  missing_globals := Ident.Map.empty;
+  missing_globals := Misc.Stdlib.String.Map.empty;
   Consistbl.clear crc_interfaces;
   implementations_defined := [];
   debug_info := [];

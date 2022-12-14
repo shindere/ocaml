@@ -44,7 +44,8 @@ let rec address path event = function
   | Env.Aident id ->
       if Ident.global id then
         try
-          Debugcom.Remote_value.global (Symtable.get_global_position id)
+          Debugcom.Remote_value.global (Symtable.get_global_position
+            (Ident.name id))
         with Symtable.Error _ -> raise(Error(Unbound_identifier id))
       else
         begin match event with

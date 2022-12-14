@@ -34,13 +34,13 @@ val transl_const: Lambda.structured_constant -> Obj.t
 
 val init_toplevel: unit -> (string * Digest.t option) list
 val update_global_table: unit -> unit
-val get_global_value: Ident.t -> Obj.t
-val is_global_defined: Ident.t -> bool
-val assign_global_value: Ident.t -> Obj.t -> unit
-val get_global_position: Ident.t -> int
+val get_global_value: string -> Obj.t
+val is_global_defined: string -> bool
+val assign_global_value: string -> Obj.t -> unit
+val get_global_position: string -> int
 val check_global_initialized: (reloc_info * int) list -> unit
-val defined_globals: (reloc_info * int) list -> Ident.t list
-val required_globals: (reloc_info * int) list -> Ident.t list
+val defined_globals: (reloc_info * int) list -> string list
+val required_globals: (reloc_info * int) list -> string list
 
 type global_map
 
@@ -48,9 +48,9 @@ val empty_global_map: global_map
 val current_state: unit -> global_map
 val restore_state: global_map -> unit
 val hide_additions: global_map -> unit
-val filter_global_map: (Ident.t -> bool) -> global_map -> global_map
-val iter_global_map : (Ident.t -> int -> unit) -> global_map -> unit
-val is_defined_in_global_map: global_map -> Ident.t -> bool
+val filter_global_map: (string -> bool) -> global_map -> global_map
+val iter_global_map : (string -> int -> unit) -> global_map -> unit
+val is_defined_in_global_map: global_map -> string -> bool
 
 (* Error report *)
 
