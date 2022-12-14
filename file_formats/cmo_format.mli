@@ -22,8 +22,9 @@ type crcs = (modname * Digest.t option) list
 
 type reloc_info =
     Reloc_literal of Obj.t                  (* structured constant *)
-  | Reloc_getglobal of Ident.t              (* reference to a global *)
-  | Reloc_setglobal of Ident.t              (* definition of a global *)
+  | Reloc_getpredef of string               (* reference to a predef *)
+  | Reloc_getglobal of string               (* reference to a global *)
+  | Reloc_setglobal of string               (* definition of a global *)
   | Reloc_primitive of string               (* C primitive number *)
 
 (* Descriptor for compilation units *)
@@ -34,7 +35,7 @@ type compilation_unit =
     cu_codesize: int;                   (* Size of code block *)
     cu_reloc: (reloc_info * int) list;  (* Relocation information *)
     cu_imports: crcs;                   (* Names and CRC of intfs imported *)
-    cu_required_globals: Ident.t list;  (* Compilation units whose
+    cu_required_globals: string list;   (* Compilation units whose
                                            initialization side effects
                                            must occur before this one. *)
     cu_primitives: string list;         (* Primitives declared inside *)

@@ -54,7 +54,7 @@ module Num_tbl (M : Map.S) = struct
     n
 
 end
-module GlobalMap = Num_tbl(Ident.Map)
+module GlobalMap = Num_tbl(Misc.Stdlib.String.Map)
 module PrimMap = Num_tbl(Misc.Stdlib.String.Map)
 
 (* Global variables *)
@@ -63,13 +63,13 @@ let global_table = ref GlobalMap.empty
 and literal_table = ref([] : (int * Obj.t) list)
 
 let is_global_defined id =
-  Ident.Map.mem id (!global_table).tbl
+  Misc.Stdlib.String.Map.mem id (!global_table).tbl
 
 let slot_for_getglobal id =
   try
     GlobalMap.find !global_table id
   with Not_found ->
-    raise(Error(Undefined_global(Ident.name id)))
+    raise(Error(Undefined_global id))
 
 let slot_for_setglobal id =
   GlobalMap.enter global_table id
@@ -176,7 +176,7 @@ let init () =
       let id =
         try List.assoc name Predef.builtin_values
         with Not_found -> fatal_error "Symtable.init" in
-      let c = slot_for_setglobal id in
+      let c = slot_for_setglobal (Ident.name id) in
       let cst = Const_block
           (Obj.object_tag,
            [Const_base(Const_string (name, Location.none,None));
@@ -232,7 +232,7 @@ let patch_object buff patchlist =
     (function
         (Reloc_literal sc, pos) ->
           patch_int buff pos (slot_for_literal sc)
-      | (Reloc_getglobal id, pos) ->
+      | (Reloc_getglobal id, pos) | (Reloc_getpredef id, pos) ->
           patch_int buff pos (slot_for_getglobal id)
       | (Reloc_setglobal id, pos) ->
           patch_int buff pos (slot_for_setglobal id)
@@ -362,7 +362,7 @@ let check_global_initialized patchlist =
       (Reloc_getglobal id, _pos) ->
         if not (List.mem id defined_globals)
         && Obj.is_int (get_global_value id)
-        then raise (Error(Uninitialized_global(Ident.name id)))
+        then raise (Error(Uninitialized_global id))
     | _ -> () in
   List.iter check_reference patchlist
 
@@ -386,17 +386,18 @@ let hide_additions (st : global_map) =
    Used to expunge the global map for the toplevel. *)
 
 let filter_global_map p (gmap : global_map) =
-  let newtbl = ref Ident.Map.empty in
-  Ident.Map.iter
-    (fun id num -> if p id then newtbl := Ident.Map.add id num !newtbl)
+  let newtbl = ref Misc.Stdlib.String.Map.empty in
+  Misc.Stdlib.String.Map.iter
+    (fun id num ->
+      if p id then newtbl := Misc.Stdlib.String.Map.add id num !newtbl)
     gmap.tbl;
   {GlobalMap. cnt = gmap.cnt; tbl = !newtbl}
 
 let iter_global_map f (gmap : global_map) =
-  Ident.Map.iter f gmap.tbl
+  Misc.Stdlib.String.Map.iter f gmap.tbl
 
 let is_defined_in_global_map (gmap : global_map) id =
-  Ident.Map.mem id gmap.tbl
+  Misc.Stdlib.String.Map.mem id gmap.tbl
 
 let empty_global_map = GlobalMap.empty
 

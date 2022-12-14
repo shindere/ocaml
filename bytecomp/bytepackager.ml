@@ -46,10 +46,11 @@ let rename_relocation packagename objfile mapping defined base (rel, ofs) =
   let rel' =
     match rel with
       Reloc_getglobal id ->
+        let id = Ident.create_persistent id in
         begin try
           let id' = List.assoc id mapping in
           if List.mem id defined
-          then Reloc_getglobal id'
+          then Reloc_getglobal (Ident.name id')
           else raise(Error(Forward_reference(objfile, id)))
         with Not_found ->
           (* PR#5276: unique-ize dotted global names, which appear
@@ -57,21 +58,39 @@ let rename_relocation packagename objfile mapping defined base (rel, ofs) =
              module. *)
           let name = Ident.name id in
           if String.contains name '.' then
-            Reloc_getglobal (Ident.create_persistent (packagename ^ "." ^ name))
+            Reloc_getglobal (packagename ^ "." ^ name)
+          else
+            rel
+        end
+    | Reloc_getpredef id ->
+        let id = Ident.create_persistent id in
+        begin try
+          let id' = List.assoc id mapping in
+          if List.mem id defined
+          then Reloc_getpredef (Ident.name id')
+          else raise(Error(Forward_reference(objfile, id)))
+        with Not_found ->
+          (* PR#5276: unique-ize dotted global names, which appear
+             if one of the units being consolidated is itself a packed
+             module. *)
+          let name = Ident.name id in
+          if String.contains name '.' then
+            Reloc_getpredef (packagename ^ "." ^ name)
           else
             rel
         end
     | Reloc_setglobal id ->
+        let id = Ident.create_persistent id in
         begin try
           let id' = List.assoc id mapping in
           if List.mem id defined
           then raise(Error(Multiple_definition(objfile, id)))
-          else Reloc_setglobal id'
+          else Reloc_setglobal (Ident.name id')
         with Not_found ->
           (* PR#5276, as above *)
           let name = Ident.name id in
           if String.contains name '.' then
-            Reloc_setglobal (Ident.create_persistent (packagename ^ "." ^ name))
+            Reloc_setglobal (packagename ^ "." ^ name)
           else
             rel
         end
@@ -214,9 +233,13 @@ let package_object_files ~ppf_dump files targetfile targetname coercion =
         | { pm_kind = PM_intf } ->
             required_globals
         | { pm_kind = PM_impl { cu_required_globals; cu_reloc } } ->
+            let cu_required_globals =
+              List.map Ident.create_persistent cu_required_globals
+            in
             let remove_required (rel, _pos) required_globals =
               match rel with
                 Reloc_setglobal id ->
+                  let id = Ident.create_persistent id in
                   Ident.Set.remove id required_globals
               | _ ->
                   required_globals
@@ -262,7 +285,8 @@ let package_object_files ~ppf_dump files targetfile targetname coercion =
         cu_imports =
           (targetname, Some (Env.crc_of_unit targetname)) :: imports;
         cu_primitives = !primitives;
-        cu_required_globals = Ident.Set.elements required_globals;
+        cu_required_globals = List.map Ident.name
+          (Ident.Set.elements required_globals);
         cu_force_link = !force_link;
         cu_debug = if pos_final > pos_debug then pos_debug else 0;
         cu_debugsize = pos_final - pos_debug } in

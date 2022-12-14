@@ -420,6 +420,7 @@ printval.cmo : \
     parser_aux.cmi \
     ../typing/outcometree.cmi \
     ../typing/oprint.cmi \
+    ../typing/ident.cmi \
     ../toplevel/genprintval.cmi \
     ../typing/env.cmi \
     debugcom.cmi \
@@ -431,6 +432,7 @@ printval.cmx : \
     parser_aux.cmi \
     ../typing/outcometree.cmi \
     ../typing/oprint.cmx \
+    ../typing/ident.cmx \
     ../toplevel/genprintval.cmx \
     ../typing/env.cmx \
     debugcom.cmx \

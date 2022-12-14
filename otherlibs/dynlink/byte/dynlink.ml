@@ -41,17 +41,14 @@ module Bytecode = struct
       let required =
         List.filter
           (fun id ->
-             not (Ident.is_predef id)
-             && not (String.contains (Ident.name id) '.'))
+             not (String.contains id '.'))
           required
       in
       List.map
-        (fun ident -> Ident.name ident, None)
+        (fun ident -> ident, None)
         required
 
-    let defined_symbols (t : t) =
-      List.map (fun ident -> Ident.name ident)
-        (Symtable.defined_globals t.cu_reloc)
+    let defined_symbols (t : t) = Symtable.defined_globals t.cu_reloc
 
     let unsafe_module (t : t) = t.cu_primitives <> []
   end
@@ -77,7 +74,7 @@ module Bytecode = struct
 
   let fold_initial_units ~init ~f =
     List.fold_left (fun acc (comp_unit, interface) ->
-        let id = Ident.create_persistent comp_unit in
+        let id = comp_unit in
         let defined =
           Symtable.is_defined_in_global_map !default_global_map id
         in
@@ -186,7 +183,7 @@ module Bytecode = struct
       raise exc
 
   let unsafe_get_global_value ~bytecode_or_asm_symbol =
-    let id = Ident.create_persistent bytecode_or_asm_symbol in
+    let id = bytecode_or_asm_symbol in
     match Symtable.get_global_value id with
     | exception _ -> None
     | obj -> Some obj

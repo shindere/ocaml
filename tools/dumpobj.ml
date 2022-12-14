@@ -48,7 +48,7 @@ let inputs ic =
 
 type global_table_entry =
     Empty
-  | Global of Ident.t
+  | Global of string
   | Constant of Obj.t
 
 let start = ref 0                              (* Position of beg. of code *)
@@ -137,7 +137,7 @@ let print_getglobal_name ic =
   if !objfile then begin
     begin try
       match find_reloc ic with
-          Reloc_getglobal id -> print_string (Ident.name id)
+          Reloc_getglobal id | Reloc_getpredef id -> print_string id
         | Reloc_literal sc -> print_obj sc
         | _ -> print_string "<wrong reloc>"
     with Not_found ->
@@ -150,7 +150,7 @@ let print_getglobal_name ic =
     if n >= Array.length !globals || n < 0
     then print_string "<global table overflow>"
     else match !globals.(n) with
-           Global id -> print_string(Ident.name id)
+           Global id -> print_string id
          | Constant obj -> print_obj obj
          | _ -> print_string "???"
   end
@@ -159,7 +159,7 @@ let print_setglobal_name ic =
   if !objfile then begin
     begin try
       match find_reloc ic with
-        Reloc_setglobal id -> print_string (Ident.name id)
+        Reloc_setglobal id -> print_string id
       | _ -> print_string "<wrong reloc>"
     with Not_found ->
       print_string "<no reloc>"
@@ -171,7 +171,7 @@ let print_setglobal_name ic =
     if n >= Array.length !globals || n < 0
     then print_string "<global table overflow>"
     else match !globals.(n) with
-           Global id -> print_string(Ident.name id)
+           Global id -> print_string id
          | _ -> print_string "???"
   end
 
@@ -451,8 +451,9 @@ let print_reloc (info, pos) =
   printf "    %d    (%d)    " pos (pos/4);
   match info with
     Reloc_literal sc -> print_obj sc; printf "\n"
-  | Reloc_getglobal id -> printf "require    %s\n" (Ident.name id)
-  | Reloc_setglobal id -> printf "provide    %s\n" (Ident.name id)
+  | Reloc_getglobal id | Reloc_getpredef id ->
+    printf "require    %s\n" id
+  | Reloc_setglobal id -> printf "provide    %s\n" id
   | Reloc_primitive s -> printf "prim    %s\n" s
 
 (* Print a .cmo file *)

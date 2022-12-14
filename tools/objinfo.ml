@@ -62,7 +62,7 @@ let print_line name =
   printf "\t%s\n" name
 
 let print_required_global id =
-  printf "\t%s\n" (Ident.name id)
+  printf "\t%s\n" id
 
 let print_cmo_infos cu =
   printf "Unit name: %s\n" cu.cu_name;
@@ -136,7 +136,7 @@ let print_general_infos name crc defines cmi cmx =
 let print_global_table table =
   printf "Globals defined:\n";
   Symtable.iter_global_map
-    (fun id _ -> print_line (Ident.name id))
+    (fun id _ -> print_line id)
     table
 
 open Cmx_format

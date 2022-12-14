@@ -33,7 +33,7 @@ let keep =
   else fun name -> is_exn name || (String.Set.mem name !to_keep)
 
 let expunge_map tbl =
-  Symtable.filter_global_map (fun id -> keep (Ident.name id)) tbl
+  Symtable.filter_global_map keep tbl
 
 let expunge_crcs tbl =
   List.filter (fun (unit, _crc) -> keep unit) tbl

@@ -38,7 +38,6 @@ dumpobj.cmo : \
     ../bytecomp/opcodes.cmi \
     ../parsing/location.cmi \
     ../bytecomp/instruct.cmi \
-    ../typing/ident.cmi \
     ../utils/config.cmi \
     ../file_formats/cmo_format.cmi \
     ../bytecomp/bytesections.cmi
@@ -48,7 +47,6 @@ dumpobj.cmx : \
     ../bytecomp/opcodes.cmx \
     ../parsing/location.cmx \
     ../bytecomp/instruct.cmx \
-    ../typing/ident.cmx \
     ../utils/config.cmx \
     ../file_formats/cmo_format.cmi \
     ../bytecomp/bytesections.cmx
