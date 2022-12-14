@@ -1,4 +1,5 @@
-#2 "utils/config.common.ml"
+(* @configure_input@ *)
+#2 "utils/config.common.ml.in"
 (**************************************************************************)
 (*                                                                        *)
 (*                                 OCaml                                  *)
@@ -28,26 +29,18 @@ let standard_library =
   with Not_found ->
     standard_library_default
 
-let exec_magic_number = "Caml1999X032"
+let exec_magic_number = {@QS@|@EXEC_MAGIC_NUMBER@|@QS@}
     (* exec_magic_number is duplicated in runtime/caml/exec.h *)
-and cmi_magic_number = "Caml1999I032"
-and cmo_magic_number = "Caml1999O032"
-and cma_magic_number = "Caml1999A032"
-and cmx_magic_number =
-  if flambda then
-    "Caml1999y032"
-  else
-    "Caml1999Y032"
-and cmxa_magic_number =
-  if flambda then
-    "Caml1999z032"
-  else
-    "Caml1999Z032"
-and ast_impl_magic_number = "Caml1999M032"
-and ast_intf_magic_number = "Caml1999N032"
-and cmxs_magic_number = "Caml1999D032"
-and cmt_magic_number = "Caml1999T032"
-and linear_magic_number = "Caml1999L032"
+and cmi_magic_number = {@QS@|@CMI_MAGIC_NUMBER@|@QS@}
+and cmo_magic_number = {@QS@|@CMO_MAGIC_NUMBER@|@QS@}
+and cma_magic_number = {@QS@|@CMA_MAGIC_NUMBER@|@QS@}
+and cmx_magic_number = {@QS@|@CMX_MAGIC_NUMBER@|@QS@}
+and cmxa_magic_number = {@QS@|@CMXA_MAGIC_NUMBER@|@QS@}
+and ast_impl_magic_number = {@QS@|@AST_IMPL_MAGIC_NUMBER@|@QS@}
+and ast_intf_magic_number = {@QS@|@AST_INTF_MAGIC_NUMBER@|@QS@}
+and cmxs_magic_number = {@QS@|@CMXS_MAGIC_NUMBER@|@QS@}
+and cmt_magic_number = {@QS@|@CMT_MAGIC_NUMBER@|@QS@}
+and linear_magic_number = {@QS@|@LINEAR_MAGIC_NUMBER@|@QS@}
 
 let safe_string = true
 let default_safe_string = true

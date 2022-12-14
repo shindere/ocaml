@@ -890,6 +890,17 @@ CSCFLAGS
 CSC
 DIFF_FLAGS
 CC
+LINEAR_MAGIC_NUMBER
+CMT_MAGIC_NUMBER
+CMXS_MAGIC_NUMBER
+AST_INTF_MAGIC_NUMBER
+AST_IMPL_MAGIC_NUMBER
+CMXA_MAGIC_NUMBER
+CMX_MAGIC_NUMBER
+CMA_MAGIC_NUMBER
+CMO_MAGIC_NUMBER
+CMI_MAGIC_NUMBER
+EXEC_MAGIC_NUMBER
 OCAML_VERSION_SHORT
 OCAML_VERSION_EXTRA
 OCAML_VERSION_PATCHLEVEL
@@ -3276,6 +3287,26 @@ OCAML_VERSION_EXTRA=dev1-2022-06-09
 
 OCAML_VERSION_SHORT=5.1
 
+EXEC_MAGIC_NUMBER=Caml1999X032
+
+CMI_MAGIC_NUMBER=Caml1999I032
+
+CMO_MAGIC_NUMBER=Caml1999O032
+
+CMA_MAGIC_NUMBER=Caml1999A032
+
+ # Computed during configuration
+ # Computed during configuration
+AST_IMPL_MAGIC_NUMBER=Caml1999M032
+
+AST_INTF_MAGIC_NUMBER=Caml1999N032
+
+CMXS_MAGIC_NUMBER=Caml1999D032
+
+CMT_MAGIC_NUMBER=Caml1999T032
+
+LINEAR_MAGIC_NUMBER=Caml1999L032
+
 
 
 
@@ -3406,6 +3437,8 @@ ac_config_files="$ac_config_files manual/src/version.tex"
 ac_config_files="$ac_config_files manual/src/html_processing/src/common.ml"
 
 ac_config_files="$ac_config_files ocamltest/ocamltest_config.ml"
+
+ac_config_files="$ac_config_files utils/config.common.ml"
 
 ac_config_files="$ac_config_files utils/config.generated.ml"
 
@@ -19221,6 +19254,15 @@ else $as_nop
   flambda_invariants=false
 fi
 
+if $flambda
+then :
+  CMX_MAGIC_NUMBER=Caml1999y032
+  CMXA_MAGIC_NUMBER=Caml1999z032
+else $as_nop
+  CMX_MAGIC_NUMBER=Caml1999Y032
+  CMXA_MAGIC_NUMBER=Caml1999Z032
+fi
+
 if test x"$enable_cmm_invariants" = "xyes"
 then :
   cmm_invariants=true
@@ -20674,6 +20716,7 @@ do
     "manual/src/version.tex") CONFIG_FILES="$CONFIG_FILES manual/src/version.tex" ;;
     "manual/src/html_processing/src/common.ml") CONFIG_FILES="$CONFIG_FILES manual/src/html_processing/src/common.ml" ;;
     "ocamltest/ocamltest_config.ml") CONFIG_FILES="$CONFIG_FILES ocamltest/ocamltest_config.ml" ;;
+    "utils/config.common.ml") CONFIG_FILES="$CONFIG_FILES utils/config.common.ml" ;;
     "utils/config.generated.ml") CONFIG_FILES="$CONFIG_FILES utils/config.generated.ml" ;;
     "runtime/caml/m.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/m.h" ;;
     "runtime/caml/s.h") CONFIG_HEADERS="$CONFIG_HEADERS runtime/caml/s.h" ;;

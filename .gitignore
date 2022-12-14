@@ -321,6 +321,7 @@ META
 
 /utils/config_boot.ml
 /utils/config_boot.mli
+/utils/config.common.ml
 /utils/config.generated.ml
 /utils/config_main.ml
 /utils/config_main.mli
