@@ -107,7 +107,8 @@ module Bytecode = struct
         let code_size = compunit.cu_codesize + 8 in
         let code = LongString.create code_size in
         LongString.input_bytes_into code ic compunit.cu_codesize;
-        LongString.set code compunit.cu_codesize (Char.chr Opcodes.opRETURN);
+        let opRETURN = 40 in (* keep in sync with bytecomp/opcodes.ml *)
+        LongString.set code compunit.cu_codesize (Char.chr opRETURN);
         LongString.blit_string "\000\000\000\001\000\000\000" 0
           code (compunit.cu_codesize + 1) 7;
         begin try
