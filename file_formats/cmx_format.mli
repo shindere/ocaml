@@ -19,7 +19,8 @@
 
 (* Format of .cmx, .cmxa and .cmxs files *)
 
-open Misc
+type modname = string
+type crcs = (modname * Digest.t option) list
 
 (* Each .o file has a matching .cmx file that provides the following infos
    on the compilation unit:
