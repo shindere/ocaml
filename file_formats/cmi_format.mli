@@ -13,11 +13,13 @@
 (*                                                                        *)
 (**************************************************************************)
 
-open Misc
+type filepath = string
+type modname = string
+type crcs = (modname * Digest.t option) list
 
 type pers_flags =
   | Rectypes
-  | Alerts of alerts
+  | Alerts of Misc.alerts
   | Opaque
 
 type cmi_infos = {
