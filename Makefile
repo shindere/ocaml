@@ -551,25 +551,25 @@ beforedepend:: lambda/runtimedef.ml
 # Choose the right machine-dependent files
 
 asmcomp/arch.mli: asmcomp/$(ARCH)/arch.mli
-	$(V_LN)cd asmcomp; $(LN) $(ARCH)/arch.mli .
+	cd asmcomp; $(LN) $(ARCH)/arch.mli .
 
 asmcomp/arch.ml: asmcomp/$(ARCH)/arch.ml
-	$(V_LN)cd asmcomp; $(LN) $(ARCH)/arch.ml .
+	cd asmcomp; $(LN) $(ARCH)/arch.ml .
 
 asmcomp/proc.ml: asmcomp/$(ARCH)/proc.ml
-	$(V_LN)cd asmcomp; $(LN) $(ARCH)/proc.ml .
+	cd asmcomp; $(LN) $(ARCH)/proc.ml .
 
 asmcomp/selection.ml: asmcomp/$(ARCH)/selection.ml
-	$(V_LN)cd asmcomp; $(LN) $(ARCH)/selection.ml .
+	cd asmcomp; $(LN) $(ARCH)/selection.ml .
 
 asmcomp/CSE.ml: asmcomp/$(ARCH)/CSE.ml
-	$(V_LN)cd asmcomp; $(LN) $(ARCH)/CSE.ml .
+	cd asmcomp; $(LN) $(ARCH)/CSE.ml .
 
 asmcomp/reload.ml: asmcomp/$(ARCH)/reload.ml
-	$(V_LN)cd asmcomp; $(LN) $(ARCH)/reload.ml .
+	cd asmcomp; $(LN) $(ARCH)/reload.ml .
 
 asmcomp/scheduling.ml: asmcomp/$(ARCH)/scheduling.ml
-	$(V_LN)cd asmcomp; $(LN) $(ARCH)/scheduling.ml .
+	cd asmcomp; $(LN) $(ARCH)/scheduling.ml .
 
 # Preprocess the code emitters
 cvt_emit = tools/cvt_emit$(EXE)
@@ -1044,7 +1044,7 @@ endif
 .PHONY: makeruntime
 makeruntime: runtime-all
 stdlib/libcamlrun.$(A): runtime-all
-	$(V_LN)cd stdlib; $(LN) ../runtime/libcamlrun.$(A) .
+	cd stdlib; $(LN) ../runtime/libcamlrun.$(A) .
 clean::
 	rm -f $(addprefix runtime/, *.o *.obj *.a *.lib *.so *.dll ld.conf)
 	rm -f $(addprefix runtime/, ocamlrun ocamlrund ocamlruni ocamlruns sak)
