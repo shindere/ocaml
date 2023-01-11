@@ -28,6 +28,10 @@ EMPTY :=
 # $(SPACE) contains a single space
 SPACE := $(EMPTY) $(EMPTY)
 
+V ?= 1
+
+ifeq "$(V)" "1"
+
 V_CC         = @$(info $   CC          $@)
 V_CCDEPS     = @$(info $   CCDEPS      $@)
 V_OCAMLC     = @$(info $   OCAMLC      $@)
@@ -46,6 +50,27 @@ V_OCAMLMKLIB = @$(info $   OCAMLMKLIB  $@)
 V_OCAMLDOC   = @$(info $   OCAMLDOC    $@)
 V_ODOC       = @$(info $   ODOC        $@)
 
+else
+
+V_CC         =
+V_CCDEPS     =
+V_OCAMLC     =
+V_OCAMLOPT   =
+V_GEN        =
+V_LINKC      =
+V_LINKOPT    =
+V_MKEXE      =
+V_MKLIB      =
+V_MKDLL      =
+V_OCAMLLEX   =
+V_OCAMLYACC  =
+V_OCAMLDEP   =
+V_ASM        =
+V_OCAMLMKLIB =
+V_OCAMLDOC   =
+V_ODOC       =
+
+endif
 DESTDIR ?=
 INSTALL_BINDIR := $(DESTDIR)$(BINDIR)
 INSTALL_LIBDIR := $(DESTDIR)$(LIBDIR)
