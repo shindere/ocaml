@@ -166,3 +166,15 @@ let fatal_errorf fmt =
     ("@?>> Fatal error: " ^^ fmt ^^ "@.")
 
 let fatal_error msg = fatal_errorf "%s" msg
+
+let ext_dll = "." ^ {@QS@|@SO@|@QS@}
+
+(* Extract the name of a DLL from its external name (xxx.so or -lxxx) *)
+
+let extract_dll_name file =
+  if Filename.check_suffix file ext_dll then
+    Filename.chop_suffix file ext_dll
+  else if String.length file >= 2 && String.sub file 0 2 = "-l" then
+    "dll" ^ String.sub file 2 (String.length file - 2)
+  else
+    file (* will cause error later *)
