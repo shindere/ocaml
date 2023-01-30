@@ -122,3 +122,6 @@ type dynheader = {
 }
 
 val fatal_error: string -> 'a
+
+(* Extract the name of a DLL from its external name (xxx.so or -lxxx) *)
+val extract_dll_name: string -> string
