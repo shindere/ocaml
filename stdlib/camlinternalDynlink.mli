@@ -34,6 +34,8 @@ module LongString :
     val input_bytes : in_channel -> int -> t
   end
 
+val load_compunit_code : in_channel -> int -> LongString.t
+
 (* This needs to be kept in sync with the modules in the
    file_formats directroy *)
 
