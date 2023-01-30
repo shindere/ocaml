@@ -15,9 +15,6 @@
 
 (* Handling of dynamically-linked libraries *)
 
-(* Extract the name of a DLLs from its external name (xxx.so or -lxxx) *)
-val extract_dll_name: string -> string
-
 type dll_mode =
   | For_checking     (* will just check existence of symbols;
                         no need to do full symbol resolution *)

@@ -275,7 +275,7 @@ and really_load_file recursive ppf name filename ic =
         let lib = (input_value ic : library) in
         List.iter
           (fun dllib ->
-            let name = Dll.extract_dll_name dllib in
+            let name = CamlinternalDynlink.extract_dll_name dllib in
             try Dll.open_dlls Dll.For_execution [name]
             with Failure reason ->
               fprintf ppf

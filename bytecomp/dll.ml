@@ -49,16 +49,6 @@ let add_path dirs =
 let remove_path dirs =
   search_path := List.filter (fun d -> not (List.mem d dirs)) !search_path
 
-(* Extract the name of a DLLs from its external name (xxx.so or -lxxx) *)
-
-let extract_dll_name file =
-  if Filename.check_suffix file Config.ext_dll then
-    Filename.chop_suffix file Config.ext_dll
-  else if String.length file >= 2 && String.sub file 0 2 = "-l" then
-    "dll" ^ String.sub file 2 (String.length file - 2)
-  else
-    file (* will cause error later *)
-
 (* Open a list of DLLs, adding them to opened_dlls.
    Raise [Failure msg] in case of error. *)
 
