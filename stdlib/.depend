@@ -114,6 +114,7 @@ camlinternalDynlink.cmo : \
     stdlib__Int.cmi \
     stdlib__Format.cmi \
     stdlib__Digest.cmi \
+    stdlib__Char.cmi \
     stdlib__Bytes.cmi \
     stdlib__Array.cmi \
     camlinternalDynlink.cmi
@@ -124,6 +125,7 @@ camlinternalDynlink.cmx : \
     stdlib__Int.cmx \
     stdlib__Format.cmx \
     stdlib__Digest.cmx \
+    stdlib__Char.cmx \
     stdlib__Bytes.cmx \
     stdlib__Array.cmx \
     camlinternalDynlink.cmi
