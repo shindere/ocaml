@@ -185,8 +185,3 @@ let init_toplevel dllpath =
     List.map (fun dll -> "", Execution dll)
       (Array.to_list (get_current_dlls()));
   linking_in_core := true
-
-let reset () =
-  search_path := [];
-  opened_dlls :=[];
-  linking_in_core := false
