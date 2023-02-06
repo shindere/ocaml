@@ -222,6 +222,7 @@ let init () =
 (* Relocate a block of object bytecode *)
 
 let patch_int buff pos n =
+  let module LongString = CamlinternalDynlink.LongString in
   LongString.set buff pos (Char.unsafe_chr n);
   LongString.set buff (pos + 1) (Char.unsafe_chr (n asr 8));
   LongString.set buff (pos + 2) (Char.unsafe_chr (n asr 16));

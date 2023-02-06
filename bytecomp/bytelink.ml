@@ -216,7 +216,9 @@ let debug_info = ref ([] : (int * Instruct.debug_event list * string list) list)
 let link_compunit output_fun currpos_fun inchan file_name compunit =
   check_consistency file_name compunit;
   seek_in inchan compunit.cu_pos;
-  let code_block = LongString.input_bytes inchan compunit.cu_codesize in
+  let code_block =
+    CamlinternalDynlink.LongString.input_bytes inchan compunit.cu_codesize
+  in
   Symtable.patch_object code_block compunit.cu_reloc;
   if !Clflags.debug && compunit.cu_debug > 0 then begin
     seek_in inchan compunit.cu_debug;

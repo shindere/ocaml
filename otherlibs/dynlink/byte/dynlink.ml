@@ -99,12 +99,12 @@ module Bytecode = struct
       ~finally:(fun () -> Mutex.unlock lock)
 
   let run lock (ic, file_name, file_digest) ~unit_header ~priv =
-    let open Misc in
     let clos = with_lock lock (fun () ->
         let old_state = Symtable.current_state () in
         let compunit : Cmo_format.compilation_unit = unit_header in
         seek_in ic compunit.cu_pos;
         let code_size = compunit.cu_codesize + 8 in
+        let module LongString = CamlinternalDynlink.LongString in
         let code = LongString.create code_size in
         LongString.input_bytes_into code ic compunit.cu_codesize;
         let opRETURN = 40 in (* keep in sync with bytecomp/opcodes.ml *)
