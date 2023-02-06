@@ -182,6 +182,7 @@ META
 /stdlib/camlheader_ur
 /stdlib/labelled-*
 /stdlib/caml
+/stdlib/camlinternalDynlink.ml
 /stdlib/sys.ml
 
 /testsuite/**/*.result
