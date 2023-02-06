@@ -23,6 +23,7 @@ open Instruct
 open Opcodes
 open Cmo_format
 module String = Misc.Stdlib.String
+module LongString = CamlinternalDynlink.LongString
 
 type error = Not_compatible_32 of (string * string)
 exception Error of error

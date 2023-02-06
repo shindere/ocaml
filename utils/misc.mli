@@ -293,20 +293,6 @@ val snd4: 'a * 'b * 'c * 'd -> 'b
 val thd4: 'a * 'b * 'c * 'd -> 'c
 val for4: 'a * 'b * 'c * 'd -> 'd
 
-module LongString :
-  sig
-    type t = bytes array
-    val create : int -> t
-    val length : t -> int
-    val get : t -> int -> char
-    val set : t -> int -> char -> unit
-    val blit : t -> int -> t -> int -> int -> unit
-    val blit_string : string -> int -> t -> int -> int -> unit
-    val output : out_channel -> t -> int -> int -> unit
-    val input_bytes_into : t -> in_channel -> int -> unit
-    val input_bytes : in_channel -> int -> t
-  end
-
 val edit_distance : string -> string -> int -> int option
 (** [edit_distance a b cutoff] computes the edit distance between
     strings [a] and [b]. To help efficiency, it uses a cutoff: if the

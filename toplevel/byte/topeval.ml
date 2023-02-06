@@ -209,6 +209,7 @@ let load_compunit ic filename ppf compunit =
   check_consistency ppf filename compunit;
   seek_in ic compunit.cu_pos;
   let code_size = compunit.cu_codesize + 8 in
+  let module LongString = CamlinternalDynlink.LongString in
   let code = LongString.create code_size in
   LongString.input_bytes_into code ic compunit.cu_codesize;
   LongString.set code compunit.cu_codesize (Char.chr Opcodes.opRETURN);

@@ -15,6 +15,25 @@
 
 (* Definition (and support tools) for dynamically loadalbe flies *)
 
+(** {1 Long strings} *)
+
+(** ``Long strings'' are mutable arrays of characters that are not limited
+    in length to {!Sys.max_string_length}. *)
+
+module LongString :
+  sig
+    type t = bytes array
+    val create : int -> t
+    val length : t -> int
+    val get : t -> int -> char
+    val set : t -> int -> char -> unit
+    val blit : t -> int -> t -> int -> int -> unit
+    val blit_string : string -> int -> t -> int -> int -> unit
+    val output : out_channel -> t -> int -> int -> unit
+    val input_bytes_into : t -> in_channel -> int -> unit
+    val input_bytes : in_channel -> int -> t
+  end
+
 (* This needs to be kept in sync with the modules in the
    file_formats directroy *)
 
