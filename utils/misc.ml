@@ -461,58 +461,6 @@ let thd4 (_,_,x,_) = x
 let for4 (_,_,_,x) = x
 
 
-module LongString = struct
-  type t = bytes array
-
-  let create str_size =
-    let tbl_size = str_size / Sys.max_string_length + 1 in
-    let tbl = Array.make tbl_size Bytes.empty in
-    for i = 0 to tbl_size - 2 do
-      tbl.(i) <- Bytes.create Sys.max_string_length;
-    done;
-    tbl.(tbl_size - 1) <- Bytes.create (str_size mod Sys.max_string_length);
-    tbl
-
-  let length tbl =
-    let tbl_size = Array.length tbl in
-    Sys.max_string_length * (tbl_size - 1) + Bytes.length tbl.(tbl_size - 1)
-
-  let get tbl ind =
-    Bytes.get tbl.(ind / Sys.max_string_length) (ind mod Sys.max_string_length)
-
-  let set tbl ind c =
-    Bytes.set tbl.(ind / Sys.max_string_length) (ind mod Sys.max_string_length)
-              c
-
-  let blit src srcoff dst dstoff len =
-    for i = 0 to len - 1 do
-      set dst (dstoff + i) (get src (srcoff + i))
-    done
-
-  let blit_string src srcoff dst dstoff len =
-    for i = 0 to len - 1 do
-      set dst (dstoff + i) (String.get src (srcoff + i))
-    done
-
-  let output oc tbl pos len =
-    for i = pos to pos + len - 1 do
-      output_char oc (get tbl i)
-    done
-
-  let input_bytes_into tbl ic len =
-    let count = ref len in
-    Array.iter (fun str ->
-      let chunk = Int.min !count (Bytes.length str) in
-      really_input ic str 0 chunk;
-      count := !count - chunk) tbl
-
-  let input_bytes ic len =
-    let tbl = create len in
-    input_bytes_into tbl ic len;
-    tbl
-end
-
-
 let edit_distance a b cutoff =
   let la, lb = String.length a, String.length b in
   let cutoff =

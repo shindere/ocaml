@@ -2190,7 +2190,6 @@ bytecomp/symtable.cmx : \
     bytecomp/bytesections.cmx \
     bytecomp/symtable.cmi
 bytecomp/symtable.cmi : \
-    utils/misc.cmi \
     lambda/lambda.cmi \
     file_formats/cmo_format.cmi
 asmcomp/CSE.cmo : \
