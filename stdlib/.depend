@@ -107,6 +107,17 @@ stdlib__Callback.cmx : callback.ml \
     stdlib__Obj.cmx \
     stdlib__Callback.cmi
 stdlib__Callback.cmi : callback.mli
+camlinternalDynlink.cmo : \
+    stdlib__Obj.cmi \
+    stdlib__Digest.cmi \
+    camlinternalDynlink.cmi
+camlinternalDynlink.cmx : \
+    stdlib__Obj.cmx \
+    stdlib__Digest.cmx \
+    camlinternalDynlink.cmi
+camlinternalDynlink.cmi : \
+    stdlib__Obj.cmi \
+    stdlib__Digest.cmi
 camlinternalFormat.cmo : \
     stdlib__Sys.cmi \
     stdlib__String.cmi \
