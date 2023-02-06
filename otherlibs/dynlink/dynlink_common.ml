@@ -18,18 +18,14 @@
 
 [@@@ocaml.warning "+a-4-30-40-41-42"]
 
-open! Dynlink_compilerlibs
+module StringSet = Set.Make (String)
+module StringMap = Map.Make (String)
 
-module String = struct
-  include Misc.Stdlib.String
-
-  module Map = struct
-    include Map
-
-    let keys t =
-      fold (fun key _data keys -> Set.add key keys) t Set.empty
-  end
-end
+let keys t =
+  StringMap.fold
+    (fun key _data keys -> StringSet.add key keys)
+    t
+    StringSet.empty
 
 module Make (P : Dynlink_platform_intf.S) = struct
   module DT = Dynlink_types
@@ -43,32 +39,32 @@ module Make (P : Dynlink_platform_intf.S) = struct
 
   module State = struct
     type t = {
-      ifaces : (interface_dep * DT.filename) String.Map.t;
+      ifaces : (interface_dep * DT.filename) StringMap.t;
       (* Interfaces that have been depended upon. *)
-      implems : implem String.Map.t;
+      implems : implem StringMap.t;
       (* Implementations that exist in the main program or have been
          dynamically loaded. *)
-      defined_symbols : String.Set.t;
+      defined_symbols : StringSet.t;
       (* Symbols corresponding to compilation units or packed modules (cf.
          [Asmpackager.build_package_cmx]).  Used as a sanity check. *)
-      allowed_units : String.Set.t;
+      allowed_units : StringSet.t;
       (* Units that are allowed to be referenced by a subsequently-loaded
          dynamic library. *)
-      main_program_units : String.Set.t;
+      main_program_units : StringSet.t;
       (* Units forming part of the main program (i.e. not dynamically
          linked). *)
-      public_dynamically_loaded_units : String.Set.t;
+      public_dynamically_loaded_units : StringSet.t;
       (* All units that have been dynamically linked, not including those that
          were privately loaded. *)
     }
 
     let empty = {
-      ifaces = String.Map.empty;
-      implems = String.Map.empty;
-      defined_symbols = String.Set.empty;
-      allowed_units = String.Set.empty;
-      main_program_units = String.Set.empty;
-      public_dynamically_loaded_units = String.Set.empty;
+      ifaces = StringMap.empty;
+      implems = StringMap.empty;
+      defined_symbols = StringSet.empty;
+      allowed_units = StringSet.empty;
+      main_program_units = StringSet.empty;
+      public_dynamically_loaded_units = StringSet.empty;
     }
   end
 
@@ -108,14 +104,14 @@ module Make (P : Dynlink_platform_intf.S) = struct
 
   let check_symbols_disjoint ~descr syms1 syms2 =
     let exe = Sys.executable_name in
-    let overlap = String.Set.inter syms1 syms2 in
-    if not (String.Set.is_empty overlap) then begin
+    let overlap = StringSet.inter syms1 syms2 in
+    if not (StringSet.is_empty overlap) then begin
       let msg =
         Format.asprintf "%s: symbols multiply-defined %s: %a"
           exe (Lazy.force descr)
           (Format.pp_print_list ~pp_sep:(fun ppf () -> Format.fprintf ppf ", ")
             Format.pp_print_string)
-          (String.Set.elements overlap)
+          (StringSet.elements overlap)
       in
       failwith msg
     end
@@ -124,39 +120,39 @@ module Make (P : Dynlink_platform_intf.S) = struct
     let exe = Sys.executable_name in
     let ifaces, implems, defined_symbols =
       P.fold_initial_units
-        ~init:(String.Map.empty, String.Map.empty, String.Set.empty)
+        ~init:(StringMap.empty, StringMap.empty, StringSet.empty)
         ~f:(fun (ifaces, implems, defined_symbols)
                 ~comp_unit ~interface ~implementation
                 ~defined_symbols:defined_symbols_this_unit ->
           let ifaces =
             match interface with
-            | None -> String.Map.add comp_unit (Name, exe) ifaces
-            | Some crc -> String.Map.add comp_unit (Contents crc, exe) ifaces
+            | None -> StringMap.add comp_unit (Name, exe) ifaces
+            | Some crc -> StringMap.add comp_unit (Contents crc, exe) ifaces
           in
           let implems =
             match implementation with
             | None -> implems
             | Some (crc, state) ->
-              String.Map.add comp_unit (crc, exe, state) implems
+              StringMap.add comp_unit (crc, exe, state) implems
           in
           let defined_symbols_this_unit =
-            String.Set.of_list defined_symbols_this_unit
+            StringSet.of_list defined_symbols_this_unit
           in
           check_symbols_disjoint ~descr:(lazy "in the executable file")
             defined_symbols_this_unit defined_symbols;
           let defined_symbols =
-            String.Set.union defined_symbols_this_unit defined_symbols
+            StringSet.union defined_symbols_this_unit defined_symbols
           in
           ifaces, implems, defined_symbols)
     in
-    let main_program_units = String.Map.keys implems in
+    let main_program_units = keys implems in
     let state : State.t =
       { ifaces;
         implems;
         defined_symbols;
         allowed_units = main_program_units;
         main_program_units;
-        public_dynamically_loaded_units = String.Set.empty;
+        public_dynamically_loaded_units = StringSet.empty;
       }
     in
     global.state <- state
@@ -170,24 +166,24 @@ module Make (P : Dynlink_platform_intf.S) = struct
     end)
 
   let set_loaded_implem filename ui implems =
-    String.Map.add (UH.name ui) (UH.crc ui, filename, DT.Loaded) implems
+    StringMap.add (UH.name ui) (UH.crc ui, filename, DT.Loaded) implems
 
   let set_loaded filename ui (state : State.t) =
     { state with implems = set_loaded_implem filename ui state.implems }
 
   let check_interface_imports filename ui ifaces =
     List.fold_left (fun ifaces (name, crc) ->
-        match String.Map.find name ifaces with
+        match StringMap.find name ifaces with
         | exception Not_found -> begin
             match crc with
-            | None -> String.Map.add name (Name, filename) ifaces
-            | Some crc -> String.Map.add name (Contents crc, filename) ifaces
+            | None -> StringMap.add name (Name, filename) ifaces
+            | Some crc -> StringMap.add name (Contents crc, filename) ifaces
           end
         | old_crc, _old_src ->
           match old_crc, crc with
           | (Name | Contents _), None -> ifaces
           | Name, Some crc ->
-            String.Map.add name (Contents crc, filename) ifaces
+            StringMap.add name (Contents crc, filename) ifaces
           | Contents old_crc, Some crc ->
             if old_crc <> crc then raise (DT.Error (Inconsistent_import name))
             else ifaces)
@@ -196,10 +192,10 @@ module Make (P : Dynlink_platform_intf.S) = struct
 
   let check_implementation_imports ~allowed_units filename ui implems =
     List.iter (fun (name, crc) ->
-      if not (String.Set.mem name allowed_units) then begin
+      if not (StringSet.mem name allowed_units) then begin
         raise (DT.Error (Unavailable_unit name))
       end;
-      match String.Map.find name implems with
+      match StringMap.find name implems with
       | exception Not_found -> raise (DT.Error (Unavailable_unit name))
       | ((old_crc, _old_src, unit_state) : implem) ->
         begin match old_crc, crc with
@@ -226,13 +222,13 @@ module Make (P : Dynlink_platform_intf.S) = struct
 
   let check_name filename ui priv ifaces implems =
     let name = UH.name ui in
-    if String.Map.mem name implems then begin
+    if StringMap.mem name implems then begin
       raise (DT.Error (Module_already_loaded name))
     end;
-    if priv && String.Map.mem name ifaces then begin
+    if priv && StringMap.mem name ifaces then begin
       raise (DT.Error (Private_library_cannot_implement_interface name))
     end;
-    String.Map.add name (UH.crc ui, filename, DT.Not_initialized) implems
+    StringMap.add name (UH.crc ui, filename, DT.Not_initialized) implems
 
   let check_unsafe_module unsafe_allowed ui =
     if not unsafe_allowed && UH.unsafe_module ui then begin
@@ -243,7 +239,7 @@ module Make (P : Dynlink_platform_intf.S) = struct
       ~unsafe_allowed ~priv =
     List.iter (fun ui -> check_unsafe_module unsafe_allowed ui) units;
     let new_units =
-      String.Set.of_list (List.map (fun ui -> UH.name ui) units)
+      StringSet.of_list (List.map (fun ui -> UH.name ui) units)
     in
     let implems =
       List.fold_left (fun implems ui ->
@@ -255,8 +251,8 @@ module Make (P : Dynlink_platform_intf.S) = struct
           check_interface_imports filename ui ifaces)
         state.ifaces units
     in
-    let allowed_units = String.Set.union state.allowed_units new_units in
-    let (_ : implem String.Map.t) =
+    let allowed_units = StringSet.union state.allowed_units new_units in
+    let (_ : implem StringMap.t) =
       List.fold_left
         (fun acc ui ->
            check_implementation_imports ~allowed_units filename ui acc;
@@ -272,9 +268,9 @@ module Make (P : Dynlink_platform_intf.S) = struct
               (UH.name ui)
               filename)
           in
-          let symbols = String.Set.of_list (UH.defined_symbols ui) in
+          let symbols = StringSet.of_list (UH.defined_symbols ui) in
           check_symbols_disjoint ~descr symbols defined_symbols;
-          String.Set.union symbols defined_symbols)
+          StringSet.union symbols defined_symbols)
         state.defined_symbols
         units
     in
@@ -282,7 +278,7 @@ module Make (P : Dynlink_platform_intf.S) = struct
       state
     end else begin
       let public_dynamically_loaded_units =
-        String.Set.union state.public_dynamically_loaded_units new_units
+        StringSet.union state.public_dynamically_loaded_units new_units
       in
       let state =
         { state with
@@ -297,7 +293,7 @@ module Make (P : Dynlink_platform_intf.S) = struct
     end
 
   let set_allowed_units allowed_units =
-    let allowed_units = String.Set.of_list allowed_units in
+    let allowed_units = StringSet.of_list allowed_units in
     with_lock (fun global ->
         global.state <- { global.state with allowed_units }
       )
@@ -305,8 +301,8 @@ module Make (P : Dynlink_platform_intf.S) = struct
   let allow_only units =
     with_lock (fun global ->
         let allowed_units =
-          String.Set.inter global.state.allowed_units
-            (String.Set.of_list units)
+          StringSet.inter global.state.allowed_units
+            (StringSet.of_list units)
         in
         global.state <- { global.state with allowed_units }
       )
@@ -314,8 +310,8 @@ module Make (P : Dynlink_platform_intf.S) = struct
   let prohibit units =
     with_lock (fun global ->
         let allowed_units =
-          String.Set.diff global.state.allowed_units
-            (String.Set.of_list units)
+          StringSet.diff global.state.allowed_units
+            (StringSet.of_list units)
         in
         global.state <- { global.state with
           allowed_units;
@@ -325,17 +321,17 @@ module Make (P : Dynlink_platform_intf.S) = struct
   let main_program_units () =
     init ();
     let global_state = with_lock (fun {state;_} -> state) in
-    String.Set.elements global_state.main_program_units
+    StringSet.elements global_state.main_program_units
 
   let public_dynamically_loaded_units () =
     init ();
     let global_state = with_lock (fun {state;_} -> state) in
-    String.Set.elements global_state.public_dynamically_loaded_units
+    StringSet.elements global_state.public_dynamically_loaded_units
 
   let all_units () =
     init ();
     let global_state = with_lock (fun {state;_} -> state) in
-    String.Set.elements (String.Set.union
+    StringSet.elements (StringSet.union
       global_state.main_program_units
       global_state.public_dynamically_loaded_units)
 

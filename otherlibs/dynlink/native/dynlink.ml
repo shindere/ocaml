@@ -20,8 +20,6 @@
 
 [@@@ocaml.warning "+a-4-30-40-41-42"]
 
-open! Dynlink_compilerlibs
-
 module DC = Dynlink_common
 module DT = Dynlink_types
 
@@ -35,7 +33,7 @@ type global_map = {
 module Native = struct
   type handle
 
-  external ndl_open : string -> bool -> handle * Cmxs_format.dynheader
+  external ndl_open : string -> bool -> handle * CamlinternalDynlink.dynheader
     = "caml_natdynlink_open"
   external ndl_register : handle -> string array -> unit
     = "caml_natdynlink_register"
@@ -45,7 +43,7 @@ module Native = struct
   external ndl_loadsym : string -> Obj.t = "caml_natdynlink_loadsym"
 
   module Unit_header = struct
-    type t = Cmxs_format.dynunit
+    type t = CamlinternalDynlink.dynunit
 
     let name (t : t) = t.dynu_name
     let crc (t : t) = Some t.dynu_crc
@@ -95,7 +93,7 @@ module Native = struct
       try ndl_open filename (not priv)
       with exn -> raise (DT.Error (Cannot_open_dynamic_library exn))
     in
-    if header.dynu_magic <> Config.cmxs_magic_number then begin
+    if header.dynu_magic <> CamlinternalDynlink.cmxs_magic_number then begin
       raise (DT.Error (Not_a_bytecode_file filename))
     end;
     let syms =
