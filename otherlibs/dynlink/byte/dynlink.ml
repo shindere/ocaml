@@ -70,7 +70,8 @@ module Bytecode = struct
   let adapt_filename f = f
 
   let num_globals_inited () =
-    Misc.fatal_error "Should never be called for bytecode dynlink"
+    CamlinternalDynlink.fatal_error
+      "Should never be called for bytecode dynlink"
 
   let fold_initial_units ~init ~f =
     List.fold_left (fun acc (comp_unit, interface) ->
