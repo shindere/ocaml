@@ -109,10 +109,12 @@ stdlib__Callback.cmx : callback.ml \
 stdlib__Callback.cmi : callback.mli
 camlinternalDynlink.cmo : \
     stdlib__Obj.cmi \
+    stdlib__Format.cmi \
     stdlib__Digest.cmi \
     camlinternalDynlink.cmi
 camlinternalDynlink.cmx : \
     stdlib__Obj.cmx \
+    stdlib__Format.cmx \
     stdlib__Digest.cmx \
     camlinternalDynlink.cmi
 camlinternalDynlink.cmi : \

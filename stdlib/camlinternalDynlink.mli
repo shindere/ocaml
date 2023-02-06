@@ -99,3 +99,5 @@ type dynheader = {
   dynu_magic: string;
   dynu_units: dynunit list;
 }
+
+val fatal_error: string -> 'a
