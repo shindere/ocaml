@@ -15,7 +15,6 @@
 
 (*  bytegen.ml : translation of lambda terms to lists of instructions. *)
 
-open Misc
 open Asttypes
 open Primitive
 open Types
@@ -23,6 +22,8 @@ open Lambda
 open Switch
 open Instruct
 open Debuginfo.Scoped_location
+
+let fatal_error = Misc.fatal_error
 
 (**** Label generation ****)
 

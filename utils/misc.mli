@@ -181,8 +181,6 @@ module Stdlib : sig
 
     val for_all : (char -> bool) -> t -> bool
   end
-
-  external compare : 'a -> 'a -> int = "%compare"
 end
 
 (** {1 Operations on files and file paths} *)

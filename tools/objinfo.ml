@@ -19,7 +19,6 @@
    and on bytecode executables. *)
 
 open Printf
-open Misc
 open Cmo_format
 
 (* Command line options to prevent printing approximation,

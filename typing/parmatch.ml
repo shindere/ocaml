@@ -15,11 +15,11 @@
 
 (* Detection of partial matches and unused match cases. *)
 
-open Misc
 open Asttypes
 open Types
 open Typedtree
 
+let fatal_error = Misc.fatal_error
 
 (*************************************)
 (* Utilities for building patterns   *)

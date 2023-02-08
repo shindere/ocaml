@@ -774,7 +774,6 @@ typing/includemod.cmo : \
     typing/predef.cmi \
     typing/path.cmi \
     typing/mtype.cmi \
-    utils/misc.cmi \
     parsing/longident.cmi \
     parsing/location.cmi \
     typing/includecore.cmi \
@@ -797,7 +796,6 @@ typing/includemod.cmx : \
     typing/predef.cmx \
     typing/path.cmx \
     typing/mtype.cmx \
-    utils/misc.cmx \
     parsing/longident.cmx \
     parsing/location.cmx \
     typing/includecore.cmx \

@@ -87,7 +87,6 @@
 
 *)
 
-open Misc
 open Asttypes
 open Types
 open Typedtree
@@ -99,6 +98,8 @@ open Printpat
 module Scoped_location = Debuginfo.Scoped_location
 
 let dbg = false
+
+let fatal_error = Misc.fatal_error
 
 (*
    Compatibility predicate that considers potential rebindings of constructors
@@ -1486,7 +1487,7 @@ and precompile_var args cls def k =
                   nexts def
               in
               let rebuild_nexts nexts k =
-                map_end (fun (e, pm) -> (e, PmVar { inside = pm })) nexts k
+                Misc.map_end (fun (e, pm) -> (e, PmVar { inside = pm })) nexts k
               in
               let rfirst =
                 { me = PmVar { inside = first };

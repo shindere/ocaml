@@ -15,7 +15,6 @@
 
 (* Introduction of closures, uncurrying, recognition of direct calls *)
 
-open Misc
 open Asttypes
 open Primitive
 open Lambda
@@ -36,10 +35,12 @@ module Storer =
 module V = Backend_var
 module VP = Backend_var.With_provenance
 
+let fatal_error = Misc.fatal_error
+
 (* The current backend *)
 
 let no_phantom_lets () =
-  Misc.fatal_error "Closure does not support phantom let generation"
+  fatal_error "Closure does not support phantom let generation"
 
 (* Auxiliaries for compiling functions *)
 
@@ -643,7 +644,7 @@ let rec substitute loc ((backend, fpc) as st) sb rn ulam =
           begin try
             Int.Map.find nfail rn
           with Not_found ->
-            fatal_errorf "Closure.split_list: invalid nfail (%d)" nfail
+            Misc.fatal_errorf "Closure.split_list: invalid nfail (%d)" nfail
           end
         | None -> nfail in
       Ustaticfail (nfail, List.map (substitute loc st sb rn) args)

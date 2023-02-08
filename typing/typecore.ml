@@ -15,7 +15,6 @@
 
 (* Typechecking for the core language *)
 
-open Misc
 open Asttypes
 open Parsetree
 open Types
@@ -583,7 +582,7 @@ and build_as_type_aux ~refine (env : Env.t ref) p =
       newty (Tvariant (create_row ~fields ~more:(newvar())
                          ~name:None ~fixed:None ~closed:false))
   | Tpat_record (lpl,_) ->
-      let lbl = snd3 (List.hd lpl) in
+      let lbl = Misc.snd3 (List.hd lpl) in
       if lbl.lbl_private = Private then p.pat_type else
       let ty = newvar () in
       let ppl = List.map (fun (_, l, p) -> l.lbl_pos, p) lpl in
@@ -680,7 +679,7 @@ let solve_constructor_annotation env name_list sty ty_args ty_ex =
         (fun rem tv ->
           match get_desc tv with
             Tconstr(Path.Pident id, [], _) when List.mem id rem ->
-              list_remove id rem
+              Misc.list_remove id rem
           | _ ->
               raise (Error (cty.ctyp_loc, !env,
                             Unbound_existential (ids, ty))))
@@ -1620,7 +1619,7 @@ and type_pat_aux
               Warnings.Wildcard_arg_to_constant_constr;
             []
         | Some({ppat_desc = Ppat_any} as sp) when constr.cstr_arity > 1 ->
-            replicate_list sp constr.cstr_arity
+            Misc.replicate_list sp constr.cstr_arity
         | Some sp -> [sp] in
       if Builtin_attributes.warn_on_literal_pattern constr.cstr_attributes then
         begin match List.filter has_literal_pattern sargs with
@@ -1839,6 +1838,8 @@ let add_pattern_variables ?check ?check_as env pv =
          } env
     )
     pv env
+
+let get_ref = Misc.get_ref
 
 let type_pattern category ~lev env spat expected_ty =
   reset_pattern true;
@@ -3978,7 +3979,7 @@ and type_binding_op_ident env s =
   let path =
     match desc.val_kind with
     | Val_ivar _ ->
-        fatal_error "Illegal name for instance variable"
+        Misc.fatal_error "Illegal name for instance variable"
     | Val_self (_, _, _, cl_num) ->
         let path, _ =
           Env.find_value_by_name (Longident.Lident ("self-" ^ cl_num)) env
@@ -4400,7 +4401,7 @@ and type_argument ?explanation ?recarg env sarg ty_expected' ty_expected =
     (* Need to be careful not to expand local constraints here *)
     if Env.has_local_constraints env then
       let snap = Btype.snapshot () in
-      try_finally ~always:(fun () -> Btype.backtrack snap) work
+      Misc.try_finally ~always:(fun () -> Btype.backtrack snap) work
     else work ()
   in
   match may_coerce with

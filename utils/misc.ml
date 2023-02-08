@@ -203,8 +203,6 @@ module Stdlib = struct
     let print ppf t =
       Format.pp_print_string ppf t
   end
-
-  external compare : 'a -> 'a -> int = "%compare"
 end
 
 (* File functions *)

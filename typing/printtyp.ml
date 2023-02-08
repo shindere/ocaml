@@ -15,7 +15,6 @@
 
 (* Printing functions *)
 
-open Misc
 open Ctype
 open Format
 open Longident
@@ -262,13 +261,13 @@ let bound_in_recursion = ref M.empty
 *)
 let fuzzy = ref S.empty
 let with_arg id f =
-  protect_refs [ R(fuzzy, S.add (Ident.name id) !fuzzy) ] f
+  Misc.protect_refs [ R(fuzzy, S.add (Ident.name id) !fuzzy) ] f
 let fuzzy_id namespace id = namespace = Module && S.mem (Ident.name id) !fuzzy
 
 let with_hidden ids f =
   let update m id = M.add (Ident.name id.ident) id.ident m in
   let updated = List.fold_left update !bound_in_recursion ids in
-  protect_refs [ R(bound_in_recursion, updated )] f
+  Misc.protect_refs [ R(bound_in_recursion, updated )] f
 
 let human_id id index =
   (* The identifier with index [k] is the (k+1)-th most recent identifier in
@@ -699,7 +698,7 @@ let set_printing_env env =
 
 let wrap_printing_env env f =
   set_printing_env env;
-  try_finally f ~always:(fun () -> set_printing_env Env.empty)
+  Misc.try_finally f ~always:(fun () -> set_printing_env Env.empty)
 
 let wrap_printing_env ~error env f =
   if error then Env.without_cmis (wrap_printing_env env) f
@@ -963,7 +962,7 @@ end = struct
     let old_subst = !name_subst in
     names      := [];
     name_subst := [];
-    try_finally
+    Misc.try_finally
       ~always:(fun () ->
         names      := old_names;
         name_subst := old_subst)
@@ -1158,7 +1157,7 @@ let rec tree_of_typexp mode ty =
         (* This case should only happen when debugging the compiler *)
         Otyp_stuff "<Tsubst>"
     | Tlink _ ->
-        fatal_error "Printtyp.tree_of_typexp"
+        Misc.fatal_error "Printtyp.tree_of_typexp"
     | Tpoly (ty, []) ->
         tree_of_typexp mode ty
     | Tpoly (ty, tyl) ->
@@ -1232,7 +1231,7 @@ and tree_of_typobject mode fi nm =
       assert (s = Id);
       Otyp_class (non_gen, tree_of_best_type_path p p', args)
   | _ ->
-      fatal_error "Printtyp.tree_of_typobject"
+      Misc.fatal_error "Printtyp.tree_of_typobject"
   end
 
 and tree_of_typfields mode rest = function
@@ -1242,7 +1241,7 @@ and tree_of_typfields mode rest = function
         | Tvar _ | Tunivar _ -> Some (is_non_gen mode rest)
         | Tconstr _ -> Some false
         | Tnil -> None
-        | _ -> fatal_error "typfields (1)"
+        | _ -> Misc.fatal_error "typfields (1)"
       in
       ([], rest)
   | (s, t) :: l ->
