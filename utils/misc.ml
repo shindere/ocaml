@@ -192,16 +192,6 @@ module Stdlib = struct
       include String
       let hash = Hashtbl.hash
     end)
-
-    let for_all f t =
-      let len = String.length t in
-      let rec loop i =
-        i = len || (f t.[i] && loop (i + 1))
-      in
-      loop 0
-
-    let print ppf t =
-      Format.pp_print_string ppf t
   end
 end
 
