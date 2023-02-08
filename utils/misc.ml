@@ -183,17 +183,13 @@ module Stdlib = struct
       with
       | Exit -> None
   end
-
-  module String = struct
-    include String
-    module Set = Set.Make(String)
-    module Map = Map.Make(String)
-    module Tbl = Hashtbl.Make(struct
-      include String
-      let hash = Hashtbl.hash
-    end)
-  end
 end
+
+(* Data structures over strings *)
+
+module StringSet = Set.Make(String)
+module StringMap = Map.Make(String)
+module StringTbl = Hashtbl.Make(String)
 
 (* File functions *)
 
@@ -836,7 +832,7 @@ type filepath = string
 type modname = string
 type crcs = (modname * Digest.t option) list
 
-type alerts = string Stdlib.String.Map.t
+type alerts = string StringMap.t
 
 module Magic_number = struct
   type native_obj_config = {

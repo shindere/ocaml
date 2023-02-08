@@ -17,24 +17,25 @@ open Asttypes
 open Location
 open Longident
 open Parsetree
-module String = Misc.Stdlib.String
+module StringSet = Misc.StringSet
+module StringMap = Misc.StringMap
 
 let pp_deps = ref []
 
 (* Module resolution map *)
 (* Node (set of imports for this path, map for submodules) *)
-type map_tree = Node of String.Set.t * bound_map
-and  bound_map = map_tree String.Map.t
-let bound = Node (String.Set.empty, String.Map.empty)
+type map_tree = Node of StringSet.t * bound_map
+and  bound_map = map_tree StringMap.t
+let bound = Node (StringSet.empty, StringMap.empty)
 
 (*let get_free (Node (s, _m)) = s*)
 let get_map (Node (_s, m)) = m
-let make_leaf s = Node (String.Set.singleton s, String.Map.empty)
-let make_node m =  Node (String.Set.empty, m)
+let make_leaf s = Node (StringSet.singleton s, StringMap.empty)
+let make_node m =  Node (StringSet.empty, m)
 let rec weaken_map s (Node(s0,m0)) =
-  Node (String.Set.union s s0, String.Map.map (weaken_map s) m0)
+  Node (StringSet.union s s0, StringMap.map (weaken_map s) m0)
 let rec collect_free (Node (s, m)) =
-  String.Map.fold (fun _ n -> String.Set.union (collect_free n)) m s
+  StringMap.fold (fun _ n -> StringSet.union (collect_free n)) m s
 
 (* Returns the imports required to access the structure at path p *)
 (* Only raises Not_found if the head of p is not in the toplevel map *)
@@ -42,29 +43,29 @@ let rec lookup_free p m =
   match p with
     [] -> raise Not_found
   | s::p ->
-      let Node (f, m') = String.Map.find s m  in
+      let Node (f, m') = StringMap.find s m  in
       try lookup_free p m' with Not_found -> f
 
 (* Returns the node corresponding to the structure at path p *)
 let rec lookup_map lid m =
   match lid with
-    Lident s    -> String.Map.find s m
-  | Ldot (l, s) -> String.Map.find s (get_map (lookup_map l m))
+    Lident s    -> StringMap.find s m
+  | Ldot (l, s) -> StringMap.find s (get_map (lookup_map l m))
   | Lapply _    -> raise Not_found
 
 (* Collect free module identifiers in the a.s.t. *)
 
-let free_structure_names = ref String.Set.empty
+let free_structure_names = ref StringSet.empty
 
 let add_names s =
-  free_structure_names := String.Set.union s !free_structure_names
+  free_structure_names := StringSet.union s !free_structure_names
 
 let rec add_path bv ?(p=[]) = function
   | Lident s ->
       let free =
-        try lookup_free (s::p) bv with Not_found -> String.Set.singleton s
+        try lookup_free (s::p) bv with Not_found -> StringSet.singleton s
       in
-      (*String.Set.iter (fun s -> Printf.eprintf "%s " s) free;
+      (*StringSet.iter (fun s -> Printf.eprintf "%s " s) free;
         prerr_endline "";*)
       add_names free
   | Ldot(l, s) -> add_path bv ~p:(s::p) l
@@ -74,7 +75,7 @@ let open_module bv lid =
   match lookup_map lid bv with
   | Node (s, m) ->
       add_names s;
-      String.Map.fold String.Map.add m bv
+      StringMap.fold StringMap.add m bv
   | exception Not_found ->
       add_path bv lid; bv
 
@@ -163,7 +164,7 @@ let add_type_extension bv te =
 let add_type_exception bv te =
   add_extension_constructor bv te.ptyexn_constructor
 
-let pattern_bv = ref String.Map.empty
+let pattern_bv = ref StringMap.empty
 
 let rec add_pattern bv pat =
   match pat.ppat_desc with
@@ -188,7 +189,7 @@ let rec add_pattern bv pat =
   | Ppat_lazy p -> add_pattern bv p
   | Ppat_unpack id ->
       Option.iter
-        (fun name -> pattern_bv := String.Map.add name bound !pattern_bv) id.txt
+        (fun name -> pattern_bv := StringMap.add name bound !pattern_bv) id.txt
   | Ppat_open ( m, p) -> let bv = open_module bv m.txt in add_pattern bv p
   | Ppat_exception p -> add_pattern bv p
   | Ppat_extension e -> handle_extension e
@@ -243,7 +244,7 @@ let rec add_expr bv exp =
       let bv =
         match id.txt with
         | None -> bv
-        | Some id -> String.Map.add id b bv
+        | Some id -> StringMap.add id b bv
       in
       add_expr bv e
   | Pexp_letexception(_, e) -> add_expr bv e
@@ -302,7 +303,7 @@ and add_modtype bv mty =
           add_modtype bv mty1;
           match id.txt with
           | None -> bv
-          | Some name -> String.Map.add name bound bv
+          | Some name -> StringMap.add name bound bv
       in
       add_modtype bv mty2
   | Pmty_with(mty, cstrl) ->
@@ -346,7 +347,7 @@ and add_signature bv sg =
   ignore (add_signature_binding bv sg)
 
 and add_signature_binding bv sg =
-  snd (List.fold_left add_sig_item (bv, String.Map.empty) sg)
+  snd (List.fold_left add_sig_item (bv, StringMap.empty) sg)
 
 and add_sig_item (bv, m) item =
   match item.psig_desc with
@@ -364,19 +365,19 @@ and add_sig_item (bv, m) item =
       let add map =
         match pmd.pmd_name.txt with
         | None -> map
-        | Some name -> String.Map.add name m' map
+        | Some name -> StringMap.add name m' map
       in
       (add bv, add m)
   | Psig_modsubst pms ->
       let m' = add_module_alias bv pms.pms_manifest in
-      let add = String.Map.add pms.pms_name.txt m' in
+      let add = StringMap.add pms.pms_name.txt m' in
       (add bv, add m)
   | Psig_recmodule decls ->
       let add =
         List.fold_right (fun pmd map ->
           match pmd.pmd_name.txt with
           | None -> map
-          | Some name -> String.Map.add name bound map
+          | Some name -> StringMap.add name bound map
         ) decls
       in
       let bv' = add bv and m' = add m in
@@ -393,7 +394,7 @@ and add_sig_item (bv, m) item =
   | Psig_include incl ->
       let Node (s, m') = add_modtype_binding bv incl.pincl_mod in
       add_names s;
-      let add = String.Map.fold String.Map.add m' in
+      let add = StringMap.fold StringMap.add m' in
       (add bv, add m)
   | Psig_class cdl ->
       List.iter (add_class_description bv) cdl; (bv, m)
@@ -407,12 +408,12 @@ and add_sig_item (bv, m) item =
 and open_description bv od =
   let Node(s, m) = add_module_alias bv od.popen_expr in
   add_names s;
-  String.Map.fold String.Map.add m bv
+  StringMap.fold StringMap.add m bv
 
 and open_declaration bv od =
   let Node (s, m) = add_module_binding bv od.popen_expr in
   add_names s;
-  String.Map.fold String.Map.add m bv
+  StringMap.fold StringMap.add m bv
 
 and add_module_binding bv modl =
   match modl.pmod_desc with
@@ -433,7 +434,7 @@ and add_module_expr bv modl =
           add_modtype bv mty;
           match id.txt with
           | None -> bv
-          | Some name -> String.Map.add name bound bv
+          | Some name -> StringMap.add name bound bv
       in
       add_module_expr bv modl
   | Pmod_apply(mod1, mod2) ->
@@ -479,9 +480,9 @@ and add_structure bv item_list =
   bv
 
 and add_structure_binding bv item_list =
-  List.fold_left add_struct_item (bv, String.Map.empty) item_list
+  List.fold_left add_struct_item (bv, StringMap.empty) item_list
 
-and add_struct_item (bv, m) item : _ String.Map.t * _ String.Map.t =
+and add_struct_item (bv, m) item : _ StringMap.t * _ StringMap.t =
   match item.pstr_desc with
     Pstr_eval (e, _attrs) ->
       add_expr bv e; (bv, m)
@@ -502,7 +503,7 @@ and add_struct_item (bv, m) item : _ String.Map.t * _ String.Map.t =
       let add map =
         match x.pmb_name.txt with
         | None -> map
-        | Some name -> String.Map.add name b map
+        | Some name -> StringMap.add name b map
       in
       (add bv, add m)
   | Pstr_recmodule bindings ->
@@ -510,7 +511,7 @@ and add_struct_item (bv, m) item : _ String.Map.t * _ String.Map.t =
         List.fold_right (fun x map ->
           match x.pmb_name.txt with
           | None -> map
-          | Some name -> String.Map.add name bound map
+          | Some name -> StringMap.add name bound map
         ) bindings
       in
       let bv' = add bv and m = add m in
@@ -538,7 +539,7 @@ and add_struct_item (bv, m) item : _ String.Map.t * _ String.Map.t =
         (* If we are not in the delayed dependency mode, we need to
            collect all delayed dependencies imported by the include statement *)
         add_names (collect_free n);
-      let add = String.Map.fold String.Map.add m' in
+      let add = StringMap.fold StringMap.add m' in
       (add bv, add m)
   | Pstr_attribute _ -> (bv, m)
   | Pstr_extension (e, _) ->

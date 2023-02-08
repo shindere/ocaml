@@ -169,15 +169,13 @@ module Stdlib : sig
 
     val all_somes : 'a option array -> 'a array option
   end
-
-(** {2 Extensions to the String module} *)
-  module String : sig
-    include module type of String
-    module Set : Set.S with type elt = string
-    module Map : Map.S with type key = string
-    module Tbl : Hashtbl.S with type key = string
-  end
 end
+
+(** {1 Data structures over strings} *)
+
+module StringSet : Set.S with type elt = string
+module StringMap : Map.S with type key = string
+module StringTbl : Hashtbl.S with type key = string
 
 (** {1 Operations on files and file paths} *)
 
@@ -731,4 +729,4 @@ type filepath = string
 type modname = string
 type crcs = (modname * Digest.t option) list
 
-type alerts = string Stdlib.String.Map.t
+type alerts = string StringMap.t

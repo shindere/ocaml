@@ -573,8 +573,8 @@ type state =
   {
     active: bool array;
     error: bool array;
-    alerts: (Misc.Stdlib.String.Set.t * bool); (* false:set complement *)
-    alert_errors: (Misc.Stdlib.String.Set.t * bool); (* false:set complement *)
+    alerts: (Misc.StringSet.t * bool); (* false:set complement *)
+    alert_errors: (Misc.StringSet.t * bool); (* false:set complement *)
   }
 
 let current =
@@ -582,8 +582,8 @@ let current =
     {
       active = Array.make (last_warning_number + 1) true;
       error = Array.make (last_warning_number + 1) false;
-      alerts = (Misc.Stdlib.String.Set.empty, false);
-      alert_errors = (Misc.Stdlib.String.Set.empty, true); (* all soft *)
+      alerts = (Misc.StringSet.empty, false);
+      alert_errors = (Misc.StringSet.empty, true); (* all soft *)
     }
 
 let disabled = ref false
@@ -604,12 +604,12 @@ let is_error x =
 let alert_is_active {kind; _} =
   not !disabled &&
   let (set, pos) = (!current).alerts in
-  Misc.Stdlib.String.Set.mem kind set = pos
+  Misc.StringSet.mem kind set = pos
 
 let alert_is_error {kind; _} =
   not !disabled &&
   let (set, pos) = (!current).alert_errors in
-  Misc.Stdlib.String.Set.mem kind set = pos
+  Misc.StringSet.mem kind set = pos
 
 let with_state state f =
   let prev = backup () in
@@ -630,15 +630,15 @@ let set_alert ~error ~enable s =
   let upd =
     match s with
     | "all" ->
-        (Misc.Stdlib.String.Set.empty, not enable)
+        (Misc.StringSet.empty, not enable)
     | s ->
         let (set, pos) =
           if error then (!current).alert_errors else (!current).alerts
         in
         let f =
           if enable = pos
-          then Misc.Stdlib.String.Set.add
-          else Misc.Stdlib.String.Set.remove
+          then Misc.StringSet.add
+          else Misc.StringSet.remove
         in
         (f s set, pos)
   in

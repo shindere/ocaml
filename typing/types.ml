@@ -93,11 +93,11 @@ module Uid = Shape.Uid
 
 (* Maps of methods and instance variables *)
 
-module MethSet = Misc.Stdlib.String.Set
-module VarSet = Misc.Stdlib.String.Set
+module MethSet = Misc.StringSet
+module VarSet = Misc.StringSet
 
-module Meths = Misc.Stdlib.String.Map
-module Vars = Misc.Stdlib.String.Map
+module Meths = Misc.StringMap
+module Vars = Misc.StringMap
 
 
 (* Value descriptions *)

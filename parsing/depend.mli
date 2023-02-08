@@ -20,15 +20,13 @@
 
 *)
 
-module String = Misc.Stdlib.String
-
-type map_tree = Node of String.Set.t * bound_map
-and  bound_map = map_tree String.Map.t
+type map_tree = Node of Misc.StringSet.t * bound_map
+and  bound_map = map_tree Misc.StringMap.t
 val make_leaf : string -> map_tree
 val make_node : bound_map -> map_tree
-val weaken_map : String.Set.t -> map_tree -> map_tree
+val weaken_map : Misc.StringSet.t -> map_tree -> map_tree
 
-val free_structure_names : String.Set.t ref
+val free_structure_names : Misc.StringSet.t ref
 
 (** dependencies found by preprocessing tools *)
 val pp_deps : string list ref

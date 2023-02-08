@@ -14,7 +14,7 @@
 
 open Local_store
 
-module STbl = Misc.Stdlib.String.Tbl
+module STbl = Misc.StringTbl
 
 (* Mapping from basenames to full filenames *)
 type registry = string STbl.t
