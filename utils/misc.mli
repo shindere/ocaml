@@ -162,9 +162,6 @@ module Stdlib : sig
 
 (** {2 Extensions to the Array module} *)
   module Array : sig
-    val exists2 : ('a -> 'b -> bool) -> 'a array -> 'b array -> bool
-    (** Same as [Array.exists2] from the standard library. *)
-
     val for_alli : (int -> 'a -> bool) -> 'a array -> bool
     (** Same as [Array.for_all] from the standard library, but the
         function is applied with the index of the element as first argument,

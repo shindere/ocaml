@@ -62,7 +62,7 @@ let rec structurally_different (arg1:A.t) (arg2:A.t) =
   | Value_block (tag1, fields1), Value_block (tag2, fields2) ->
     not (Tag.equal tag1 tag2)
     || (Array.length fields1 <> Array.length fields2)
-    || Misc.Stdlib.Array.exists2 structurally_different fields1 fields2
+    || Array.exists2 structurally_different fields1 fields2
   | descr1, descr2 ->
     (* This is not very precise as this won't allow to distinguish
        blocks from strings for instance. This can be improved if it
