@@ -99,22 +99,6 @@ module Stdlib = struct
   module List = struct
     type 'a t = 'a list
 
-    let rec compare cmp l1 l2 =
-      match l1, l2 with
-      | [], [] -> 0
-      | [], _::_ -> -1
-      | _::_, [] -> 1
-      | h1::t1, h2::t2 ->
-        let c = cmp h1 h2 in
-        if c <> 0 then c
-        else compare cmp t1 t2
-
-    let rec equal eq l1 l2 =
-      match l1, l2 with
-      | ([], []) -> true
-      | (hd1 :: tl1, hd2 :: tl2) -> eq hd1 hd2 && equal eq tl1 tl2
-      | (_, _) -> false
-
     let map2_prefix f l1 l2 =
       let rec aux acc l1 l2 =
         match l1, l2 with

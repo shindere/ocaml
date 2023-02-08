@@ -102,4 +102,4 @@ let print_opt ppf = function
   | Some t -> print ppf t
 
 let compare_lists l1 l2 =
-  Misc.Stdlib.List.compare compare l1 l2
+  List.compare compare l1 l2

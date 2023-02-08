@@ -95,7 +95,7 @@ let rec same (l1 : Flambda.t) (l2 : Flambda.t) =
   | Apply a1 , Apply a2  ->
     Flambda.equal_call_kind a1.kind a2.kind
       && Variable.equal a1.func a2.func
-      && Misc.Stdlib.List.equal Variable.equal a1.args a2.args
+      && List.equal Variable.equal a1.args a2.args
   | Apply _, _ | _, Apply _ -> false
   | Let { var = var1; defining_expr = defining_expr1; body = body1; _ },
       Let { var = var2; defining_expr = defining_expr2; body = body2; _ } ->
@@ -111,23 +111,23 @@ let rec same (l1 : Flambda.t) (l2 : Flambda.t) =
       && same b1 b2
   | Let_mutable _, _ | _, Let_mutable _ -> false
   | Let_rec (bl1, a1), Let_rec (bl2, a2) ->
-    Misc.Stdlib.List.equal samebinding bl1 bl2 && same a1 a2
+    List.equal samebinding bl1 bl2 && same a1 a2
   | Let_rec _, _ | _, Let_rec _ -> false
   | Switch (a1, s1), Switch (a2, s2) ->
     Variable.equal a1 a2 && sameswitch s1 s2
   | Switch _, _ | _, Switch _ -> false
   | String_switch (a1, s1, d1), String_switch (a2, s2, d2) ->
     Variable.equal a1 a2
-      && Misc.Stdlib.List.equal
+      && List.equal
         (fun (s1, e1) (s2, e2) -> String.equal s1 s2 && same e1 e2) s1 s2
       && Option.equal same d1 d2
   | String_switch _, _ | _, String_switch _ -> false
   | Static_raise (e1, a1), Static_raise (e2, a2) ->
-    Static_exception.equal e1 e2 && Misc.Stdlib.List.equal Variable.equal a1 a2
+    Static_exception.equal e1 e2 && List.equal Variable.equal a1 a2
   | Static_raise _, _ | _, Static_raise _ -> false
   | Static_catch (s1, v1, a1, b1), Static_catch (s2, v2, a2, b2) ->
     Static_exception.equal s1 s2
-      && Misc.Stdlib.List.equal Variable.equal v1 v2
+      && List.equal Variable.equal v1 v2
       && same a1 a2
       && same b1 b2
   | Static_catch _, _ | _, Static_catch _ -> false
@@ -160,7 +160,7 @@ let rec same (l1 : Flambda.t) (l2 : Flambda.t) =
     Lambda.equal_meth_kind kind1 kind2
       && Variable.equal meth1 meth2
       && Variable.equal obj1 obj2
-      && Misc.Stdlib.List.equal Variable.equal args1 args2
+      && List.equal Variable.equal args1 args2
   | Send _, _ | _, Send _ -> false
   | Proved_unreachable, Proved_unreachable -> true
 
@@ -193,13 +193,13 @@ and same_named (named1 : Flambda.named) (named2 : Flambda.named) =
     false
   | Prim (p1, al1, _), Prim (p2, al2, _) ->
     Clambda_primitives.equal p1 p2
-      && Misc.Stdlib.List.equal Variable.equal al1 al2
+      && List.equal Variable.equal al1 al2
   | Prim _, _ | _, Prim _ -> false
   | Expr e1, Expr e2 -> same e1 e2
 
 and sameclosure (c1 : Flambda.function_declaration)
       (c2 : Flambda.function_declaration) =
-  Misc.Stdlib.List.equal Parameter.equal c1.params c2.params
+  List.equal Parameter.equal c1.params c2.params
     && same c1.body c2.body
 
 and same_set_of_closures (c1 : Flambda.set_of_closures)
@@ -228,8 +228,8 @@ and sameswitch (fs1 : Flambda.switch) (fs2 : Flambda.switch) =
   let samecase (n1, a1) (n2, a2) = n1 = n2 && same a1 a2 in
   Numbers.Int.Set.equal fs1.numconsts fs2.numconsts
     && Numbers.Int.Set.equal fs1.numblocks fs2.numblocks
-    && Misc.Stdlib.List.equal samecase fs1.consts fs2.consts
-    && Misc.Stdlib.List.equal samecase fs1.blocks fs2.blocks
+    && List.equal samecase fs1.consts fs2.consts
+    && List.equal samecase fs1.blocks fs2.blocks
     && Option.equal same fs1.failaction fs2.failaction
 
 let can_be_merged = same
@@ -794,7 +794,7 @@ module Switch_storer = Switch.Store (struct
       | Static_raise (sexn1, args1), Static_raise (sexn2, args2) ->
         let comp_sexn = Static_exception.compare sexn1 sexn2 in
         if comp_sexn <> 0 then comp_sexn
-        else Misc.Stdlib.List.compare (compare_var env) args1 args2
+        else List.compare (compare_var env) args1 args2
     and compare_named env (n1:key_named) (n2:key_named) : int =
       match n1, n2 with
       | Symbol s1, Symbol s2 -> Symbol.compare s1 s2
@@ -809,7 +809,7 @@ module Switch_storer = Switch.Store (struct
       | Prim (prim1, args1), Prim (prim2, args2) ->
         let comp_prim = Stdlib.compare prim1 prim2 in
         if comp_prim <> 0 then comp_prim
-        else Misc.Stdlib.List.compare (compare_var env) args1 args2
+        else List.compare (compare_var env) args1 args2
     in
     compare_expr Variable.Map.empty e1 e2
 end)

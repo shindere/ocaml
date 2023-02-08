@@ -110,14 +110,6 @@ module Stdlib : sig
   module List : sig
     type 'a t = 'a list
 
-    val compare : ('a -> 'a -> int) -> 'a t -> 'a t -> int
-    (** The lexicographic order supported by the provided order.
-        There is no constraint on the relative lengths of the lists. *)
-
-    val equal : ('a -> 'a -> bool) -> 'a t -> 'a t -> bool
-    (** Returns [true] if and only if the given lists have the same length and
-        content with respect to the given equality function. *)
-
     val some_if_all_elements_are_some : 'a option t -> 'a t option
     (** If all elements of the given list are [Some _] then [Some xs]
         is returned with the [xs] being the contents of those [Some]s, with

@@ -1217,7 +1217,7 @@ module Constant_defining_value = struct
         let c = Tag.compare tag1 tag2 in
         if c <> 0 then c
         else
-          Misc.Stdlib.List.compare compare_constant_defining_value_block_field
+          List.compare compare_constant_defining_value_block_field
             fields1 fields2
       | Set_of_closures set1, Set_of_closures set2 ->
         Set_of_closures_id.compare set1.function_decls.set_of_closures_id
