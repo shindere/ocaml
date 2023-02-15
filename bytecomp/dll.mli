@@ -29,12 +29,9 @@ val open_dlls: dll_mode -> string list -> unit
 val close_all_dlls: unit -> unit
 
 (* The abstract type representing C function pointers *)
-type dll_address
+type dll_address = CamlinternalDynlink.MiniDll.dll_address
 
-type primitive_address =
-  | Prim_loaded of dll_address (* Primitive found in a DLL opened
-                                  "for execution" *)
-  | Prim_exists (* Primitive found in a DLL opened "for checking" *)
+type primitive_address = CamlinternalDynlink.MiniDll.primitive_address
 
 (* Find a primitive in the currently opened DLLs and return its address.
    Return [None] if the primitive is not found. *)
@@ -57,10 +54,3 @@ val remove_path: string list -> unit
    environment variable CAML_LD_LIBRARY_PATH, plus contents of ld.conf file
    if argument is [false].  If argument is [true], ignore ld.conf. *)
 val init_compile: bool -> unit
-
-(* Initialization for linking in core (dynlink or toplevel).
-   Initialize the search path to the same path that was used to start
-   the running program (CAML_LD_LIBRARY_PATH + directories in executable +
-   contents of ld.conf file).  Take note of the DLLs that were opened
-   when starting the running program. *)
-val init_toplevel: string -> unit

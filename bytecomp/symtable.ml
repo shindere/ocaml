@@ -86,7 +86,7 @@ let c_prim_table = ref PrimMap.empty
 let set_prim_table name =
   ignore(PrimMap.enter c_prim_table name)
 
-let of_prim name =
+let of_prim find_primitive name =
   try
     PrimMap.find !c_prim_table name
   with Not_found ->
@@ -95,18 +95,18 @@ let of_prim name =
     then
       PrimMap.enter c_prim_table name
     else begin
-      match Dll.find_primitive name with
+      match find_primitive name with
       | None -> raise(Error(Unavailable_primitive name))
-      | Some Prim_exists ->
+      | Some CamlinternalDynlink.MiniDll.Prim_exists ->
           PrimMap.enter c_prim_table name
-      | Some (Prim_loaded symb) ->
+      | Some (CamlinternalDynlink.MiniDll.Prim_loaded symb) ->
           let num = PrimMap.enter c_prim_table name in
           Dll.synchronize_primitive num symb;
           num
     end
 
-let require_primitive name =
-  if name.[0] <> '%' then ignore(of_prim name)
+let require_primitive  name =
+  if name.[0] <> '%' then ignore(of_prim Dll.find_primitive name)
 
 let all_primitives () =
   let prim = Array.make !c_prim_table.cnt "" in
@@ -228,7 +228,7 @@ let patch_int buff pos n =
   LongString.set buff (pos + 2) (Char.unsafe_chr (n asr 16));
   LongString.set buff (pos + 3) (Char.unsafe_chr (n asr 24))
 
-let patch_object buff patchlist =
+let patch_object find_primitive buff patchlist =
   List.iter
     (function
         (Reloc_literal sc, pos) ->
@@ -238,7 +238,7 @@ let patch_object buff patchlist =
       | (Reloc_setglobal id, pos) ->
           patch_int buff pos (slot_for_setglobal id)
       | (Reloc_primitive name, pos) ->
-          patch_int buff pos (of_prim name))
+          patch_int buff pos (of_prim find_primitive name))
     patchlist
 
 (* Build the initial table of globals *)
@@ -315,7 +315,7 @@ let init_toplevel () =
     done;
     (* DLL initialization *)
     let dllpath = try sect.read_string "DLPT" with Not_found -> "" in
-    Dll.init_toplevel dllpath;
+    CamlinternalDynlink.MiniDll.init_toplevel dllpath;
     (* Recover CRC infos for interfaces *)
     let crcintfs =
       try

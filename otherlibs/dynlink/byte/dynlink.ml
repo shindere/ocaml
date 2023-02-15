@@ -107,7 +107,8 @@ module Bytecode = struct
           CamlinternalDynlink.load_compunit_code ic compunit.cu_codesize
         in
         begin try
-          Symtable.patch_object code compunit.cu_reloc;
+          let find_prim = CamlinternalDynlink.MiniDll.find_primitive in
+          Symtable.patch_object find_prim code compunit.cu_reloc;
           Symtable.check_global_initialized compunit.cu_reloc;
           Symtable.update_global_table ()
         with Symtable.Error error ->
@@ -165,8 +166,9 @@ module Bytecode = struct
         let toc_pos = input_binary_int ic in  (* Go to table of contents *)
         seek_in ic toc_pos;
         let lib = (input_value ic : Cmo_format.library) in
+        let open_dlls = List.iter CamlinternalDynlink.MiniDll.open_dll in
         begin try
-          Dll.open_dlls Dll.For_execution
+          open_dlls
             (List.map CamlinternalDynlink.extract_dll_name lib.lib_dllibs)
         with exn ->
           raise (DT.Error (Cannot_open_dynamic_library exn))

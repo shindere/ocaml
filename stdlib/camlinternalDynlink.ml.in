@@ -178,3 +178,126 @@ let extract_dll_name file =
     "dll" ^ String.sub file 2 (String.length file - 2)
   else
     file (* will cause error later *)
+
+module MiniDll = struct
+
+  type dll_handle
+
+  type dll_address
+
+  type primitive_address =
+    | Prim_loaded of dll_address (* Primitive found in a DLL opened
+                                    "for execution" *)
+    | Prim_exists (* Primitive found in a DLL opened "for checking" *)
+
+  external dll_open: string -> dll_handle = "caml_dynlink_open_lib"
+  external dll_close: dll_handle -> unit = "caml_dynlink_close_lib"
+  external dll_sym: dll_handle -> string -> dll_address
+                  = "caml_dynlink_lookup_symbol"
+  external get_current_dlls: unit -> dll_handle array
+                                             = "caml_dynlink_get_current_libs"
+
+  let search_path = ref ([] : string list)
+
+  let opened_dlls = ref ([] : (string * dll_handle) list)
+
+  let find_in_path path name =
+    if not (Filename.is_implicit name) then
+      if Sys.file_exists name then name else raise Not_found
+    else begin
+      let rec try_dir = function
+        [] -> raise Not_found
+      | dir::rem ->
+          let fullname = Filename.concat dir name in
+          if Sys.file_exists fullname then fullname else try_dir rem
+      in try_dir path
+    end
+
+  let open_dll name =
+    let name = name ^ ext_dll in
+    let fullname =
+      try
+        let fullname = find_in_path !search_path name in
+        if Filename.is_implicit fullname then
+        Filename.concat Filename.current_dir_name fullname
+        else fullname
+      with Not_found -> name
+    in
+    match List.assoc_opt fullname !opened_dlls with
+    | Some _ -> () (* DLL already opened, nothing to do *)
+    | None ->
+      begin
+        match dll_open fullname with
+        | dll_handle ->
+          opened_dlls := (fullname, dll_handle) :: !opened_dlls
+        | exception Failure msg -> failwith (fullname ^ ": " ^ msg)
+      end
+
+  let close_all_dlls () =
+    List.iter dll_close (List.map snd !opened_dlls);
+    opened_dlls := []
+
+  let add_path dirs =
+    search_path := dirs @ !search_path
+
+  let remove_path dirs =
+    search_path := List.filter (fun d -> not (List.mem d dirs)) !search_path
+
+  let find_primitive prim_name =
+    let rec find seen = function
+      [] -> None
+    | (_, dll) as curr :: rem ->
+        let addr = dll_sym dll prim_name in
+        if addr == Obj.magic () then find (curr :: seen) rem else begin
+          if seen <> [] then opened_dlls := curr :: List.rev_append seen rem;
+          Some (Prim_loaded addr)
+        end
+    in
+    find [] !opened_dlls
+
+  let path_separator = '/'
+
+  let split_path_contents ?(sep = path_separator) = function
+    | "" -> []
+    | s -> String.split_on_char sep s
+
+  (* Read the [ld.conf] file and return the corresponding list of directories *)
+
+  let ld_conf_contents () =
+    let standard_library = "/usr/local/lib" in
+    let path = ref [] in
+    begin try
+      let ic = open_in (Filename.concat standard_library "ld.conf") in
+      begin try
+        while true do
+          path := input_line ic :: !path
+        done
+      with End_of_file -> ()
+      end;
+      close_in ic
+    with Sys_error _ -> ()
+    end;
+    List.rev !path
+
+  (* Split the CAML_LD_LIBRARY_PATH environment variable and return
+     the corresponding list of directories.  *)
+  let ld_library_path_contents () =
+    match Sys.getenv "CAML_LD_LIBRARY_PATH" with
+    | exception Not_found -> []
+    | s ->
+      split_path_contents s
+
+  let split_dll_path path =
+    split_path_contents ~sep:'\000' path
+
+  (* Initialization for linking in core (dynlink or toplevel) *)
+
+  let init_toplevel dllpath =
+    search_path :=
+    ld_library_path_contents() @
+    split_dll_path dllpath @
+    ld_conf_contents();
+    opened_dlls :=
+    List.map (fun dll -> "", dll)
+      (Array.to_list (get_current_dlls()));
+end

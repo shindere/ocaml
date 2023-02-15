@@ -125,3 +125,27 @@ val fatal_error: string -> 'a
 
 (* Extract the name of a DLL from its external name (xxx.so or -lxxx) *)
 val extract_dll_name: string -> string
+
+module MiniDll : sig
+  type dll_address
+
+  type primitive_address =
+    | Prim_loaded of dll_address (* Primitive found in a DLL opened
+                                    "for execution" *)
+    | Prim_exists (* Primitive found in a DLL opened "for checking" *)
+
+  val open_dll: string -> unit
+  val close_all_dlls: unit -> unit
+  val add_path: string list -> unit
+  val remove_path: string list -> unit
+  val find_primitive: string -> primitive_address option
+
+  val ld_library_path_contents: unit -> string list
+
+  (* Initialization for linking in core (dynlink or toplevel).
+     Initialize the search path to the same path that was used to start
+     the running program (CAML_LD_LIBRARY_PATH + directories in executable +
+     contents of ld.conf file).  Take note of the DLLs that were opened
+     when starting the running program. *)
+  val init_toplevel: string -> unit
+end

@@ -16,7 +16,7 @@
 (* Handling of dynamically-linked libraries *)
 
 type dll_handle
-type dll_address
+type dll_address = CamlinternalDynlink.MiniDll.dll_address
 type dll_mode = For_checking | For_execution
 
 external dll_open: string -> dll_handle = "caml_dynlink_open_lib"
@@ -25,9 +25,6 @@ external dll_sym: dll_handle -> string -> dll_address
                 = "caml_dynlink_lookup_symbol"
          (* returned dll_address may be Val_unit *)
 external add_primitive: dll_address -> int = "caml_dynlink_add_primitive"
-external get_current_dlls: unit -> dll_handle array
-                                           = "caml_dynlink_get_current_libs"
-
 (* Current search path for DLLs *)
 let search_path = ref ([] : string list)
 
@@ -93,9 +90,7 @@ let close_all_dlls () =
 
 (* Find a primitive in the currently opened DLLs. *)
 
-type primitive_address =
-  | Prim_loaded of dll_address
-  | Prim_exists
+type primitive_address = CamlinternalDynlink.MiniDll.primitive_address
 
 let find_primitive prim_name =
   let rec find seen = function
@@ -105,11 +100,11 @@ let find_primitive prim_name =
       let addr = dll_sym dll prim_name in
       if addr == Obj.magic () then find (curr :: seen) rem else begin
         if seen <> [] then opened_dlls := curr :: List.rev_append seen rem;
-        Some (Prim_loaded addr)
+        Some (CamlinternalDynlink.MiniDll.Prim_loaded addr)
       end
   | (_,Checking t) as curr :: rem ->
       if Binutils.defines_symbol t prim_name then
-        Some Prim_exists
+        Some CamlinternalDynlink.MiniDll.Prim_exists
       else
         find (curr :: seen) rem
   in
@@ -145,33 +140,9 @@ let ld_conf_contents () =
   end;
   List.rev !path
 
-(* Split the CAML_LD_LIBRARY_PATH environment variable and return
-   the corresponding list of directories.  *)
-let ld_library_path_contents () =
-  match Sys.getenv "CAML_LD_LIBRARY_PATH" with
-  | exception Not_found ->
-      []
-  | s ->
-      Misc.split_path_contents s
-
-let split_dll_path path =
-  Misc.split_path_contents ~sep:'\000' path
-
 (* Initialization for separate compilation *)
 
 let init_compile nostdlib =
   search_path :=
-    ld_library_path_contents() @
+    CamlinternalDynlink.MiniDll.ld_library_path_contents() @
     (if nostdlib then [] else ld_conf_contents())
-
-(* Initialization for linking in core (dynlink or toplevel) *)
-
-let init_toplevel dllpath =
-  search_path :=
-    ld_library_path_contents() @
-    split_dll_path dllpath @
-    ld_conf_contents();
-  opened_dlls :=
-    List.map (fun dll -> "", Execution dll)
-      (Array.to_list (get_current_dlls()));
-  linking_in_core := true
