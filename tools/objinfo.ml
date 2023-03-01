@@ -62,7 +62,7 @@ let print_line name =
   printf "\t%s\n" name
 
 let print_required_global id =
-  printf "\t%s\n" (Ident.name id)
+  printf "\t%s (PREDEF=%B)\n" (Ident.name id) (Ident.is_predef id)
 
 let print_cmo_infos cu =
   printf "Unit name: %s\n" cu.cu_name;
