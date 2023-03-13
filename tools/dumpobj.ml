@@ -447,13 +447,18 @@ let print_code ic len =
 
 (* Dump relocation info *)
 
-let print_reloc (info, pos) =
-  printf "    %d    (%d)    " pos (pos/4);
+let string_of_id id =
+  let s1 = if Ident.global id then "global " else "" in
+  let s2 = if Ident.is_predef id then "predef " else "" in
+  "[" ^ s1 ^ s2 ^ (Ident.name id) ^ "]"
+
+let print_reloc (info, _pos) =
+  (* printf "    %d    (%d)    " pos (pos/4); *)
   match info with
-    Reloc_literal sc -> print_obj sc; printf "\n"
-  | Reloc_getglobal id -> printf "require    %s\n" (Ident.name id)
-  | Reloc_setglobal id -> printf "provide    %s\n" (Ident.name id)
-  | Reloc_primitive s -> printf "prim    %s\n" s
+    Reloc_literal _sc -> () (* print_obj sc; printf "\n" *)
+  | Reloc_getglobal id -> printf "Reloc_get_global %s\n" (string_of_id id)
+  | Reloc_setglobal id -> printf "Reloc_setglobal %s\n" (string_of_id id)
+  | Reloc_primitive s -> printf "Reloc_primitive %s\n" s
 
 (* Print a .cmo file *)
 
@@ -468,6 +473,9 @@ let dump_obj ic =
   reloc := cu.cu_reloc;
   if !print_reloc_info then
     List.iter print_reloc cu.cu_reloc;
+  printf "Required globals: %s\n%!"
+    (String.concat ", " (List.map string_of_id cu.cu_required_globals))
+(*
   if cu.cu_debug > 0 then begin
     seek_in ic cu.cu_debug;
     let evl = (input_value ic : debug_event list) in
@@ -476,6 +484,7 @@ let dump_obj ic =
   end;
   seek_in ic cu.cu_pos;
   print_code ic cu.cu_codesize
+*)
 
 (* Print an executable file *)
 
