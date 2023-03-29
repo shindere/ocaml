@@ -762,36 +762,35 @@ let _ =
 
 (* Introduce dependencies on modules referenced only by "external". *)
 
-let scan_used_globals lam =
-  let is_compunit id = not (Ident.is_predef id) in
-  let globals = ref Ident.Set.empty in
+let scan_used_compunits lam =
+  let compunits = ref Symtable.Compunit.Set.empty in
   let rec scan lam =
     Lambda.iter_head_constructor scan lam;
     match lam with
-      Lprim ((Pgetglobal id | Psetglobal id), _, _) when (is_compunit id) ->
-        globals := Ident.Set.add id !globals
+      Lprim ((Pgetcompunit cu | Psetcompunit cu), _, _) ->
+        compunits := Symtable.Compunit.Set.add cu !compunits
     | _ -> ()
   in
-  scan lam; !globals
+  scan lam; !compunits
 
-let required_globals ~flambda body =
-  let globals = scan_used_globals body in
-  let add_global id req =
-    if not flambda && Ident.Set.mem id globals then
+let required_compunits ~flambda body =
+  let compunits = scan_used_compunits body in
+  let add_compunit cu req =
+    if not flambda && Symtable.Compunit.Set.mem cu compunits then
       req
     else
-      Ident.Set.add id req
+      Symtable.Compunit.Set.add cu req
   in
   let required =
     List.fold_left
-      (fun acc path -> add_global (Path.head path) acc)
-      (if flambda then globals else Ident.Set.empty)
+      (fun acc path -> add_compunit (Path.head path) acc)
+      (if flambda then compunits else Symtable.Compunit.Set.empty)
       (Translprim.get_used_primitives ())
   in
   let required =
-    List.fold_right add_global (Env.get_required_globals ()) required
+    List.fold_right add_compunit (Env.get_required_compunits ()) required
   in
-  Env.reset_required_globals ();
+  Env.reset_required_compunits ();
   Translprim.clear_used_primitives ();
   required
 
@@ -810,7 +809,7 @@ let transl_implementation_flambda module_name (str, cc) =
   in
   { module_ident = module_id;
     main_module_block_size = size;
-    required_globals = required_globals ~flambda:true body;
+    required_compunits = required_compunits ~flambda:true body;
     code = body }
 
 let transl_implementation module_name (str, cc) =
@@ -965,7 +964,7 @@ let transl_store_subst = ref Ident.Map.empty
 let nat_toplevel_name id =
   try match Ident.Map.find id !transl_store_subst with
     | Lprim(Pfield (pos, _, _),
-            [Lprim(Pgetglobal glob, [], _)], _) -> (glob,pos)
+            [Lprim(Pgetcompunit compunit, [], _)], _) -> (compunit,pos)
     | _ -> raise Not_found
   with Not_found ->
     fatal_error("Translmod.nat_toplevel_name: " ^ Ident.unique_name id)
@@ -1117,7 +1116,7 @@ let transl_store_structure ~scopes glob map prims aliases str =
                If so, keep using the local module value (id) in the remainder of
                the compilation unit (add_ident true returns subst unchanged).
                If not, we can use the value from the global
-               (add_ident true adds id -> Pgetglobal... to subst). *)
+               (add_ident true adds id -> Pgetcompunit... to subst). *)
             Llet(Strict, Pgenval, id, Lambda.subst no_env_update subst lam,
                  Lsequence(store_ident (of_location ~scopes loc) id,
                            transl_store ~scopes rootpath
@@ -1244,8 +1243,8 @@ let transl_store_structure ~scopes glob map prims aliases str =
                 let pure = pure_module od.open_expr in
                 (* this optimization shouldn't be needed because Simplif would
                    actually remove the [Llet] when it's not used.
-                   But since [scan_used_globals] runs before Simplif, we need to
-                   do it. *)
+                   But since [scan_used_compunits] runs before Simplif,
+                   we need to do it. *)
                 match od.open_bound_items with
                 | [] when pure = Alias ->
                   transl_store ~scopes rootpath subst cont rem
@@ -1279,7 +1278,7 @@ let transl_store_structure ~scopes glob map prims aliases str =
       let (pos, cc) = Ident.find_same id map in
       let init_val = apply_coercion loc Alias cc (Lvar id) in
       Lprim(Psetfield(pos, Pointer, Root_initialization),
-            [Lprim(Pgetglobal glob, [], loc); init_val],
+            [Lprim(Pgetcompunit compunit, [], loc); init_val],
             loc)
     with Not_found ->
       fatal_error("Translmod.store_ident: " ^ Ident.unique_name id)
@@ -1411,7 +1410,7 @@ let transl_store_implementation module_name (str, restr) =
     (* module_ident is not used by closure, but this allow to share
        the type with the flambda version *)
     module_ident;
-    required_globals = required_globals ~flambda:true code }
+    required_compunits = required_compunits ~flambda:true code }
 
 (* Compile a toplevel phrase *)
 
@@ -1542,7 +1541,7 @@ let transl_toplevel_item ~scopes item =
       let pure = pure_module od.open_expr in
       (* this optimization shouldn't be needed because Simplif would
           actually remove the [Llet] when it's not used.
-          But since [scan_used_globals] runs before Simplif, we need to do
+          But since [scan_used_compunits] runs before Simplif, we need to do
           it. *)
       begin match od.open_bound_items with
       | [] when pure = Alias -> lambda_unit
@@ -1726,5 +1725,5 @@ let reset () =
   primitive_declarations := [];
   transl_store_subst := Ident.Map.empty;
   aliased_idents := Ident.empty;
-  Env.reset_required_globals ();
+  Env.reset_required_compunits ();
   Translprim.clear_used_primitives ()

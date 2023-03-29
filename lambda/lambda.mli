@@ -50,8 +50,9 @@ type primitive =
   | Pbytes_of_string
   | Pignore
     (* Globals *)
-  | Pgetglobal of Ident.t
-  | Psetglobal of Ident.t
+  | Pgetpredef of Cmo_format.predef
+  | Pgetcompunit of Cmo_format.compunit
+  | Psetcompunit of Cmo_format.compunit
   (* Operations on heap blocks *)
   | Pmakeblock of int * mutable_flag * block_shape
   | Pfield of int * immediate_or_pointer * mutable_flag

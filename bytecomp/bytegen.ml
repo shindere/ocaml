@@ -112,28 +112,28 @@ let preserve_tailcall_for_prim = function
   | Popaque | Psequor | Psequand
   | Prunstack | Pperform | Presume | Preperform ->
       true
-  | Pbytes_to_string | Pbytes_of_string | Pignore | Pgetglobal _ | Psetglobal _
-  | Pmakeblock _ | Pfield _ | Pfield_computed | Psetfield _
-  | Psetfield_computed _ | Pfloatfield _ | Psetfloatfield _ | Pduprecord _
-  | Pccall _ | Praise _ | Pnot | Pnegint | Paddint | Psubint | Pmulint
-  | Pdivint _ | Pmodint _ | Pandint | Porint | Pxorint | Plslint | Plsrint
-  | Pasrint | Pintcomp _ | Poffsetint _ | Poffsetref _ | Pintoffloat
-  | Pfloatofint | Pnegfloat | Pabsfloat | Paddfloat | Psubfloat | Pmulfloat
-  | Pdivfloat | Pfloatcomp _ | Pstringlength | Pstringrefu  | Pstringrefs
-  | Pcompare_ints | Pcompare_floats | Pcompare_bints _
-  | Pbyteslength | Pbytesrefu | Pbytessetu | Pbytesrefs | Pbytessets
-  | Pmakearray _ | Pduparray _ | Parraylength _ | Parrayrefu _ | Parraysetu _
-  | Parrayrefs _ | Parraysets _ | Pisint | Pisout | Pbintofint _ | Pintofbint _
-  | Pcvtbint _ | Pnegbint _ | Paddbint _ | Psubbint _ | Pmulbint _ | Pdivbint _
-  | Pmodbint _ | Pandbint _ | Porbint _ | Pxorbint _ | Plslbint _ | Plsrbint _
-  | Pasrbint _ | Pbintcomp _ | Pbigarrayref _ | Pbigarrayset _ | Pbigarraydim _
-  | Pstring_load_16 _ | Pstring_load_32 _ | Pstring_load_64 _ | Pbytes_load_16 _
-  | Pbytes_load_32 _ | Pbytes_load_64 _ | Pbytes_set_16 _ | Pbytes_set_32 _
-  | Pbytes_set_64 _ | Pbigstring_load_16 _ | Pbigstring_load_32 _
-  | Pbigstring_load_64 _ | Pbigstring_set_16 _ | Pbigstring_set_32 _
-  | Pbigstring_set_64 _ | Pctconst _ | Pbswap16 | Pbbswap _ | Pint_as_pointer
-  | Patomic_exchange | Patomic_cas | Patomic_fetch_add | Patomic_load _
-  | Pdls_get ->
+  | Pbytes_to_string | Pbytes_of_string | Pignore | Pgetpredef _ 
+  | Pgetcompunit _ | Psetcompunit _ | Pmakeblock _ | Pfield _
+  | Pfield_computed | Psetfield _ | Psetfield_computed _ | Pfloatfield _
+  | Psetfloatfield _ | Pduprecord _ | Pccall _ | Praise _ | Pnot
+  | Pnegint | Paddint | Psubint | Pmulint | Pdivint _ | Pmodint _ | Pandint
+  | Porint | Pxorint | Plslint | Plsrint | Pasrint | Pintcomp _ | Poffsetint _
+  | Poffsetref _ | Pintoffloat | Pfloatofint | Pnegfloat | Pabsfloat
+  | Paddfloat | Psubfloat | Pmulfloat | Pdivfloat | Pfloatcomp _
+  | Pstringlength | Pstringrefu | Pstringrefs | Pcompare_ints | Pcompare_floats
+  | Pcompare_bints _ | Pbyteslength | Pbytesrefu | Pbytessetu | Pbytesrefs
+  | Pbytessets | Pmakearray _ | Pduparray _ | Parraylength _ | Parrayrefu _
+  | Parraysetu _ | Parrayrefs _ | Parraysets _ | Pisint | Pisout | Pbintofint _
+  | Pintofbint _ | Pcvtbint _ | Pnegbint _ | Paddbint _ | Psubbint _
+  | Pmulbint _ | Pdivbint _ | Pmodbint _ | Pandbint _ | Porbint _ | Pxorbint _
+  | Plslbint _ | Plsrbint _ | Pasrbint _ | Pbintcomp _ | Pbigarrayref _
+  | Pbigarrayset _ | Pbigarraydim _ | Pstring_load_16 _ | Pstring_load_32 _
+  | Pstring_load_64 _ | Pbytes_load_16 _ | Pbytes_load_32 _ | Pbytes_load_64 _
+  | Pbytes_set_16 _ | Pbytes_set_32 _ | Pbytes_set_64 _ | Pbigstring_load_16 _
+  | Pbigstring_load_32 _ | Pbigstring_load_64 _ | Pbigstring_set_16 _
+  | Pbigstring_set_32 _ | Pbigstring_set_64 _ | Pctconst _ | Pbswap16
+  | Pbbswap _ | Pint_as_pointer | Patomic_exchange | Patomic_cas
+  | Patomic_fetch_add | Patomic_load _ | Pdls_get ->
       false
 
 (* Add a Kpop N instruction in front of a continuation *)
@@ -401,8 +401,9 @@ let comp_bint_primitive bi suff args =
 let comp_primitive stack_info p sz args =
   check_stack stack_info sz;
   match p with
-    Pgetglobal id -> Kgetglobal id
-  | Psetglobal id -> Ksetglobal id
+    Pgetpredef predef -> Kgetpredef predef
+  | Pgetcompunit compunit -> Kgetcompunit compunit
+  | Psetcompunit compunit -> Kcompunit compunit
   | Pintcomp cmp -> Kintcomp cmp
   | Pcompare_ints -> Kccall("caml_int_compare", 2)
   | Pcompare_floats -> Kccall("caml_float_compare", 2)

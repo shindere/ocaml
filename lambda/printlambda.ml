@@ -149,8 +149,12 @@ let primitive ppf = function
   | Pbytes_to_string -> fprintf ppf "bytes_to_string"
   | Pbytes_of_string -> fprintf ppf "bytes_of_string"
   | Pignore -> fprintf ppf "ignore"
-  | Pgetglobal id -> fprintf ppf "global %a" Ident.print id
-  | Psetglobal id -> fprintf ppf "setglobal %a" Ident.print id
+  | Pgetpredef (Cmo_format.Predef_exn predef_exn) ->
+    fprintf ppf "predefined exception %s" predef_exn
+  | Pgetcompunit (Cmo_format.Compunit compunit) ->
+    fprintf ppf "getcompunit %s" compunit
+  | Psetcompunit (Cmo_format.Compunit compunit) ->
+    fprintf ppf "setcompunit %s" compunit
   | Pmakeblock(tag, Immutable, shape) ->
       fprintf ppf "makeblock %i%a" tag block_shape shape
   | Pmakeblock(tag, Mutable, shape) ->
@@ -363,8 +367,9 @@ let name_of_primitive = function
   | Pbytes_of_string -> "Pbytes_of_string"
   | Pbytes_to_string -> "Pbytes_to_string"
   | Pignore -> "Pignore"
-  | Pgetglobal _ -> "Pgetglobal"
-  | Psetglobal _ -> "Psetglobal"
+  | Pgetpredef _ -> "Pgetpredef"
+  | Pgetcompunit _ -> "Pgetcompunit"
+  | Psetcompunit _ -> "Psetcompunit"
   | Pmakeblock _ -> "Pmakeblock"
   | Pfield _ -> "Pfield"
   | Pfield_computed -> "Pfield_computed"

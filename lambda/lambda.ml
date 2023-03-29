@@ -44,8 +44,9 @@ type primitive =
   | Pbytes_of_string
   | Pignore
     (* Globals *)
-  | Pgetglobal of Ident.t
-  | Psetglobal of Ident.t
+  | Pgetpredef of Cmo_format.predef
+  | Pgetcompunit of Cmo_format.compunit
+  | Psetcompunit of Cmo_format.compunit
   (* Operations on heap blocks *)
   | Pmakeblock of int * mutable_flag * block_shape
   | Pfield of int * immediate_or_pointer * mutable_flag
@@ -664,9 +665,14 @@ let rec patch_guarded patch = function
 
 let rec transl_address loc = function
   | Env.Aident id ->
-      if Ident.global id
-      then Lprim(Pgetglobal id, [], loc)
-      else Lvar id
+    begin
+      match Symtable.Global.global_of_ident id with
+      | None -> Lvar id
+      | Some (Symtable.Global.Glob_predef predef) ->
+        Lprim (Pgetpredef predef, [], loc)
+      | Some (Symtable.Global.Glob_compunit cu) ->
+        Lprim (Pgetcompunit cu, [], loc)
+    end
   | Env.Adot(addr, pos) ->
       Lprim(Pfield(pos, Pointer, Immutable),
                    [transl_address loc addr], loc)
