@@ -56,10 +56,10 @@ module Global = struct
   let global_of_ident id =
     let name = Ident.name id in
     if (Ident.is_predef id)
-    then Glob_predef (Predef_exn name)
+    then Some (Glob_predef (Predef_exn name))
     else if (Ident.global id)
-    then Glob_compunit (Compunit name)
-    else assert false
+    then Some (Glob_compunit (Compunit name))
+    else None
 
   module Set = Set.Make(struct type nonrec t = t let compare = compare end)
   module Map = Map.Make(struct type nonrec t = t let compare = compare end)

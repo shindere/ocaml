@@ -35,7 +35,7 @@ module Global : sig
     | Glob_predef of predef
   val name: t -> string
   val description: t -> string
-  val global_of_ident: Ident.t -> t
+  val global_of_ident: Ident.t -> t option
   module Set : Set.S with type elt = t
   module Map : Map.S with type key = t
 end
