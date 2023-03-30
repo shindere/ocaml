@@ -51,7 +51,7 @@ let next_cache tag =
   (tag, [!method_cache; Lconst(Const_base(Const_int n))])
 
 let rec is_path = function
-    Lvar _ | Lprim (Pgetglobal _, [], _) | Lconst _ -> true
+    Lvar _ | Lprim (Pgetcompunit _, [], _) | Lconst _ -> true
   | Lprim (Pfield _, [lam], _) -> is_path lam
   | Lprim ((Parrayrefu _ | Parrayrefs _), [lam1; lam2], _) ->
       is_path lam1 && is_path lam2
@@ -122,12 +122,12 @@ let transl_label_init_flambda f =
   in
   transl_label_init_general (fun () -> expr, size)
 
-let transl_store_label_init glob size f arg =
+let transl_store_label_init compunit size f arg =
   assert(not Config.flambda);
   assert(!Clflags.native_code);
   method_cache := Lprim(Pfield (size, Pointer, Mutable),
                         (* XXX KC: conservative *)
-                        [Lprim(Pgetglobal glob, [], Loc_unknown)],
+                        [Lprim(Pgetcompunit compunit, [], Loc_unknown)],
                         Loc_unknown);
   let expr = f arg in
   let (size, expr) =
@@ -135,7 +135,7 @@ let transl_store_label_init glob size f arg =
     (size+1,
      Lsequence(
      Lprim(Psetfield(size, Pointer, Root_initialization),
-           [Lprim(Pgetglobal glob, [], Loc_unknown);
+           [Lprim(Pgetcompunit compunit, [], Loc_unknown);
             Lprim (Pccall prim_makearray,
                    [int !method_count; int 0],
                    Loc_unknown)],

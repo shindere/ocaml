@@ -43,7 +43,7 @@ let abstract_type =
 let rec address path event = function
   | Env.Aident id ->
     begin
-      match Symtable.Global.global_of_ident id with
+      match Cmo_format.Global.global_of_ident id with
         | Some global ->
           begin
             try Debugcom.Remote_value.global (Symtable.get_global_position

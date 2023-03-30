@@ -814,13 +814,13 @@ let lambda_primitive_needs_event_after = function
   | Prunstack | Pperform | Preperform | Presume
   | Pbbswap _ -> true
 
-  | Pbytes_to_string | Pbytes_of_string | Pignore | Psetglobal _
-  | Pgetglobal _ | Pmakeblock _ | Pfield _ | Pfield_computed | Psetfield _
+  | Pbytes_to_string | Pbytes_of_string | Pignore | Psetcompunit _
+  | Pgetcompunit _ | Pmakeblock _ | Pfield _ | Pfield_computed | Psetfield _
   | Psetfield_computed _ | Pfloatfield _ | Psetfloatfield _ | Praise _
   | Psequor | Psequand | Pnot | Pnegint | Paddint | Psubint | Pmulint
   | Pdivint _ | Pmodint _ | Pandint | Porint | Pxorint | Plslint | Plsrint
   | Pasrint | Pintcomp _ | Poffsetint _ | Poffsetref _ | Pintoffloat
-  | Pcompare_ints | Pcompare_floats
+  | Pcompare_ints | Pcompare_floats | Pgetpredef _
   | Pfloatcomp _ | Pstringlength | Pstringrefu | Pbyteslength | Pbytesrefu
   | Pbytessetu | Pmakearray ((Pintarray | Paddrarray | Pfloatarray), _)
   | Parraylength _ | Parrayrefu _ | Parraysetu _ | Pisint | Pisout

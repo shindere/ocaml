@@ -20,10 +20,10 @@ open Misc
 (* Names of compilation units as represented in CMO files *)
 type compunit = Compunit of string [@@unboxed]
 
-module Compunit : sig
+module Compunit = struct
   type t = compunit
-  module Set : Set.S with type elt = t
-  module Map : Map.S with type key = t
+  module Set = Set.Make(struct type nonrec t = t let compare = compare end)
+  module Map = Map.Make(struct type nonrec t = t let compare = compare end)
 end
 
 (* Predefined symbols as represented in CMO files *)
@@ -31,10 +31,10 @@ end
 type predef =
   | Predef_exn of string [@@unboxed]
 
-module Predef : sig
+module Predef = struct
   type t = predef
-  module Set : Set.S with type elt = t
-  module Map : Map.S with type key = t
+  module Set = Set.Make(struct type nonrec t = t let compare = compare end)
+  module Map = Map.Make(struct type nonrec t = t let compare = compare end)
 end
 
 (* Global symbols as stored in the symbol table *)
@@ -43,12 +43,21 @@ type global =
   | Glob_compunit of compunit
   | Glob_predef of predef
 
-module Global : sig
+module Global = struct
   type t = global
-  val name: t -> string
-  val description: t -> string
-  module Set : Set.S with type elt = t
-  module Map : Map.S with type key = t
+
+  let name = function
+    | Glob_compunit (Compunit cu) -> cu
+    | Glob_predef (Predef_exn exn) -> exn
+
+  let quote s = "`" ^ s ^ "'"
+
+  let description = function
+    | Glob_compunit (Compunit cu) -> "compilation unit " ^ (quote cu)
+    | Glob_predef (Predef_exn exn) -> "predefined exception " ^ (quote exn)
+
+  module Set = Set.Make(struct type nonrec t = t let compare = compare end)
+  module Map = Map.Make(struct type nonrec t = t let compare = compare end)
 end
 
 (* Relocation information *)

@@ -20,50 +20,12 @@
 open Misc
 open Asttypes
 open Lambda
-open Cmo_format
-
-module String = Misc.Stdlib.String
-
-module Compunit = struct
-  type t = compunit
-  module Set = Set.Make(struct type nonrec t = t let compare = compare end)
-  module Map = Map.Make(struct type nonrec t = t let compare = compare end)
-end
 
 let builtin_values = Predef.builtin_values
 
-module Predef = struct
-  type t = predef
-  module Set = Set.Make(struct type nonrec t = t let compare = compare end)
-  module Map = Map.Make(struct type nonrec t = t let compare = compare end)
-end
+open Cmo_format
 
-module Global = struct
-  type t =
-    | Glob_compunit of compunit
-    | Glob_predef of predef
-
-  let name = function
-    | Glob_compunit (Compunit cu) -> cu
-    | Glob_predef (Predef_exn exn) -> exn
-
-  let quote s = "`" ^ s ^ "'"
-
-  let description = function
-    | Glob_compunit (Compunit cu) -> "compilation unit " ^ (quote cu)
-    | Glob_predef (Predef_exn exn) -> "predefined exception " ^ (quote exn)
-
-  let global_of_ident id =
-    let name = Ident.name id in
-    if (Ident.is_predef id)
-    then Some (Glob_predef (Predef_exn name))
-    else if (Ident.global id)
-    then Some (Glob_compunit (Compunit name))
-    else None
-
-  module Set = Set.Make(struct type nonrec t = t let compare = compare end)
-  module Map = Map.Make(struct type nonrec t = t let compare = compare end)
-end
+module String = Misc.Stdlib.String
 
 (* Functions for batch linking *)
 

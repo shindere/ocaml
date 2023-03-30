@@ -2161,7 +2161,7 @@ and type_module_aux ~alias sttn funct_body anchor env smod =
       in
       let md =
         if alias && aliasable then
-          (Env.add_required_global (Path.head path); md)
+          (Env.add_required_compunit (Ident.compunit_of_ident (Path.head path)); md)
         else begin
           let mty =
             if sttn then
@@ -2854,7 +2854,7 @@ and type_structure ?(toplevel = false) funct_body anchor env sstr =
   else Builtin_attributes.warning_scope [] run
 
 let type_toplevel_phrase env s =
-  Env.reset_required_globals ();
+  Env.reset_required_compunits ();
   type_structure ~toplevel:true false None env s
 
 let type_module_alias = type_module ~alias:true true false None
@@ -3031,7 +3031,7 @@ let type_implementation sourcefile outputprefix modulename initial_env ast =
   Cmt_format.clear ();
   Misc.try_finally (fun () ->
       Typecore.reset_delayed_checks ();
-      Env.reset_required_globals ();
+      Env.reset_required_compunits ();
       if !Clflags.print_types then (* #7656 *)
         ignore @@ Warnings.parse_options false "-32-34-37-38-60";
       let (str, sg, names, shape, finalenv) =

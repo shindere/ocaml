@@ -122,7 +122,7 @@ val normalize_module_path: Location.t option -> t -> Path.t -> Path.t
 (* Normalize the path to a concrete module.
    If the option is None, allow returning dangling paths.
    Otherwise raise a Missing_module error, and may add forgotten
-   head as required global. *)
+   head as required compunit. *)
 
 val normalize_type_path: Location.t option -> t -> Path.t -> Path.t
 (* Normalize the prefix part of the type path *)
@@ -133,9 +133,9 @@ val normalize_value_path: Location.t option -> t -> Path.t -> Path.t
 val normalize_modtype_path: t -> Path.t -> Path.t
 (* Normalize a module type path *)
 
-val reset_required_globals: unit -> unit
-val get_required_globals: unit -> Ident.t list
-val add_required_global: Ident.t -> unit
+val reset_required_compunits: unit -> unit
+val get_required_compunits: unit -> Cmo_format.compunit list
+val add_required_compunit: Cmo_format.compunit -> unit
 
 val has_local_constraints: t -> bool
 

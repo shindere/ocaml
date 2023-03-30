@@ -386,3 +386,15 @@ include Identifiable.Make (struct
   let equal = same
 end)
 let equal = original_equal
+
+let global_of_ident id =
+  let name = name id in
+  if (is_predef id)
+  then Some (Cmo_format.Glob_predef (Cmo_format.Predef_exn name))
+  else if (global id)
+  then Some (Cmo_format.Glob_compunit (Cmo_format.Compunit name))
+  else None
+
+let compunit_of_ident id = match global_of_ident id with
+  | Some (Cmo_format.Glob_compunit cu) -> cu
+  | _ -> assert false (* FIXME *)

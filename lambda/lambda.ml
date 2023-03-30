@@ -351,9 +351,9 @@ and lambda_event_kind =
   | Lev_pseudo
 
 type program =
-  { module_ident : Ident.t;
+  { module_ident : Cmo_format.compunit;
     main_module_block_size : int;
-    required_globals : Ident.Set.t;
+    required_compunits : Cmo_format.Compunit.Set.t;
     code : lambda }
 
 let const_int n = Const_base (Const_int n)
@@ -666,11 +666,11 @@ let rec patch_guarded patch = function
 let rec transl_address loc = function
   | Env.Aident id ->
     begin
-      match Symtable.Global.global_of_ident id with
+      match Ident.global_of_ident id with
       | None -> Lvar id
-      | Some (Symtable.Global.Glob_predef predef) ->
+      | Some (Cmo_format.Glob_predef predef) ->
         Lprim (Pgetpredef predef, [], loc)
-      | Some (Symtable.Global.Glob_compunit cu) ->
+      | Some (Cmo_format.Glob_compunit cu) ->
         Lprim (Pgetcompunit cu, [], loc)
     end
   | Env.Adot(addr, pos) ->

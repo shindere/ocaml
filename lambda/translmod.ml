@@ -763,12 +763,12 @@ let _ =
 (* Introduce dependencies on modules referenced only by "external". *)
 
 let scan_used_compunits lam =
-  let compunits = ref Symtable.Compunit.Set.empty in
+  let compunits = ref Cmo_format.Compunit.Set.empty in
   let rec scan lam =
     Lambda.iter_head_constructor scan lam;
     match lam with
       Lprim ((Pgetcompunit cu | Psetcompunit cu), _, _) ->
-        compunits := Symtable.Compunit.Set.add cu !compunits
+        compunits := Cmo_format.Compunit.Set.add cu !compunits
     | _ -> ()
   in
   scan lam; !compunits
@@ -776,15 +776,16 @@ let scan_used_compunits lam =
 let required_compunits ~flambda body =
   let compunits = scan_used_compunits body in
   let add_compunit cu req =
-    if not flambda && Symtable.Compunit.Set.mem cu compunits then
+    if not flambda && Cmo_format.Compunit.Set.mem cu compunits then
       req
     else
-      Symtable.Compunit.Set.add cu req
+      Cmo_format.Compunit.Set.add cu req
   in
   let required =
     List.fold_left
-      (fun acc path -> add_compunit (Path.head path) acc)
-      (if flambda then compunits else Symtable.Compunit.Set.empty)
+      (fun acc path -> add_compunit
+        (Ident.compunit_of_ident (Path.head path)) acc)
+      (if flambda then compunits else Cmo_format.Compunit.Set.empty)
       (Translprim.get_used_primitives ())
   in
   let required =
@@ -800,7 +801,7 @@ let transl_implementation_flambda module_name (str, cc) =
   reset_labels ();
   primitive_declarations := [];
   Translprim.clear_used_primitives ();
-  let module_id = Ident.create_persistent module_name in
+  let module_id = Cmo_format.Compunit module_name in
   let scopes = enter_module_definition ~scopes:empty_scopes module_id in
   let body, size =
     Translobj.transl_label_init
@@ -1378,7 +1379,7 @@ let transl_store_gen ~scopes module_name ({ str_items = str }, restr) topl =
   reset_labels ();
   primitive_declarations := [];
   Translprim.clear_used_primitives ();
-  let module_id = Ident.create_persistent module_name in
+  let compunit = Cmo_format.Compunit module_name in
   let (map, prims, aliases, size) =
     build_ident_map restr (defined_idents str) (more_idents str) in
   let f = function
@@ -1386,9 +1387,9 @@ let transl_store_gen ~scopes module_name ({ str_items = str }, restr) topl =
         assert (size = 0);
         Lambda.subst (fun _ _ env -> env) !transl_store_subst
           (transl_exp ~scopes expr)
-    | str -> transl_store_structure ~scopes module_id map prims aliases str
+    | str -> transl_store_structure ~scopes compunit map prims aliases str
   in
-  transl_store_label_init module_id size f str
+  transl_store_label_init compunit size f str
   (*size, transl_label_init (transl_store_structure module_id map prims str)*)
 
 let transl_store_phrases module_name str =

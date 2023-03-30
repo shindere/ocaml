@@ -1300,13 +1300,13 @@ let shape_or_leaf uid = function
   | None -> Shape.leaf uid
   | Some shape -> shape
 
-let required_globals = s_ref []
-let reset_required_globals () = required_globals := []
-let get_required_globals () = !required_globals
-let add_required_global id =
-  if Ident.global id && not !Clflags.transparent_modules
-  && not (List.exists (Ident.same id) !required_globals)
-  then required_globals := id :: !required_globals
+let required_compunits = s_ref []
+let reset_required_compunits () = required_compunits := []
+let get_required_compunits () = !required_compunits
+let add_required_compunit cu =
+  if not !Clflags.transparent_modules
+  && not (List.mem cu !required_compunits)
+  then required_compunits := cu :: !required_compunits
 
 let rec normalize_module_path lax env = function
   | Pident id as path when lax && Ident.persistent id ->
@@ -1331,7 +1331,7 @@ and expand_module_path lax env path =
       if lax || !Clflags.transparent_modules then path' else
       let id = Path.head path in
       if Ident.global id && not (Ident.same id (Path.head path'))
-      then add_required_global id;
+      then add_required_compunit (Ident.compunit_of_ident id);
       path'
   | _ -> path
   with Not_found when lax

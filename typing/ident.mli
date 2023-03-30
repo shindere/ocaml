@@ -108,3 +108,6 @@ val remove: t -> 'a tbl -> 'a tbl
 (* Idents for sharing keys *)
 
 val make_key_generator : unit -> (t -> t)
+
+val global_of_ident: t -> Cmo_format.Global.t option
+val compunit_of_ident: t -> Cmo_format.compunit

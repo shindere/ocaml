@@ -17,29 +17,6 @@
 
 open Cmo_format
 
-module Compunit : sig
-  type t = compunit
-  module Set : Set.S with type elt = t
-  module Map : Map.S with type key = t
-end
-
-module Predef : sig
-  type t = predef
-  module Set : Set.S with type elt = t
-  module Map : Map.S with type key = t
-end
-
-module Global : sig
-  type t =
-    | Glob_compunit of compunit
-    | Glob_predef of predef
-  val name: t -> string
-  val description: t -> string
-  val global_of_ident: Ident.t -> t option
-  module Set : Set.S with type elt = t
-  module Map : Map.S with type key = t
-end
-
 (* Functions for batch linking *)
 
 val init: unit -> unit

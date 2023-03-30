@@ -342,10 +342,11 @@ and lambda_event_kind =
   | Lev_pseudo
 
 type program =
-  { module_ident : Ident.t;
+  { module_ident : Cmo_format.compunit;
     main_module_block_size : int;
-    required_globals : Ident.Set.t;    (* Modules whose initializer side effects
-                                          must occur before [code]. *)
+    required_compunits : Cmo_format.Compunit.Set.t;
+    (* Modules whose initializer side effects
+       must occur before [code]. *)
     code : lambda }
 (* Lambda code for the middle-end.
    * In the closure case the code is a sequence of assignments to a
