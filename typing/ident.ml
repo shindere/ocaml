@@ -397,4 +397,4 @@ let global_of_ident id =
 
 let compunit_of_ident id = match global_of_ident id with
   | Some (Cmo_format.Glob_compunit cu) -> cu
-  | _ -> assert false (* FIXME *)
+  | _ -> Misc.fatal_error "Ident.compunit_of_ident"
