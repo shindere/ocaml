@@ -94,7 +94,7 @@ let branch_to label cont = match cont with
 
 let rec discard_dead_code = function
     [] -> []
-  | (Klabel _ | Krestart | Ksetglobal _) :: _ as cont -> cont
+  | (Klabel _ | Krestart | Ksetcompunit _) :: _ as cont -> cont
   | _ :: cont -> discard_dead_code cont
 
 (* Check if we're in tailcall position *)
@@ -401,9 +401,9 @@ let comp_bint_primitive bi suff args =
 let comp_primitive stack_info p sz args =
   check_stack stack_info sz;
   match p with
-    Pgetpredef predef -> Kgetpredef predef
-  | Pgetcompunit compunit -> Kgetcompunit compunit
-  | Psetcompunit compunit -> Kcompunit compunit
+    Pgetpredef predef -> Kgetglobal (Cmo_format.Glob_predef predef)
+  | Pgetcompunit compunit -> Kgetglobal (Cmo_format.Glob_compunit compunit)
+  | Psetcompunit compunit -> Ksetcompunit compunit
   | Pintcomp cmp -> Kintcomp cmp
   | Pcompare_ints -> Kccall("caml_int_compare", 2)
   | Pcompare_floats -> Kccall("caml_float_compare", 2)

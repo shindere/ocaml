@@ -178,7 +178,7 @@ let init () =
     (fun i name ->
         if not (List.mem_assoc name builtin_values)
         then fatal_error "Symtable.init";
-      let global = Global.Glob_predef (Predef_exn name) in
+      let global = Cmo_format.Glob_predef (Cmo_format.Predef_exn name) in
       let c = slot_for_setglobal global in
       let cst = Const_block
           (Obj.object_tag,
@@ -236,13 +236,13 @@ let patch_object buff patchlist =
         (Reloc_literal sc, pos) ->
           patch_int buff pos (slot_for_literal sc)
       | (Reloc_getcompunit cu, pos) ->
-          let global = Global.Glob_compunit cu in
+          let global = Cmo_format.Glob_compunit cu in
           patch_int buff pos (slot_for_getglobal global)
       | (Reloc_getpredef pd, pos) ->
-          let global = Global.Glob_predef pd in
+          let global = Cmo_format.Glob_predef pd in
           patch_int buff pos (slot_for_getglobal global)
       | (Reloc_setcompunit cu, pos) ->
-          let global = Global.Glob_compunit cu in
+          let global = Cmo_format.Glob_compunit cu in
           patch_int buff pos (slot_for_setglobal global)
       | (Reloc_primitive name, pos) ->
           patch_int buff pos (of_prim name))
@@ -375,7 +375,7 @@ let check_global_initialized patchlist =
   (* Then check that all referenced, not defined comp units have a value *)
   let check_reference (rel, _) = match rel with
       Reloc_getcompunit compunit ->
-        let global = Global.Glob_compunit compunit in
+        let global = Cmo_format.Glob_compunit compunit in
         if not (List.mem compunit initialized_compunits)
         && Obj.is_int (get_global_value global)
         then raise (Error(Uninitialized_global global))
@@ -403,18 +403,18 @@ let hide_additions (st : global_map) =
    Used to expunge the global map for the toplevel. *)
 
 let filter_global_map p (gmap : global_map) =
-  let newtbl = ref Global.Map.empty in
-  Global.Map.iter
+  let newtbl = ref Cmo_format.Global.Map.empty in
+  Cmo_format.Global.Map.iter
     (fun global num ->
-      if p global then newtbl := Global.Map.add global num !newtbl)
+      if p global then newtbl := Cmo_format.Global.Map.add global num !newtbl)
     gmap.tbl;
   {GlobalMap. cnt = gmap.cnt; tbl = !newtbl}
 
 let iter_global_map f (gmap : global_map) =
-  Global.Map.iter f gmap.tbl
+  Cmo_format.Global.Map.iter f gmap.tbl
 
 let is_defined_in_global_map (gmap : global_map) global =
-  Global.Map.mem global gmap.tbl
+  Cmo_format.Global.Map.mem global gmap.tbl
 
 let empty_global_map = GlobalMap.empty
 
@@ -424,14 +424,15 @@ open Format
 
 let report_error ppf = function
   | Undefined_global global ->
-      fprintf ppf "Reference to undefined %s" (Global.description global)
+      fprintf ppf "Reference to undefined %s"
+        (Cmo_format.Global.description global)
   | Unavailable_primitive s ->
       fprintf ppf "The external function `%s' is not available" s
   | Wrong_vm s ->
       fprintf ppf "Cannot find or execute the runtime system %s" s
   | Uninitialized_global global ->
       fprintf ppf "The value of the %s is not yet computed"
-        (Global.description global)
+        (Cmo_format.Global.description global)
 
 let () =
   Location.register_error_of_exn

@@ -117,7 +117,8 @@ let pfield_computed = "Pfield_computed"
 let pfloatcomp = "Pfloatcomp"
 let pfloatfield = "Pfloatfield"
 let pfloatofint = "Pfloatofint"
-let pgetglobal = "Pgetglobal"
+let pgetpredef = "Pgetpredef"
+let pgetcompunit = "Pgetcompunit"
 let pignore = "Pignore"
 let pint_as_pointer = "Pint_as_pointer"
 let pintcomp = "Pintcomp"
@@ -157,7 +158,7 @@ let psequor = "Psequor"
 let psetfield = "Psetfield"
 let psetfield_computed = "Psetfield_computed"
 let psetfloatfield = "Psetfloatfield"
-let psetglobal = "Psetglobal"
+let psetcompunit = "Psetcompunit"
 let pstring_load_16 = "Pstring_load_16"
 let pstring_load_32 = "Pstring_load_32"
 let pstring_load_64 = "Pstring_load_64"
@@ -226,7 +227,8 @@ let pfield_computed_arg = "Pfield_computed_arg"
 let pfloatcomp_arg = "Pfloatcomp_arg"
 let pfloatfield_arg = "Pfloatfield_arg"
 let pfloatofint_arg = "Pfloatofint_arg"
-let pgetglobal_arg = "Pgetglobal_arg"
+let pgetpredef_arg = "Pgetpredef_arg"
+let pgetcompunit_arg = "Pgetcompunit_arg"
 let pignore_arg = "Pignore_arg"
 let pint_as_pointer_arg = "Pint_as_pointer_arg"
 let pintcomp_arg = "Pintcomp_arg"
@@ -263,7 +265,7 @@ let psequor_arg = "Psequor_arg"
 let psetfield_arg = "Psetfield_arg"
 let psetfield_computed_arg = "Psetfield_computed_arg"
 let psetfloatfield_arg = "Psetfloatfield_arg"
-let psetglobal_arg = "Psetglobal_arg"
+let psetcompunit_arg = "Psetcompunit_arg"
 let pstring_load_16_arg = "Pstring_load_16_arg"
 let pstring_load_32_arg = "Pstring_load_32_arg"
 let pstring_load_64_arg = "Pstring_load_64_arg"
@@ -327,8 +329,9 @@ let of_primitive : Lambda.primitive -> string = function
   | Pbytes_of_string -> pbytes_of_string
   | Pbytes_to_string -> pbytes_to_string
   | Pignore -> pignore
-  | Pgetglobal _ -> pgetglobal
-  | Psetglobal _ -> psetglobal
+  | Pgetpredef _ -> pgetpredef
+  | Pgetcompunit _ -> pgetcompunit
+  | Psetcompunit _ -> psetcompunit
   | Pmakeblock _ -> pmakeblock
   | Pfield _ -> pfield
   | Pfield_computed -> pfield_computed
@@ -439,8 +442,9 @@ let of_primitive_arg : Lambda.primitive -> string = function
   | Pbytes_of_string -> pbytes_of_string_arg
   | Pbytes_to_string -> pbytes_to_string_arg
   | Pignore -> pignore_arg
-  | Pgetglobal _ -> pgetglobal_arg
-  | Psetglobal _ -> psetglobal_arg
+  | Pgetpredef _ -> pgetpredef_arg
+  | Pgetcompunit _ -> pgetcompunit_arg
+  | Psetcompunit _ -> psetcompunit_arg
   | Pmakeblock _ -> pmakeblock_arg
   | Pfield _ -> pfield_arg
   | Pfield_computed -> pfield_computed_arg

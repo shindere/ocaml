@@ -19,7 +19,7 @@ open Misc
 open Config
 open Cmo_format
 
-module Compunit = Symtable.Compunit
+module Compunit = Cmo_format.Compunit
 
 module Dep = struct
   type t = compunit * compunit

@@ -19,12 +19,12 @@ open Cmo_format
 open Instruct
 
 val to_file: out_channel -> Cmo_format.compunit -> string ->
-  required_globals:Ident.Set.t -> instruction list -> unit
+  required_compunits:Cmo_format.Compunit.Set.t -> instruction list -> unit
         (* Arguments:
              channel on output file
              name of compilation unit implemented
              path of cmo file being written
-             required_globals: list of compilation units that must be
+             required_compunits: list of compilation units that must be
                evaluated before this one
              list of instructions to emit *)
 val to_memory:

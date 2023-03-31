@@ -20,7 +20,7 @@ open Misc
 open Instruct
 open Cmo_format
 module String = Misc.Stdlib.String
-module Compunit = Symtable.Compunit
+module Compunit = Cmo_format.Compunit
 
 let rec rev_append_map f l rest =
   match l with
@@ -227,10 +227,9 @@ let rename_append_pack_member packagename oc state m =
 (* Generate the code that builds the tuple representing the package module *)
 
 let build_global_target ~ppf_dump oc target_name state components coercion =
-  let components = List.map (Option.map ident_of_compunit) components in
   let lam =
     Translmod.transl_package
-      components (Ident.create_persistent target_name) coercion in
+      components (Cmo_format.Compunit target_name) coercion in
   let lam = Simplif.simplify_lambda lam in
   if !Clflags.dump_lambda then
     Format.fprintf ppf_dump "%a@." Printlambda.lambda lam;

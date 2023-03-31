@@ -155,8 +155,9 @@ let convert (prim : Lambda.primitive) : Clambda_primitives.primitive =
   | Pbytes_of_string
   | Pctconst _
   | Pignore
-  | Pgetglobal _
-  | Psetglobal _
+  | Pgetpredef _
+  | Pgetcompunit _
+  | Psetcompunit _
     ->
       Misc.fatal_errorf "lambda primitive %a can't be converted to \
                          clambda primitive"

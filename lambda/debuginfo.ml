@@ -58,8 +58,8 @@ module Scoped_location = struct
   let enter_value_definition ~scopes id =
     cons Sc_value_definition (dot scopes (Ident.name id))
 
-  let enter_module_definition ~scopes (Cmo_format.Compunit cu_name) =
-    cons Sc_module_definition (dot scopes cu_name)
+  let enter_module_definition ~scopes id =
+    cons Sc_module_definition (dot scopes (Ident.name id))
 
   let enter_class_definition ~scopes id =
     cons Sc_class_definition (dot scopes (Ident.name id))

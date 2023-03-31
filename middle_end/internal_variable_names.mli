@@ -65,7 +65,8 @@ val numerator : t
 val obj : t
 val offsetted : t
 val partial_fun : t
-val pgetglobal : t
+val pgetpredef : t
+val pgetcompunit : t
 val pointer : t
 val predef_exn : t
 val project_closure : t

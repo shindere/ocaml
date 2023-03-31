@@ -342,7 +342,7 @@ and lambda_event_kind =
   | Lev_pseudo
 
 type program =
-  { module_ident : Cmo_format.compunit;
+  { module_ident : Ident.t;
     main_module_block_size : int;
     required_compunits : Cmo_format.Compunit.Set.t;
     (* Modules whose initializer side effects

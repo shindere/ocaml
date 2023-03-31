@@ -801,7 +801,7 @@ let transl_implementation_flambda module_name (str, cc) =
   reset_labels ();
   primitive_declarations := [];
   Translprim.clear_used_primitives ();
-  let module_id = Cmo_format.Compunit module_name in
+  let module_id = Ident.create_persistent module_name in
   let scopes = enter_module_definition ~scopes:empty_scopes module_id in
   let body, size =
     Translobj.transl_label_init
@@ -817,8 +817,9 @@ let transl_implementation module_name (str, cc) =
   let implementation =
     transl_implementation_flambda module_name (str, cc)
   in
+  let compunit = Cmo_format.Compunit module_name in
   let code =
-    Lprim (Psetglobal implementation.module_ident, [implementation.code],
+    Lprim (Psetcompunit compunit, [implementation.code],
            Loc_unknown)
   in
   { implementation with code }
@@ -965,7 +966,9 @@ let transl_store_subst = ref Ident.Map.empty
 let nat_toplevel_name id =
   try match Ident.Map.find id !transl_store_subst with
     | Lprim(Pfield (pos, _, _),
-            [Lprim(Pgetcompunit compunit, [], _)], _) -> (compunit,pos)
+            [Lprim(Pgetcompunit (Cmo_format.Compunit cu_name), [], _)], _) ->
+      let id = Ident.create_persistent cu_name in
+      (id,pos)
     | _ -> raise Not_found
   with Not_found ->
     fatal_error("Translmod.nat_toplevel_name: " ^ Ident.unique_name id)
@@ -1278,6 +1281,7 @@ let transl_store_structure ~scopes glob map prims aliases str =
     try
       let (pos, cc) = Ident.find_same id map in
       let init_val = apply_coercion loc Alias cc (Lvar id) in
+      let compunit = Ident.compunit_of_ident id in
       Lprim(Psetfield(pos, Pointer, Root_initialization),
             [Lprim(Pgetcompunit compunit, [], loc); init_val],
             loc)
@@ -1292,9 +1296,10 @@ let transl_store_structure ~scopes glob map prims aliases str =
       let (pos, cc) = Ident.find_same id map in
       match cc with
         Tcoerce_none ->
+          let compunit = Ident.compunit_of_ident id in
           Ident.Map.add id
             (Lprim(Pfield (pos, Pointer, Immutable),
-                   [Lprim(Pgetglobal glob, [], Loc_unknown)],
+                   [Lprim(Pgetcompunit compunit, [], Loc_unknown)],
                    Loc_unknown))
             subst
       | _ ->
@@ -1307,7 +1312,7 @@ let transl_store_structure ~scopes glob map prims aliases str =
 
   and store_primitive (pos, prim) cont =
     Lsequence(Lprim(Psetfield(pos, Pointer, Root_initialization),
-                    [Lprim(Pgetglobal glob, [], Loc_unknown);
+                    [Lprim(Pgetcompunit glob, [], Loc_unknown);
                      Translprim.transl_primitive Loc_unknown
                        prim.pc_desc prim.pc_env prim.pc_type None],
                     Loc_unknown),
@@ -1317,13 +1322,15 @@ let transl_store_structure ~scopes glob map prims aliases str =
     let path_lam = transl_module_path Loc_unknown env path in
     let init_val = apply_coercion Loc_unknown Strict cc path_lam in
     Lprim(Psetfield(pos, Pointer, Root_initialization),
-          [Lprim(Pgetglobal glob, [], Loc_unknown);
+          [Lprim(Pgetcompunit glob, [], Loc_unknown);
            init_val],
           Loc_unknown)
   in
   let aliases = make_sequence store_alias aliases in
+  let Cmo_format.Compunit name = glob in
+  let id = Ident.create_persistent name in
   List.fold_right store_primitive prims
-    (transl_store ~scopes (global_path glob) !transl_store_subst aliases str)
+    (transl_store ~scopes (global_path id) !transl_store_subst aliases str)
 
 (* Transform a coercion and the list of value identifiers defined by
    a toplevel structure into a table [id -> (pos, coercion)],
@@ -1415,7 +1422,7 @@ let transl_store_implementation module_name (str, restr) =
 
 (* Compile a toplevel phrase *)
 
-let toploop_ident = Ident.create_persistent "Toploop"
+let toploop_compunit = Cmo_format.Compunit "Toploop"
 let toploop_getvalue_pos = 0 (* position of getvalue in module Toploop *)
 let toploop_setvalue_pos = 1 (* position of setvalue in module Toploop *)
 
@@ -1433,7 +1440,7 @@ let toploop_getvalue id =
   Lapply{
     ap_loc=Loc_unknown;
     ap_func=Lprim(Pfield (toploop_getvalue_pos, Pointer, Mutable),
-                  [Lprim(Pgetglobal toploop_ident, [], Loc_unknown)],
+                  [Lprim(Pgetcompunit toploop_compunit, [], Loc_unknown)],
                   Loc_unknown);
     ap_args=[Lconst(Const_base(
       Const_string (toplevel_name id, Location.none, None)))];
@@ -1446,7 +1453,7 @@ let toploop_setvalue id lam =
   Lapply{
     ap_loc=Loc_unknown;
     ap_func=Lprim(Pfield (toploop_setvalue_pos, Pointer, Mutable),
-                  [Lprim(Pgetglobal toploop_ident, [], Loc_unknown)],
+                  [Lprim(Pgetcompunit toploop_compunit, [], Loc_unknown)],
                   Loc_unknown);
     ap_args=
       [Lconst(Const_base(
@@ -1589,7 +1596,7 @@ let transl_toplevel_definition str =
 
 let get_component = function
     None -> Lconst const_unit
-  | Some id -> Lprim(Pgetglobal id, [], Loc_unknown)
+  | Some id -> Lprim(Pgetcompunit id, [], Loc_unknown)
 
 let transl_package_flambda component_names coercion =
   let size =
@@ -1610,7 +1617,7 @@ let transl_package component_names target_name coercion =
   let components =
     Lprim(Pmakeblock(0, Immutable, None),
           List.map get_component component_names, Loc_unknown) in
-  Lprim(Psetglobal target_name,
+  Lprim(Psetcompunit target_name,
         [apply_coercion Loc_unknown Strict coercion components],
         Loc_unknown)
   (*
@@ -1626,7 +1633,7 @@ let transl_package component_names target_name coercion =
           pos_cc_list
     | _ ->
         assert false in
-  Lprim(Psetglobal target_name, [Lprim(Pmakeblock(0, Immutable), components)])
+  Lprim(Psetcompunit target_name, [Lprim(Pmakeblock(0, Immutable), components)])
    *)
 
 let transl_store_package component_names target_name coercion =
@@ -1640,7 +1647,7 @@ let transl_store_package component_names target_name coercion =
        make_sequence
          (fun pos id ->
            Lprim(Psetfield(pos, Pointer, Root_initialization),
-                 [Lprim(Pgetglobal target_name, [], Loc_unknown);
+                 [Lprim(Pgetcompunit target_name, [], Loc_unknown);
                   get_component id],
                  Loc_unknown))
          0 component_names)
@@ -1657,7 +1664,7 @@ let transl_store_package component_names target_name coercion =
              make_sequence
                (fun pos _id ->
                  Lprim(Psetfield(pos, Pointer, Root_initialization),
-                       [Lprim(Pgetglobal target_name, [], Loc_unknown);
+                       [Lprim(Pgetcompunit target_name, [], Loc_unknown);
                         Lprim(Pfield (pos, Pointer, Mutable),
                               [Lvar blk], Loc_unknown)],
                        Loc_unknown))
@@ -1669,7 +1676,7 @@ let transl_store_package component_names target_name coercion =
        make_sequence
          (fun dst (src, cc) ->
            Lprim(Psetfield(dst, false),
-                 [Lprim(Pgetglobal target_name, []);
+                 [Lprim(Pgetcompunit target_name, []);
                   apply_coercion Strict cc (get_component id.(src))]))
          0 pos_cc_list)
   *)

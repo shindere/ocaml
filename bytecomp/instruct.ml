@@ -66,8 +66,7 @@ type instruction =
   | Kclosure of label * int
   | Kclosurerec of label list * int
   | Koffsetclosure of int
-  | Kgetpredef of Cmo_format.predef
-  | Kgetcompunit of Cmo_format.compunit
+  | Kgetglobal of Cmo_format.global
   | Ksetcompunit of Cmo_format.compunit
   | Kconst of structured_constant
   | Kmakeblock of int * int             (* size, tag *)
