@@ -20,7 +20,7 @@ module Scoped_location : sig
   val empty_scopes : scopes
   val enter_anonymous_function : scopes:scopes -> scopes
   val enter_value_definition : scopes:scopes -> Ident.t -> scopes
-  val enter_module_definition : scopes:scopes -> Cmo_format.compunit -> scopes
+  val enter_module_definition : scopes:scopes -> Ident.t -> scopes
   val enter_class_definition : scopes:scopes -> Ident.t -> scopes
   val enter_method_definition : scopes:scopes -> Asttypes.label -> scopes
 
