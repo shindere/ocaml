@@ -1094,7 +1094,8 @@ let rec close ({ backend; fenv; cenv ; mutable_vars } as env) lam =
       Usequence(fst (close env arg), expr), approx
   | Lprim((Pbytes_to_string | Pbytes_of_string), [arg], _loc) ->
       close env arg
-  | Lprim(Pgetglobal id, [], loc) ->
+  | Lprim(Pgetcompunit (Cmo_format.Compunit cu), [], loc) ->
+      let id = Ident.create_persistent cu in
       let dbg = Debuginfo.from_location loc in
       check_constant_result (getglobal dbg id)
                             (Compilenv.global_approx id)
@@ -1103,7 +1104,9 @@ let rec close ({ backend; fenv; cenv ; mutable_vars } as env) lam =
       let dbg = Debuginfo.from_location loc in
       check_constant_result (Uprim(P.Pfield (n, ptr, mut), [ulam], dbg))
                             (field_approx n approx)
-  | Lprim(Psetfield(n, is_ptr, init), [Lprim(Pgetglobal id, [], _); lam], loc)->
+  | Lprim(Psetfield(n, is_ptr, init), [Lprim
+    (Pgetcompunit (Cmo_format.Compunit cu), [], _); lam], loc) ->
+      let id = Ident.create_persistent cu in
       let (ulam, approx) = close env lam in
       if approx <> Value_unknown then
         (!global_approx).(n) <- approx;

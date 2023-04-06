@@ -18,17 +18,14 @@
 
 include Identifiable.S
 
-(* The [Ident.t] must be persistent.  This function raises an exception
-   if that is not the case. *)
-val create : Ident.t -> Linkage_name.t -> t
+val create : Cmo_format.compunit -> Linkage_name.t -> t
 
-val get_persistent_ident : t -> Ident.t
+val get_compunit_basename : t -> Cmo_format.compunit
 val get_linkage_name : t -> Linkage_name.t
 
 val is_current : t -> bool
 val set_current : t -> unit
 val get_current : unit -> t option
 val get_current_exn : unit -> t
-val get_current_id_exn : unit -> Ident.t
 
 val string_for_printing : t -> string

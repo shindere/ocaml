@@ -130,7 +130,7 @@ let reset ?packname name =
   Hashtbl.clear export_infos_table;
   let compilation_unit =
     Compilation_unit.create
-      (Ident.create_persistent name)
+      (Cmo_format.Compunit name)
       (current_unit_linkage_name ())
   in
   Compilation_unit.set_current compilation_unit

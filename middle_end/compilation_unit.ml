@@ -18,12 +18,12 @@
 open! Int_replace_polymorphic_compare
 
 type t = {
-  id : Ident.t;
+  basename : Cmo_format.compunit;
   linkage_name : Linkage_name.t;
   hash : int;
 }
 
-let string_for_printing t = Ident.name t.id
+let string_for_printing x = Cmo_format.string_of_compunit (x.basename)
 
 include Identifiable.Make (struct
   type nonrec t = t
@@ -36,9 +36,9 @@ include Identifiable.Make (struct
     else
       let c = compare v1.hash v2.hash in
       if c = 0 then
-        let v1_id = Ident.name v1.id in
-        let v2_id = Ident.name v2.id in
-        let c = String.compare v1_id v2_id in
+        let v1_basename = Cmo_format.string_of_compunit v1.basename in
+        let v2_basename = Cmo_format.string_of_compunit v2.basename in
+        let c = String.compare v1_basename v2_basename in
         if c = 0 then
           Linkage_name.compare v1.linkage_name v2.linkage_name
         else
@@ -51,17 +51,14 @@ include Identifiable.Make (struct
 
   let print ppf t = Format.pp_print_string ppf (string_for_printing t)
 
-  let output oc x = output_string oc (Ident.name x.id)
+  let output oc x = output_string oc (string_for_printing x)
   let hash x = x.hash
 end)
 
-let create (id : Ident.t) linkage_name =
-  if not (Ident.persistent id) then begin
-    Misc.fatal_error "Compilation_unit.create with non-persistent Ident.t"
-  end;
-  { id; linkage_name; hash = Hashtbl.hash (Ident.name id); }
+let create basename linkage_name =
+  { basename; linkage_name; hash = Hashtbl.hash basename; }
 
-let get_persistent_ident cu = cu.id
+let get_compunit_basename cu = cu.basename
 let get_linkage_name cu = cu.linkage_name
 
 let current = ref None
@@ -75,4 +72,3 @@ let get_current_exn () =
   match !current with
   | Some current -> current
   | None -> Misc.fatal_error "Compilation_unit.get_current_exn"
-let get_current_id_exn () = get_persistent_ident (get_current_exn ())

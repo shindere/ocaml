@@ -26,7 +26,7 @@ let name_expr = Flambda_utils.name_expr
 let name_expr_from_var = Flambda_utils.name_expr_from_var
 
 type t = {
-  current_unit_id : Ident.t;
+  current_unit_id : Cmo_format.compunit;
   symbol_for_global' : (Ident.t -> Symbol.t);
   backend : (module Backend_intf.S);
   mutable imported_symbols : Symbol.Set.t;
@@ -440,8 +440,8 @@ let rec close t env (lam : Lambda.lambda) : Flambda.t =
       close t env
         (Lambda.Llet(Strict, Pgenval, Ident.create_local "dummy",
                      arg, Lconst const))
-  | Lprim (Pfield _, [Lprim (Pgetglobal id, [],_)], _)
-      when Ident.same id t.current_unit_id ->
+  | Lprim (Pfield _, [Lprim (Pgetcompunit (Cmo_format.Compunit cu), [],_)], _)
+      when cu = t.current_unit_id ->
     Misc.fatal_errorf "[Pfield (Pgetglobal ...)] for the current compilation \
         unit is forbidden upon entry to the middle end"
   | Lprim (Psetfield (_, _, _), [Lprim (Pgetglobal _, [], _); _], _) ->
@@ -451,8 +451,8 @@ let rec close t env (lam : Lambda.lambda) : Flambda.t =
     let symbol = t.symbol_for_global' id in
     t.imported_symbols <- Symbol.Set.add symbol t.imported_symbols;
     name_expr (Symbol symbol) ~name:Names.predef_exn
-  | Lprim (Pgetglobal id, [], _) ->
-    assert (not (Ident.same id t.current_unit_id));
+  | Lprim (Pgetcompunit cu, [], _) ->
+    assert (cu <> t.current_unit_id);
     let symbol = t.symbol_for_global' id in
     t.imported_symbols <- Symbol.Set.add symbol t.imported_symbols;
     name_expr (Symbol symbol) ~name:Names.pgetglobal

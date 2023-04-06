@@ -20,6 +20,8 @@ open Misc
 (* Names of compilation units as represented in CMO files *)
 type compunit = Compunit of string [@@unboxed]
 
+let string_of_compunit (Compunit cu) = cu
+
 module Compunit = struct
   type t = compunit
   module Set = Set.Make(struct type nonrec t = t let compare = compare end)
