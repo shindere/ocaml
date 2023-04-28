@@ -557,6 +557,28 @@ partialclean::
 
 beforedepend:: lambda/runtimedef.ml
 
+# Choose the right middle-end-specific modules
+
+MIDDLE_END_SPECIFIC_MODULES = $(addprfix middle_end/,\
+  middle_end.mli middle_end.ml compilenv.mli compilenv.ml)
+
+middle_end/middle_end.mli: middle_end/$(MIDDLE_END_DIR)/middle_end.mli
+	cd middle_end; $(LN) $(MIDDLE_END_DIR)/middle_end.mli .
+
+middle_end/middle_end.ml: middle_end/$(MIDDLE_END_DIR)/middle_end.ml
+	cd middle_end; $(LN) $(MIDDLE_END_DIR)/middle_end.ml .
+
+middle_end/compilenv.mli: middle_end/$(MIDDLE_END_DIR)/compilenv.mli
+	cd middle_end; $(LN) $(MIDDLE_END_DIR)/compilenv.mli .
+
+middle_end/compilenv.ml: middle_end/$(MIDDLE_END_DIR)/compilenv.ml
+	cd middle_end; $(LN) $(MIDDLE_END_DIR)/compilenv.ml .
+
+beforedepend:: $(MIDDLE_END_SPECIFIC_MODULES)
+
+partialclean::
+	rm -f $(MIDDLE_END_SPECIFIC_MODULES)
+
 # Choose the right machine-dependent files
 
 asmcomp/arch.mli: asmcomp/$(ARCH)/arch.mli

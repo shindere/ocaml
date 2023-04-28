@@ -249,6 +249,12 @@ ASMCOMP_CMI = $(ARCH_SPECIFIC_ASMCOMP_CMI)
 # This ensures that the middle end can be linked (e.g. for objinfo) even when
 # the native code compiler is not present for some particular target.
 
+ifeq "$(FLAMBDA)" "true"
+  MIDDLE_END_DIR = flambda
+else
+  MIDDLE_END_DIR = clambda
+endif
+
 MIDDLE_END_CLOSURE = \
   middle_end/closure/closure.cmo \
   middle_end/closure/closure_middle_end.cmo
@@ -337,9 +343,10 @@ MIDDLE_END = \
   middle_end/flambda/simple_value_approx.cmo \
   middle_end/flambda/export_info.cmo \
   middle_end/flambda/export_info_for_pack.cmo \
+  middle_end/middle_end.cmo \
   middle_end/compilenv.cmo \
   $(MIDDLE_END_CLOSURE) \
-  $(MIDDLE_END_FLAMBDA)
+  $(MIDDLE_END_FLAMBDA) \
 MIDDLE_END_CMI = \
   middle_end/backend_intf.cmi \
   $(MIDDLE_END_CLOSURE_CMI) \

@@ -19,7 +19,7 @@
 
 (* Format of .cmx, .cmxa and .cmxs files *)
 
-open Misc
+open Middle_end
 
 (* Each .o file has a matching .cmx file that provides the following infos
    on the compilation unit:
@@ -30,23 +30,6 @@ open Misc
      - list of currying functions and application functions needed
    The .cmx file contains these infos (as an externed record) plus a MD5
    of these infos *)
-
-type export_info =
-  | Clambda of Clambda.value_approximation
-  | Flambda of Export_info.t
-
-type unit_infos =
-  { mutable ui_name: modname;             (* Name of unit implemented *)
-    mutable ui_symbol: string;            (* Prefix for symbols *)
-    mutable ui_defines: string list;      (* Unit and sub-units implemented *)
-    mutable ui_imports_cmi: crcs;         (* Interfaces imported *)
-    mutable ui_imports_cmx: crcs;         (* Infos imported *)
-    mutable ui_curry_fun: int list;       (* Currying functions needed *)
-    mutable ui_apply_fun: int list;       (* Apply functions needed *)
-    mutable ui_send_fun: int list;        (* Send functions needed *)
-    mutable ui_export_info: export_info;
-    mutable ui_force_link: bool;          (* Always linked *)
-    mutable ui_for_pack: string option }  (* Part of a pack *)
 
 (* Each .a library has a matching .cmxa file that provides the following
    infos on the library: *)

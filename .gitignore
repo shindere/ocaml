@@ -181,6 +181,11 @@ META
 /api_docgen/odoc/build
 /api_docgen/ocamldoc/build
 
+/middle_end/compilenv.ml
+/middle_end/compilenv.mli
+/middle_end/middle_end.ml
+/middle_end/middle_end.mli
+
 /ocamldoc/ocamldoc
 /ocamldoc/ocamldoc.opt
 /ocamldoc/odoc
