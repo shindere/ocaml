@@ -19,10 +19,12 @@ module String = Misc.Stdlib.String
 let ppf = Format.err_formatter
 (* Print the dependencies *)
 
-type file_kind = ML | MLI
+type file_kind = ML | MLI | MLL | MLY
 
 let ml_synonyms = ref [".ml"]
 let mli_synonyms = ref [".mli"]
+let mll_synonyms = ref [".mll"]
+let mly_synonyms = ref [".mly"]
 let shared = ref false
 let native_only = ref false
 let bytecode_only = ref false
@@ -95,10 +97,11 @@ let add_to_synonym_list synonyms suffix =
 
 (* Find file 'name' (capitalized) in search path *)
 let find_module_in_load_path name =
-  let names = List.map (fun ext -> name ^ ext) (!mli_synonyms @ !ml_synonyms) in
-  let unames =
+  let synonyms = !mli_synonyms @ !ml_synonyms @ !mll_synonyms @ !mly_synonyms in
+  let names = List.map (fun ext -> name ^ ext) synonyms
+  and unames =
     let uname = String.uncapitalize_ascii name in
-    List.map (fun ext -> uname ^ ext) (!mli_synonyms @ !ml_synonyms)
+    List.map (fun ext -> uname ^ ext) synonyms
   in
   let rec find_in_path = function
     | [] -> raise Not_found
@@ -115,23 +118,28 @@ let find_dependency target_kind modname (byt_deps, opt_deps) =
   | exception Not_found -> (byt_deps, opt_deps)
   | filename ->
     let basename = Filename.chop_extension filename in
-    let cmi_file = basename ^ ".cmi" in
-    let cmx_file = basename ^ ".cmx" in
+    let cmi_file = basename ^ ".cmi"
+    and cmx_file = basename ^ ".cmx" in
     let mli_exists =
-      List.exists (fun ext -> Sys.file_exists (basename ^ ext)) !mli_synonyms in
-    let ml_exists =
-      List.exists (fun ext -> Sys.file_exists (basename ^ ext)) !ml_synonyms in
-    if mli_exists then
+      List.exists (fun ext -> Sys.file_exists (basename ^ ext)) !mli_synonyms
+    and ml_exists =
+      List.exists (fun ext -> Sys.file_exists (basename ^ ext)) !ml_synonyms
+    and mll_exists =
+      List.exists (fun ext -> Sys.file_exists (basename ^ ext)) !mll_synonyms
+    and mly_exists =
+      List.exists (fun ext -> Sys.file_exists (basename ^ ext)) !mly_synonyms in
+    if mli_exists || mll_exists || mly_exists then
       let new_opt_dep =
         if !all_dependencies then
           match target_kind with
           | MLI -> [ cmi_file ]
           | ML  ->
               cmi_file :: (if ml_exists then [ cmx_file ] else [])
+          | MLL | MLY -> assert false
         else
         (* this is a make-specific hack that makes .cmx to be a 'proxy'
            target that would force the dependency on .cmi via transitivity *)
-        if ml_exists
+        if ml_exists  || mll_exists || mly_exists
         then [ cmx_file ]
         else [ cmi_file ]
       in
@@ -143,6 +151,7 @@ let find_dependency target_kind modname (byt_deps, opt_deps) =
           match target_kind with
           | MLI -> [ cmi_file ]
           | ML  -> [ cmi_file ]
+          | MLL | MLY -> assert false
         else
           (* again, make-specific hack *)
           [basename ^ (if !native_only then ".cmx" else ".cmo")] in
@@ -151,6 +160,7 @@ let find_dependency target_kind modname (byt_deps, opt_deps) =
         then match target_kind with
           | MLI -> [ cmi_file ]
           | ML  -> [ cmi_file; cmx_file ]
+          | MLL | MLY -> assert false
         else [ cmx_file ]
       in
       (bytenames @ byt_deps, optnames @  opt_deps)
@@ -320,7 +330,7 @@ let read_parse_and_extract parse_function extract_function def ast_kind
       (read_and_approximate source_file, def)
   end
 
-let print_ml_dependencies source_file extracted_deps pp_deps =
+let print_ml_dependencies (source_file, kind, extracted_deps, pp_deps) =
   let basename = Filename.chop_extension source_file in
   let byte_targets = [ basename ^ ".cmo" ] in
   let native_targets =
@@ -328,7 +338,9 @@ let print_ml_dependencies source_file extracted_deps pp_deps =
     then [ basename ^ ".cmx"; basename ^ ".o" ]
     else [ basename ^ ".cmx" ] in
   let shared_targets = [ basename ^ ".cmxs" ] in
-  let init_deps = if !all_dependencies then [source_file] else [] in
+  let init_deps =
+    if !all_dependencies || kind = MLL || kind = MLY
+    then [source_file] else [] in
   let cmi_name = basename ^ ".cmi" in
   let init_deps, extra_targets =
     if List.exists (fun ext -> Sys.file_exists (basename ^ ext))
@@ -358,13 +370,15 @@ let print_mli_dependencies source_file extracted_deps pp_deps =
       extracted_deps ([], []) in
   print_dependencies [basename ^ ".cmi"] (byt_deps @ pp_deps)
 
-let print_file_dependencies (source_file, kind, extracted_deps, pp_deps) =
+let print_file_dependencies ((source_file, kind, extracted_deps, pp_deps) as args) =
   if !raw_dependencies then begin
     print_raw_dependencies source_file extracted_deps
   end else
     match kind with
-    | ML -> print_ml_dependencies source_file extracted_deps pp_deps
+    | ML -> print_ml_dependencies args
     | MLI -> print_mli_dependencies source_file extracted_deps pp_deps
+    | MLL -> print_ml_dependencies args
+    | MLY -> print_ml_dependencies args
 
 
 let ml_file_dependencies source_file =
@@ -389,6 +403,79 @@ let mli_file_dependencies source_file =
   in
   files := (source_file, MLI, extracted_deps, !Depend.pp_deps) :: !files
 
+let process_ocaml_fragments buf ~need_struct_item action start_pos end_pos
+      (extracted_deps, pp_deps) =
+  let header_size = Buffer.length buf in
+  let size = end_pos - start_pos in
+  if need_struct_item then
+    Buffer.add_string buf "let _ =\n";
+  action start_pos size;
+  let filename = Filename.temp_file "ocamldep-" ".ml" in
+  Misc.protect_writing_to_file ~filename ~f:(fun oc ->
+      output_string oc (Buffer.contents buf));
+  ml_file_dependencies filename;
+  Misc.remove_file filename;
+  Buffer.truncate buf header_size;
+  match !files with
+  | (_, ML, extracted_deps', pp_deps') :: tl ->
+     files := tl;
+     (String.Set.union extracted_deps' extracted_deps),
+     (pp_deps' @ pp_deps)
+  | _ -> assert false
+
+let mll_file_dependencies source_file =
+  let mll = In_channel.with_open_bin source_file Misc.string_of_file in
+  let lexbuf = Lexing.from_string mll in
+  let lexdef = Ocamllex.Parser.lexer_definition Ocamllex.Lexer.main lexbuf in
+  let buf = Buffer.create 4096 in
+  let header_size = lexdef.header.end_pos - lexdef.header.start_pos in
+  Buffer.add_substring buf mll lexdef.header.start_pos header_size;
+  let action pos len = Buffer.add_substring buf mll pos len in
+  let deps =
+    List.fold_left (fun deps { Ocamllex.Syntax.clauses; _ } ->
+        List.fold_left (fun deps (_, entry) ->
+            let { Ocamllex.Syntax.start_pos; end_pos; _ } = entry in
+            process_ocaml_fragments buf ~need_struct_item:true action start_pos
+              end_pos deps
+          ) deps clauses
+      ) (String.Set.empty, []) lexdef.entrypoints
+  in
+  let extracted_deps, pp_deps =
+    process_ocaml_fragments buf ~need_struct_item:false action
+      lexdef.trailer.start_pos lexdef.trailer.end_pos deps in
+  files := (source_file, MLY, extracted_deps, pp_deps) :: !files
+
+(* This function doesn't process token type payload. The module is
+   likely referred to in the semantic actions. *)
+let mly_file_dependencies source_file =
+  let mly = In_channel.with_open_bin source_file Misc.string_of_file in
+  let lexbuf = Lexing.from_string mly in
+  let buf = Buffer.create 4096 in
+  let action pos len =
+    String.sub mly pos len
+    (* The sigil for ocamlyacc variables isn't valid OCaml syntax. *)
+    |> String.map (function '$' -> '_' | c -> c)
+    |> Buffer.add_string buf
+  in
+  let rec aux deps =
+    match Ocamldzo.main lexbuf with
+    | Theader (start, finish) ->
+       let header_size = finish.Lexing.pos_cnum - start.Lexing.pos_cnum in
+       Buffer.add_substring buf mly start.Lexing.pos_cnum header_size;
+       aux deps
+    | Taction (start, finish) ->
+       let start_pos, end_pos = start.Lexing.pos_cnum, finish.Lexing.pos_cnum in
+       process_ocaml_fragments buf ~need_struct_item:true action start_pos
+         end_pos deps
+    | Ttrailer (start, finish) ->
+       let start_pos, end_pos = start.Lexing.pos_cnum, finish.Lexing.pos_cnum in
+       process_ocaml_fragments buf ~need_struct_item:false action start_pos
+         end_pos deps
+    | Teof -> deps
+  in
+  let extracted_deps, pp_deps = aux (String.Set.empty, []) in
+  files := (source_file, MLY, extracted_deps, pp_deps) :: !files
+
 let process_file_as process_fun def source_file =
   Compenv.readenv ppf (Before_compile source_file);
   load_path := [];
@@ -404,22 +491,30 @@ let process_file_as process_fun def source_file =
     if Sys.file_exists source_file then process_fun source_file else def
   with x -> report_err x; def
 
-let process_file source_file ~ml_file ~mli_file ~def =
+let process_file source_file ~ml_file ~mli_file ~mll_file ~mly_file ~def =
   if List.exists (Filename.check_suffix source_file) !ml_synonyms then
     process_file_as ml_file def source_file
   else if List.exists (Filename.check_suffix source_file) !mli_synonyms then
     process_file_as mli_file def source_file
+  else if List.exists (Filename.check_suffix source_file) !mll_synonyms then
+    process_file_as mll_file def source_file
+  else if List.exists (Filename.check_suffix source_file) !mly_synonyms then
+    process_file_as mly_file def source_file
   else def
 
 let file_dependencies source_file =
   process_file source_file ~def:()
     ~ml_file:ml_file_dependencies
     ~mli_file:mli_file_dependencies
+    ~mll_file:mll_file_dependencies
+    ~mly_file:mly_file_dependencies
 
 let file_dependencies_as kind =
   match kind with
   | ML -> process_file_as ml_file_dependencies ()
   | MLI -> process_file_as mli_file_dependencies ()
+  | MLL -> process_file_as mll_file_dependencies ()
+  | MLY -> process_file_as mly_file_dependencies ()
 
 let sort_files_by_dependencies files =
   let h = Hashtbl.create 31 in
@@ -444,12 +539,13 @@ let sort_files_by_dependencies files =
     in
     String.Set.iter (fun modname ->
       match file_kind with
-          ML -> (* ML depends both on ML and MLI *)
+        | ML -> (* ML depends both on ML and MLI *)
             if Hashtbl.mem h (modname, MLI) then add_dep modname MLI;
             if Hashtbl.mem h (modname, ML) then add_dep modname ML
         | MLI -> (* MLI depends on MLI if exists, or ML otherwise *)
           if Hashtbl.mem h (modname, MLI) then add_dep modname MLI
           else if Hashtbl.mem h (modname, ML) then add_dep modname ML
+        | MLL | MLY -> ()
     ) deps;
     if file_kind = ML then (* add dep from .ml to .mli *)
       if Hashtbl.mem h (modname, MLI) then add_dep modname MLI
@@ -490,7 +586,9 @@ let sort_files_by_dependencies files =
     List.iter (fun (file, deps) ->
       Format.fprintf ppf "\t@[%s: " file;
       List.iter (fun (modname, kind) ->
-        Format.fprintf ppf "%s.%s " modname (if kind=ML then "ml" else "mli")
+        Format.fprintf ppf "%s.%s " modname
+          (match kind with ML -> "ml" | MLI -> "mli" | MLL -> "mll"
+                           | MLY -> "mly")
       ) !deps;
       Format.fprintf ppf "@]@.";
       Printf.printf "%s " file) sorted_deps;
@@ -521,6 +619,14 @@ let process_mli_map =
   read_parse_and_extract Parse.interface Depend.add_signature_binding
                          String.Map.empty Pparse.Signature
 
+let process_mll_map fname =
+  report_err (Failure (fname ^ " : maps are not supported on mll files."));
+  String.Set.empty, String.Map.empty
+
+let process_mly_map fname =
+  report_err (Failure (fname ^ " : maps are not supported on mll files."));
+  String.Set.empty, String.Map.empty
+
 let parse_map fname =
   let old_transp = !Clflags.transparent_modules in
   Clflags.transparent_modules := true;
@@ -528,6 +634,8 @@ let parse_map fname =
     process_file fname ~def:(String.Set.empty, String.Map.empty)
       ~ml_file:process_ml_map
       ~mli_file:process_mli_map
+      ~mll_file:process_mll_map
+      ~mly_file:process_mly_map
   in
   Clflags.transparent_modules := old_transp;
   let modname =
@@ -547,7 +655,8 @@ let parse_map fname =
 
 type dep_arg =
   | Map of Misc.filepath (* -map option *)
-  | Src of Misc.filepath * file_kind option (* -impl, -intf or anon arg *)
+  (* -impl, -intf, -lex, -yacc, or anon arg *)
+  | Src of Misc.filepath * file_kind option
 
 let process_dep_arg = function
   | Map file -> parse_map file
@@ -598,12 +707,20 @@ let run_main argv =
         "<f>  Process <f> as a .ml file";
       "-intf", Arg.String (add_dep_arg (fun f -> Src (f, Some MLI))),
         "<f>  Process <f> as a .mli file";
+      "-lex", Arg.String (add_dep_arg (fun f -> Src (f, Some MLL))),
+        "<f>  Process <f> as a .mll file";
+      "-yacc", Arg.String (add_dep_arg (fun f -> Src (f, Some MLY))),
+        "<f>  Process <f> as a .mly file";
       "-map", Arg.String (add_dep_arg (fun f -> Map f)),
         "<f>  Read <f> and propagate delayed dependencies to following files";
       "-ml-synonym", Arg.String(add_to_synonym_list ml_synonyms),
         "<e>  Consider <e> as a synonym of the .ml extension";
       "-mli-synonym", Arg.String(add_to_synonym_list mli_synonyms),
         "<e>  Consider <e> as a synonym of the .mli extension";
+      "-mll-synonym", Arg.String(add_to_synonym_list mll_synonyms),
+        "<e>  Consider <e> as a synonym of the .mll extension";
+      "-mly-synonym", Arg.String(add_to_synonym_list mly_synonyms),
+        "<e>  Consider <e> as a synonym of the .mly extension";
       "-modules", Arg.Set raw_dependencies,
         " Print module dependencies in raw form (not suitable for make)";
       "-native", Arg.Set native_only,
