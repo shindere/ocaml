@@ -76,21 +76,18 @@ let readdir dir =
     dirs := String.Map.add dir contents !dirs;
     contents
 
-let add_to_list li s =
-  li := s :: !li
-
 let add_to_load_path dir =
   try
     let dir = Misc.expand_directory Config.standard_library dir in
     let contents = readdir dir in
-    add_to_list load_path (dir, contents)
+    load_path := (dir, contents) !load_path
   with Sys_error msg ->
     Format.fprintf ppf "@[Bad -I option: %s@]@." msg;
     Error_occurred.set ()
 
 let add_to_synonym_list synonyms suffix =
   if (String.length suffix) > 1 && suffix.[0] = '.' then
-    add_to_list synonyms suffix
+    synonyms := suffix :: !synonyms
   else begin
     Format.fprintf ppf "@[Bad suffix: '%s'@]@." suffix;
     Error_occurred.set ()
@@ -574,8 +571,9 @@ let print_version_num () =
 
 
 let run_main argv =
+  let add_to_list l e = l := e :: !l in
   let dep_args_rev : dep_arg list ref = ref [] in
-  let add_dep_arg f s = dep_args_rev := (f s) :: !dep_args_rev in
+  let add_dep_arg f s = add_to_list dep_args_rev (f s) in
   Clflags.classic := false;
   try
     Compenv.readenv ppf Before_args;
