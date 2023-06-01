@@ -69,7 +69,7 @@ let readdir dir =
       try
         Sys.readdir dir
       with Sys_error msg ->
-        Format.fprintf Format.err_formatter "@[Bad -I option: %s@]@." msg;
+        Format.fprintf ppf "@[Bad -I option: %s@]@." msg;
         Error_occurred.set ();
         [||]
     in
@@ -85,14 +85,14 @@ let add_to_load_path dir =
     let contents = readdir dir in
     add_to_list load_path (dir, contents)
   with Sys_error msg ->
-    Format.fprintf Format.err_formatter "@[Bad -I option: %s@]@." msg;
+    Format.fprintf ppf "@[Bad -I option: %s@]@." msg;
     Error_occurred.set ()
 
 let add_to_synonym_list synonyms suffix =
   if (String.length suffix) > 1 && suffix.[0] = '.' then
     add_to_list synonyms suffix
   else begin
-    Format.fprintf Format.err_formatter "@[Bad suffix: '%s'@]@." suffix;
+    Format.fprintf ppf "@[Bad suffix: '%s'@]@." suffix;
     Error_occurred.set ()
   end
 
@@ -236,7 +236,7 @@ let print_raw_dependencies source_file deps =
 (* Process one file *)
 
 let print_exception exn =
-  Location.report_exception Format.err_formatter exn
+  Location.report_exception ppf exn
 
 let report_err exn =
   Error_occurred.set ();
@@ -487,19 +487,18 @@ let sort_files_by_dependencies files =
 
   if !worklist <> [] then begin
     Location.error "cycle in dependencies. End of list is not sorted."
-    |> Location.print_report Format.err_formatter;
+    |> Location.print_report ppf;
     let sorted_deps =
       let li = ref [] in
       Hashtbl.iter (fun _ file_deps -> li := file_deps :: !li) h;
       List.sort (fun (file1, _) (file2, _) -> String.compare file1 file2) !li
     in
     List.iter (fun (file, deps) ->
-      Format.fprintf Format.err_formatter "\t@[%s: " file;
+      Format.fprintf ppf "\t@[%s: " file;
       List.iter (fun (modname, kind) ->
-        Format.fprintf Format.err_formatter "%s.%s " modname
-          (if kind=ML then "ml" else "mli");
+        Format.fprintf ppf "%s.%s " modname (if kind=ML then "ml" else "mli")
       ) !deps;
-      Format.fprintf Format.err_formatter "@]@.";
+      Format.fprintf ppf "@]@.";
       Printf.printf "%s " file) sorted_deps;
     Error_occurred.set ()
   end;
