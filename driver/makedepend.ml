@@ -80,7 +80,7 @@ let add_to_load_path dir =
   try
     let dir = Misc.expand_directory Config.standard_library dir in
     let contents = readdir dir in
-    load_path := (dir, contents) !load_path
+    load_path := (dir, contents) :: !load_path
   with Sys_error msg ->
     Format.fprintf ppf "@[Bad -I option: %s@]@." msg;
     Error_occurred.set ()
@@ -274,19 +274,17 @@ let rec lexical_approximation lexbuf =
 
 let read_and_approximate inputfile =
   Depend.free_structure_names := String.Set.empty;
-  let ic = open_in_bin inputfile in
+  In_channel.with_open_bin inputfile @@ begin fun ic ->
   try
     seek_in ic 0;
     Location.input_name := inputfile;
     let lexbuf = Lexing.from_channel ic in
     Location.init lexbuf inputfile;
-    lexical_approximation lexbuf;
-    close_in ic;
-    !Depend.free_structure_names
+    lexical_approximation lexbuf
   with exn ->
-    close_in ic;
-    report_err exn;
-    !Depend.free_structure_names
+    report_err exn
+  end;
+  !Depend.free_structure_names
 
 let read_parse_and_extract parse_function extract_function def ast_kind
     source_file =
