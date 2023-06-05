@@ -327,7 +327,7 @@ let call_linker file_list startup_file output_name =
   let files, ldflags =
     if (not !Clflags.output_c_object) || main_dll || main_obj_runtime then
       files @ (List.rev !Clflags.ccobjs) @ runtime_lib (),
-      native_ldflags ^ " " ^
+      Config.native_ldflags ^ " " ^
       (if !Clflags.nopervasives || (main_obj_runtime && not main_dll)
        then "" else Config.native_c_libraries)
     else

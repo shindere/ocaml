@@ -70,7 +70,9 @@ val native_c_libraries: string
 (** The C libraries to link with native-code programs *)
 
 val native_ldflags : string
-(* Flags to pass to the system linker *)
+(**
+  Flags to pass to the system linker when linking native programs and libraries
+*)
 
 val native_pack_linker: string
 (** The linker to use for packaging (ocamlopt -pack) and for partial
