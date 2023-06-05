@@ -2128,7 +2128,11 @@ AS_CASE([$enable_ocamltest,OCAML__DEVELOPMENT_VERSION],
   [ocamltest=''])
 
 AS_IF([test -n "$ocamltest"],
-  [AC_CHECK_PROGS([DIFF], [patdiff diff], [none])
+  [ocamltest_unix_mod="ocamltest/ocamltest_unix_${ocamltest_unix_impl}.ml"
+  AC_CONFIG_LINKS([
+    ocamltest/ocamltest_unix.ml:${ocamltest_unix_mod}
+  ])
+  AC_CHECK_PROGS([DIFF], [patdiff diff], [none])
   DIFF_FLAGS=""
   flags=""
   AS_CASE([$DIFF],

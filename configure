@@ -19470,6 +19470,9 @@ esac
 
 if test -n "$ocamltest"
 then :
+  ocamltest_unix_mod="ocamltest/ocamltest_unix_${ocamltest_unix_impl}.ml"
+  ac_config_links="$ac_config_links ocamltest/ocamltest_unix.ml:${ocamltest_unix_mod}"
+
   for ac_prog in patdiff diff
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
@@ -20992,6 +20995,7 @@ do
     "otherlibs/str/META") CONFIG_FILES="$CONFIG_FILES otherlibs/str/META" ;;
     "otherlibs/systhreads/META") CONFIG_FILES="$CONFIG_FILES otherlibs/systhreads/META" ;;
     "ocamldoc/META") CONFIG_FILES="$CONFIG_FILES ocamldoc/META" ;;
+    "ocamltest/ocamltest_unix.ml") CONFIG_LINKS="$CONFIG_LINKS ocamltest/ocamltest_unix.ml:${ocamltest_unix_mod}" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac
