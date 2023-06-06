@@ -111,8 +111,9 @@ let find_module_in_load_path name =
   find_in_path !load_path
 
 let find_dependency target_kind modname (byt_deps, opt_deps) =
-  try
-    let filename = find_module_in_load_path modname in
+  match find_module_in_load_path modname with
+  | exception Not_found -> (byt_deps, opt_deps)
+  | filename ->
     let basename = Filename.chop_extension filename in
     let cmi_file = basename ^ ".cmi" in
     let cmx_file = basename ^ ".cmx" in
@@ -153,8 +154,6 @@ let find_dependency target_kind modname (byt_deps, opt_deps) =
         else [ cmx_file ]
       in
       (bytenames @ byt_deps, optnames @  opt_deps)
-  with Not_found ->
-    (byt_deps, opt_deps)
 
 let (depends_on, escaped_eol) = (":", " \\\n    ")
 
