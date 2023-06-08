@@ -83,8 +83,6 @@ cmx_files = $(ml_files:.ml=.cmx)
 mli_files = \
   $(filter %.mli,$(subst .mly,.mli,$(ocamltest_SOURCES)))
 
-cmi_files = $(mli_files:.mli=.cmi)
-
 c_files = $(filter %.c, $(ocamltest_SOURCES))
 
 o_files = $(c_files:.c=.$(O))
