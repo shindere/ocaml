@@ -26,7 +26,7 @@ include $(ROOTDIR)/Makefile.best_binaries
 # ocamltest has two components: its core and the OCaml "plugin"
 # which is actually built into the tool but clearly separated from its core
 
-core = \
+ocamltest_CORE = \
   run_$(UNIX_OR_WIN32).c run_stubs.c \
   $(call OCAML_CONFIGURED_MODULE, ocamltest_config) \
   $(call OCAML_MODULE, ocamltest_unix) \
@@ -49,7 +49,7 @@ core = \
   $(call OCAML_MODULE, builtin_actions) \
   $(call OCAML_MODULE, translate)
 
-ocaml_plugin = \
+ocamltest_ocaml_PLUGIN = \
   $(call OCAML_MODULE, ocaml_backends) \
   $(call OCAML_MODULE, ocaml_filetypes) \
   $(call OCAML_MODULE, ocaml_variables) \
@@ -64,7 +64,7 @@ ocaml_plugin = \
   $(call OCAML_MODULE, ocaml_actions) \
   $(call OCAML_MODULE, ocaml_tests)
 
-sources = $(core) $(ocaml_plugin) \
+ocamltest_SOURCES = $(ocamltest_CORE) $(ocamltest_ocaml_PLUGIN) \
   $(call OCAML_MODULE, options) \
   $(call OCAML_MODULE, main)
 
@@ -72,8 +72,8 @@ sources = $(core) $(ocaml_plugin) \
 
 ml_files = \
   $(filter %.ml, \
-    $(subst .ml.in,.ml,$(subst .mll,.ml,$(subst .mly,.ml,$(sources)))) \
-  )
+    $(subst .ml.in,.ml,\
+      $(subst .mll,.ml,$(subst .mly,.ml,$(ocamltest_SOURCES)))))
 
 cmo_files = $(ml_files:.ml=.cmo)
 
@@ -81,17 +81,17 @@ cmx_files = $(ml_files:.ml=.cmx)
 
 # List of .mli files for ocamldep
 mli_files = \
-  $(filter %.mli,$(subst .mly,.mli,$(sources)))
+  $(filter %.mli,$(subst .mly,.mli,$(ocamltest_SOURCES)))
 
 cmi_files = $(mli_files:.mli=.cmi)
 
-c_files = $(filter %.c, $(sources))
+c_files = $(filter %.c, $(ocamltest_SOURCES))
 
 o_files = $(c_files:.c=.$(O))
 
-lexers = $(filter %.mll,$(sources))
+lexers = $(filter %.mll,$(ocamltest_SOURCES))
 
-parsers = $(filter %.mly,$(sources))
+parsers = $(filter %.mly,$(ocamltest_SOURCES))
 
 dependencies_generated_prereqs = \
   $(lexers:.mll=.ml) \
