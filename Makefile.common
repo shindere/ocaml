@@ -93,6 +93,30 @@ INSTALL_PROGRAMS_MAN_DIR := $(DESTDIR)$(PROGRAMS_MAN_DIR)
 INSTALL_LIBRARIES_MAN_DIR := $(DESTDIR)$(LIBRARIES_MAN_DIR)
 INSTALL_DOCDIR := $(DESTDIR)$(DOCDIR)
 
+# Macros used to describe the known types of source files
+
+define OCAML_MODULE
+  $(1).mli $(1).ml
+endef
+
+define OCAML_CONFIGURED_MODULE
+  $(1).mli $(1).ml.in
+endef
+
+# List of ocamllex lexers, updated by each call to OCAMLLEX_LEXER
+
+OCAMLLEX_LEXERS =
+
+define OCAMLLEX_LEXER
+  $(eval OCAMLLEX_LEXERS += $(1).mll) $(1).mli $(1).mll
+endef
+
+# List of ocamlyacc parsers, updated by each call to OCAMLYACC_PARSER
+
+define OCAMLYACC_PARSER
+  $(eval OCAMLYACC_PARSERS += $(1).mly) $(1).mly
+endef
+
 FLEXDLL_SUBMODULE_PRESENT := $(wildcard $(ROOTDIR)/flexdll/Makefile)
 
 IN_COREBOOT_CYCLE ?= false

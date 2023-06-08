@@ -28,45 +28,45 @@ include $(ROOTDIR)/Makefile.best_binaries
 
 core := \
   run_$(UNIX_OR_WIN32).c run_stubs.c \
-  ocamltest_config.mli ocamltest_config.ml.in \
-  ocamltest_unix.mli ocamltest_unix.ml \
-  ocamltest_stdlib.mli ocamltest_stdlib.ml \
-  run_command.mli run_command.ml \
-  filecompare.mli filecompare.ml \
-  variables.mli variables.ml \
-  environments.mli environments.ml \
-  result.mli result.ml \
-  actions.mli actions.ml \
-  tests.mli tests.ml \
-  strace.mli strace.ml \
-  tsl_ast.mli tsl_ast.ml \
-  tsl_parser.mly \
-  tsl_lexer.mli tsl_lexer.mll \
-  modifier_parser.mli modifier_parser.ml \
-  tsl_semantics.mli tsl_semantics.ml \
-  builtin_variables.mli builtin_variables.ml \
-  actions_helpers.mli actions_helpers.ml \
-  builtin_actions.mli builtin_actions.ml \
-  translate.mli translate.ml
+  $(call OCAML_CONFIGURED_MODULE, ocamltest_config) \
+  $(call OCAML_MODULE, ocamltest_unix) \
+  $(call OCAML_MODULE, ocamltest_stdlib) \
+  $(call OCAML_MODULE, run_command) \
+  $(call OCAML_MODULE, filecompare) \
+  $(call OCAML_MODULE, variables) \
+  $(call OCAML_MODULE, environments) \
+  $(call OCAML_MODULE, result) \
+  $(call OCAML_MODULE, actions) \
+  $(call OCAML_MODULE, tests) \
+  $(call OCAML_MODULE, strace) \
+  $(call OCAML_MODULE, tsl_ast) \
+  $(call OCAMLYACC_PARSER, tsl_parser) \
+  $(call OCAMLLEX_LEXER, tsl_lexer) \
+  $(call OCAML_MODULE, modifier_parser) \
+  $(call OCAML_MODULE, tsl_semantics) \
+  $(call OCAML_MODULE, builtin_variables) \
+  $(call OCAML_MODULE, actions_helpers) \
+  $(call OCAML_MODULE, builtin_actions) \
+  $(call OCAML_MODULE, translate)
 
 ocaml_plugin := \
-  ocaml_backends.mli ocaml_backends.ml \
-  ocaml_filetypes.mli ocaml_filetypes.ml \
-  ocaml_variables.mli ocaml_variables.ml \
-  ocaml_modifiers.mli ocaml_modifiers.ml \
-  ocaml_directories.mli ocaml_directories.ml \
-  ocaml_files.mli ocaml_files.ml \
-  ocaml_flags.mli ocaml_flags.ml \
-  ocaml_commands.mli ocaml_commands.ml \
-  ocaml_tools.mli ocaml_tools.ml \
-  ocaml_compilers.mli ocaml_compilers.ml \
-  ocaml_toplevels.mli ocaml_toplevels.ml \
-  ocaml_actions.mli ocaml_actions.ml \
-  ocaml_tests.mli ocaml_tests.ml
+  $(call OCAML_MODULE, ocaml_backends) \
+  $(call OCAML_MODULE, ocaml_filetypes) \
+  $(call OCAML_MODULE, ocaml_variables) \
+  $(call OCAML_MODULE, ocaml_modifiers) \
+  $(call OCAML_MODULE, ocaml_directories) \
+  $(call OCAML_MODULE, ocaml_files) \
+  $(call OCAML_MODULE, ocaml_flags) \
+  $(call OCAML_MODULE, ocaml_commands) \
+  $(call OCAML_MODULE, ocaml_tools) \
+  $(call OCAML_MODULE, ocaml_compilers) \
+  $(call OCAML_MODULE, ocaml_toplevels) \
+  $(call OCAML_MODULE, ocaml_actions) \
+  $(call OCAML_MODULE, ocaml_tests)
 
 sources := $(core) $(ocaml_plugin) \
-  options.mli options.ml \
-  main.mli main.ml
+  $(call OCAML_MODULE, options) \
+  $(call OCAML_MODULE, main)
 
 # List of .ml files used for ocamldep and to get the list of modules
 
