@@ -270,6 +270,7 @@ LINK_BYTECODE_PROGRAM =\
 define OCAML_BYTECODE_PROGRAM
 $(eval $(call PROGRAM_SYNONYM,$(1)))
 $(basename $(notdir $(1)))_BCOBJS = \
+  $$(patsubst %,%.b.$(O), $$($(basename $(notdir $(1)))_STUBS)) \
   $$(patsubst %,%.cma, $$($(basename $(notdir $(1)))_LIBRARIES)) \
   $$(patsubst %,%.cmo, $$($(basename $(notdir $(1)))_MODULES))
 $(1)$(EXE): $$$$($(basename $(notdir $(1)))_BCOBJS)
@@ -283,6 +284,7 @@ LINK_NATIVE_PROGRAM =\
 define OCAML_NATIVE_PROGRAM
 $(eval $(call PROGRAM_SYNONYM,$(1)))
 $(basename $(notdir $(1)))_NCOBJS = \
+  $$(patsubst %,%.n.$(O), $$($(basename $(notdir $(1)))_STUBS)) \
   $$(patsubst %,%.cmxa, $$($(basename $(notdir $(1)))_LIBRARIES)) \
   $$(patsubst %,%.cmx, $$($(basename $(notdir $(1)))_MODULES))
 $(1)$(EXE): $$$$($(basename $(notdir $(1)))_NCOBJS)
