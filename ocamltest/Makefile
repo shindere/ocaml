@@ -26,7 +26,7 @@ include $(ROOTDIR)/Makefile.best_binaries
 # ocamltest has two components: its core and the OCaml "plugin"
 # which is actually built into the tool but clearly separated from its core
 
-core := \
+core = \
   run_$(UNIX_OR_WIN32).c run_stubs.c \
   $(call OCAML_CONFIGURED_MODULE, ocamltest_config) \
   $(call OCAML_MODULE, ocamltest_unix) \
@@ -49,7 +49,7 @@ core := \
   $(call OCAML_MODULE, builtin_actions) \
   $(call OCAML_MODULE, translate)
 
-ocaml_plugin := \
+ocaml_plugin = \
   $(call OCAML_MODULE, ocaml_backends) \
   $(call OCAML_MODULE, ocaml_filetypes) \
   $(call OCAML_MODULE, ocaml_variables) \
@@ -64,51 +64,51 @@ ocaml_plugin := \
   $(call OCAML_MODULE, ocaml_actions) \
   $(call OCAML_MODULE, ocaml_tests)
 
-sources := $(core) $(ocaml_plugin) \
+sources = $(core) $(ocaml_plugin) \
   $(call OCAML_MODULE, options) \
   $(call OCAML_MODULE, main)
 
 # List of .ml files used for ocamldep and to get the list of modules
 
-ml_files := \
+ml_files = \
   $(filter %.ml, \
     $(subst .ml.in,.ml,$(subst .mll,.ml,$(subst .mly,.ml,$(sources)))) \
   )
 
-cmo_files := $(ml_files:.ml=.cmo)
+cmo_files = $(ml_files:.ml=.cmo)
 
-cmx_files := $(ml_files:.ml=.cmx)
+cmx_files = $(ml_files:.ml=.cmx)
 
 # List of .mli files for ocamldep
-mli_files := \
+mli_files = \
   $(filter %.mli,$(subst .mly,.mli,$(sources)))
 
-cmi_files := $(mli_files:.mli=.cmi)
+cmi_files = $(mli_files:.mli=.cmi)
 
-c_files := $(filter %.c, $(sources))
+c_files = $(filter %.c, $(sources))
 
-o_files := $(c_files:.c=.$(O))
+o_files = $(c_files:.c=.$(O))
 
-lexers := $(filter %.mll,$(sources))
+lexers = $(filter %.mll,$(sources))
 
-parsers := $(filter %.mly,$(sources))
+parsers = $(filter %.mly,$(sources))
 
-dependencies_generated_prereqs := \
+dependencies_generated_prereqs = \
   $(lexers:.mll=.ml) \
   $(parsers:.mly=.mli) $(parsers:.mly=.ml)
 
-generated := $(dependencies_generated_prereqs) $(parsers:.mly=.output)
+generated = $(dependencies_generated_prereqs) $(parsers:.mly=.output)
 
-bytecode_modules := $(o_files) $(cmo_files)
+bytecode_modules = $(o_files) $(cmo_files)
 
-native_modules := $(o_files) $(cmx_files)
+native_modules = $(o_files) $(cmx_files)
 
-directories := $(addprefix $(ROOTDIR)/,utils bytecomp parsing \
+directories = $(addprefix $(ROOTDIR)/,utils bytecomp parsing \
                                        compilerlibs file_formats)
 
-include_directories := $(addprefix -I , $(directories))
+include_directories = $(addprefix -I , $(directories))
 
-flags := $(STDLIBFLAGS) -g $(include_directories) \
+flags = $(STDLIBFLAGS) -g $(include_directories) \
   -strict-sequence -strict-formats \
   -principal -absname -bin-annot \
   -w +a-4-9-40-41-42-44-45-48 -warn-error +A
