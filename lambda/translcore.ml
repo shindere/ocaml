@@ -81,6 +81,74 @@ let extract_float = function
     Const_base(Const_float f) -> f
   | _ -> fatal_error "Translcore.extract_float"
 
+(* Push the default values under the functional abstractions *)
+
+let wrap_bindings bindings exp =
+  List.fold_left
+    (fun exp binds ->
+      {exp with exp_desc = Texp_let(Nonrecursive, binds, exp)})
+    exp bindings
+
+let rec trivial_pat pat =
+  match pat.pat_desc with
+    Tpat_var _
+  | Tpat_any -> true
+  | Tpat_alias (p, _, _) ->
+      trivial_pat p
+  | Tpat_construct (_, cd, [], _) ->
+      not cd.cstr_generalized && cd.cstr_consts = 1 && cd.cstr_nonconsts = 0
+  | Tpat_tuple patl ->
+      List.for_all trivial_pat patl
+  | _ -> false
+
+let rec push_defaults loc bindings use_lhs cases partial =
+  match cases with
+    [{c_lhs=pat; c_guard=None; c_cont=None;
+      c_rhs={exp_desc = Texp_function { arg_label; param; cases; partial; } }
+        as exp}] when bindings = [] || trivial_pat pat ->
+      let cases = push_defaults exp.exp_loc bindings false cases partial in
+      [{c_lhs=pat; c_guard=None; c_cont=None;
+        c_rhs={exp with exp_desc = Texp_function { arg_label; param; cases;
+          partial; }}}]
+  | [{c_lhs=pat; c_guard=None; c_cont=None;
+      c_rhs={exp_attributes=[{Parsetree.attr_name = {txt="#default"};_}];
+             exp_desc = Texp_let
+               (Nonrecursive, binds,
+                ({exp_desc = Texp_function _} as e2))}}] ->
+      push_defaults loc (binds :: bindings) true
+                   [{c_lhs=pat;c_guard=None;c_cont=None;c_rhs=e2}]
+                   partial
+  | [{c_lhs=pat; c_guard=None; c_rhs=exp} as case]
+    when use_lhs || trivial_pat pat && exp.exp_desc <> Texp_unreachable ->
+      [{case with c_rhs = wrap_bindings bindings exp}]
+  | {c_lhs=pat; c_rhs=exp; c_guard=_} :: _ when bindings <> [] ->
+      let param = Typecore.name_cases "param" cases in
+      let desc =
+        {val_type = pat.pat_type; val_kind = Val_reg;
+         val_attributes = []; Types.val_loc = Location.none;
+         val_uid = Types.Uid.internal_not_actually_unique; }
+      in
+      let env = Env.add_value param desc exp.exp_env in
+      let name = Ident.name param in
+      let exp =
+        let cases =
+          let pure_case ({c_lhs; _} as case) =
+            {case with c_lhs = as_computation_pattern c_lhs} in
+          List.map pure_case cases in
+        { exp with exp_loc = loc; exp_env = env; exp_desc =
+          Texp_match
+            ({exp with exp_type = pat.pat_type; exp_env = env; exp_desc =
+              Texp_ident
+                (Path.Pident param, mknoloc (Longident.Lident name), desc)},
+             cases, [], partial) }
+      in
+      [{c_lhs = {pat with pat_desc = Tpat_var (param, mknoloc name)};
+        c_guard = None; c_cont=None; c_rhs= wrap_bindings bindings exp}]
+  | _ ->
+      cases
+
+let push_defaults loc = push_defaults loc [] false
+
 (* Insertion of debugging events *)
 
 let event_before ~scopes exp lam =
@@ -242,13 +310,35 @@ and transl_exp0 ~in_new_scope ~scopes e =
       event_after ~scopes e
         (transl_apply ~scopes ~tailcall ~inlined ~specialised
            (transl_exp ~scopes funct) oargs (of_location ~scopes e.exp_loc))
-  | Texp_match(arg, pat_expr_list, partial) ->
+  | Texp_match(arg, pat_expr_list, [], partial) ->
       transl_match ~scopes e arg pat_expr_list partial
-  | Texp_try(body, pat_expr_list) ->
+  | Texp_match(arg, pat_expr_list, eff_pat_expr_list, partial) ->
+  (* need to separate the values from exceptions for tansl_handler *)
+      let split_case (val_cases, exn_cases as acc)
+            ({ c_lhs; c_rhs } as case) =
+        if c_rhs.exp_desc = Texp_unreachable then acc else
+        let val_pat, exn_pat = split_pattern c_lhs in
+        match val_pat, exn_pat with
+        | None, None -> assert false
+        | Some pv, None ->
+            { case with c_lhs = pv } :: val_cases, exn_cases
+        | None, Some pe ->
+            val_cases, { case with c_lhs = pe } :: exn_cases
+        | Some _pv, Some _pe ->
+            assert false (* FIXME: handle this case *)
+      in
+      let pat_expr_list, exn_pat_expr_list =
+        let x, y = List.fold_left split_case ([], []) pat_expr_list in
+        List.rev x, List.rev y
+      in
+      transl_handler ~scopes e arg (Some (pat_expr_list, partial)) exn_pat_expr_list eff_pat_expr_list
+  | Texp_try(body, pat_expr_list, []) ->
       let id = Typecore.name_cases "exn" pat_expr_list in
       Ltrywith(transl_exp ~scopes body, id,
                Matching.for_trywith ~scopes e.exp_loc (Lvar id)
                  (transl_cases_try ~scopes pat_expr_list))
+  | Texp_try(body, exn_pat_expr_list, eff_pat_expr_list) ->
+      transl_handler ~scopes e body None exn_pat_expr_list eff_pat_expr_list
   | Texp_tuple el ->
       let ll, shape = transl_list_with_shape ~scopes el in
       begin try
@@ -588,13 +678,20 @@ and transl_guard ~scopes guard rhs =
       event_before ~scopes cond
         (Lifthenelse(transl_exp ~scopes cond, expr, staticfail))
 
-and transl_case ~scopes {c_lhs; c_guard; c_rhs} =
-  (c_lhs, transl_guard ~scopes c_guard c_rhs)
+and transl_cont cont c_cont body =
+  match cont, c_cont with
+  | Some id1, Some id2 -> Llet(Alias, Pgenval, id2, Lvar id1, body)
+  | None, None
+  | Some _, None -> body
+  | None, Some _ -> assert false
 
-and transl_cases ~scopes cases =
+and transl_case ~scopes ?cont {c_lhs; c_cont; c_guard; c_rhs} =
+  (c_lhs, transl_cont cont c_cont (transl_guard ~scopes c_guard c_rhs))
+
+and transl_cases ~scopes ?cont cases =
   let cases =
     List.filter (fun c -> c.c_rhs.exp_desc <> Texp_unreachable) cases in
-  List.map (transl_case ~scopes) cases
+  List.map (transl_case ~scopes ?cont) cases
 
 and transl_case_try ~scopes {c_lhs; c_guard; c_rhs} =
   iter_exn_names Translprim.add_exception_ident c_lhs;
@@ -1152,6 +1249,64 @@ and transl_match ~scopes e arg pat_expr_list partial =
   List.fold_left (fun body (static_exception_id, val_ids, handler) ->
     Lstaticcatch (body, (static_exception_id, val_ids), handler)
   ) classic static_handlers
+
+and prim_alloc_stack =
+  Pccall (Primitive.simple ~name:"caml_alloc_stack" ~arity:3 ~alloc:true)
+
+and transl_handler ~scopes e body val_caselist exn_caselist eff_caselist =
+  let val_fun =
+    match val_caselist with
+    | None ->
+        let param = Ident.create_local "param" in
+        lfunction ~kind:Curried ~params:[param, Pgenval]
+         ~return:Pgenval ~body:(Lvar param)
+         ~attr:default_function_attribute ~loc:Loc_unknown
+    | Some (val_caselist, partial) ->
+        let val_cases = transl_cases ~scopes val_caselist in
+        let param = Typecore.name_cases "param" val_caselist in
+        let body = Matching.for_function ~scopes e.exp_loc None (Lvar param) val_cases partial in
+        lfunction ~kind:Curried ~params:[param, Pgenval]
+          ~return:Pgenval ~attr:default_function_attribute
+          ~loc:Loc_unknown ~body
+  in
+  let exn_fun =
+    let exn_cases = transl_cases ~scopes exn_caselist in
+    let param = Typecore.name_cases "exn" exn_caselist in
+    let body = Matching.for_trywith ~scopes e.exp_loc (Lvar param) exn_cases in
+    lfunction ~kind:Curried ~params:[param, Pgenval] ~return:Pgenval
+      ~attr:default_function_attribute ~loc:Loc_unknown ~body
+  in
+  let eff_fun =
+    let param = Typecore.name_cases "eff" eff_caselist in
+    let cont = Ident.create_local "k" in
+    let cont_tail = Ident.create_local "ktail" in
+    let eff_cases = transl_cases ~scopes ~cont eff_caselist in
+    let body = Matching.for_handler ~scopes e.exp_loc (Lvar param) (Lvar cont) (Lvar cont_tail) eff_cases in
+    lfunction ~kind:Curried ~params:[(param, Pgenval); (cont, Pgenval); (cont_tail, Pgenval)]
+      ~return:Pgenval ~attr:default_function_attribute ~loc:Loc_unknown ~body
+  in
+  let is_pure = function
+    | Lconst _ -> true
+    | Lvar _ -> true
+    | Lfunction _ -> true
+    | _ -> false
+  in
+  let (body_fun, arg) =
+    match transl_exp ~scopes body with
+    | Lapply { ap_func = fn; ap_args = [arg]; _ }
+        when is_pure fn && is_pure arg -> (fn, arg)
+    | body ->
+       let param = Ident.create_local "param" in
+       (lfunction ~kind:Curried ~params:[param, Pgenval] ~return:Pgenval
+                  ~attr:default_function_attribute ~loc:Loc_unknown
+                  ~body,
+        Lconst(Const_base(Const_int 0)))
+  in
+  let alloc_stack =
+    Lprim(prim_alloc_stack, [val_fun; exn_fun; eff_fun], Loc_unknown)
+  in
+  Lprim(Prunstack, [alloc_stack; body_fun; arg],
+        of_location ~scopes e.exp_loc)
 
 and transl_letop ~scopes loc env let_ ands param case partial =
   let rec loop prev_lam = function
