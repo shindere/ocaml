@@ -181,6 +181,6 @@ $(DEPDIR)/%.$(D): %.c | $(DEPDIR)
 
 .PHONY: depend
 depend: $(ocamltest_DEPS_PREREQS)
-	$(V_OCAMLDEP)$(OCAMLDEP_CMD) $(ocamltest_MLI_FILES) $(ocamltest_ML_FILES) > .depend
+	$(V_OCAMLDEP)$(OCAMLDEP_CMD) *.mli *.ml > .depend
 
 -include .depend
