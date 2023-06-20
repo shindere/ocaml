@@ -150,6 +150,11 @@ COMP = \
   driver/compenv.cmo \
   driver/main_args.cmo \
   driver/compmisc.cmo \
+  lex/syntax.cmo \
+  lex/cset.cmo \
+  lex/lexer.cmo \
+  lex/parser.cmo \
+  driver/ocamldzo.cmo \
   driver/makedepend.cmo \
   driver/compile_common.cmo
 COMP_CMI = \
