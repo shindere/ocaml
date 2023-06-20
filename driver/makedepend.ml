@@ -426,15 +426,15 @@ let process_ocaml_fragments buf ~need_struct_item action start_pos end_pos
 let mll_file_dependencies source_file =
   let mll = In_channel.with_open_bin source_file Misc.string_of_file in
   let lexbuf = Lexing.from_string mll in
-  let lexdef = Ocamllex.Parser.lexer_definition Ocamllex.Lexer.main lexbuf in
+  let lexdef = Parser.lexer_definition Lexer.main lexbuf in
   let buf = Buffer.create 4096 in
   let header_size = lexdef.header.end_pos - lexdef.header.start_pos in
   Buffer.add_substring buf mll lexdef.header.start_pos header_size;
   let action pos len = Buffer.add_substring buf mll pos len in
   let deps =
-    List.fold_left (fun deps { Ocamllex.Syntax.clauses; _ } ->
+    List.fold_left (fun deps { Syntax.clauses; _ } ->
         List.fold_left (fun deps (_, entry) ->
-            let { Ocamllex.Syntax.start_pos; end_pos; _ } = entry in
+            let { Syntax.start_pos; end_pos; _ } = entry in
             process_ocaml_fragments buf ~need_struct_item:true action start_pos
               end_pos deps
           ) deps clauses
