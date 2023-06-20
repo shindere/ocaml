@@ -99,8 +99,12 @@ define OCAML_MODULE
   $(1).mli $(1).ml
 endef
 
+# List of configured modules, updated by each call to OCAML_CONFIGURED_MODULE
+
+OCAML_CONFIGURED_MODULES =
+
 define OCAML_CONFIGURED_MODULE
-  $(1).mli $(1).ml.in
+  $(eval OCAML_CONFIGURED_MODULES += $(1).ml.in) $(1).mli $(1).ml.in
 endef
 
 # List of ocamllex lexers, updated by each call to OCAMLLEX_LEXER
