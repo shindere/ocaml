@@ -70,36 +70,32 @@ ocamltest_SOURCES = $(ocamltest_CORE) $(ocamltest_ocaml_PLUGIN) \
 
 # List of .ml files used for ocamldep and to get the list of modules
 
-ml_files = \
+ocamltest_ML_FILES = \
   $(filter %.ml, \
     $(subst .ml.in,.ml,\
       $(subst .mll,.ml,$(subst .mly,.ml,$(ocamltest_SOURCES)))))
 
-cmo_files = $(ml_files:.ml=.cmo)
+ocamltest_CMO_FILES = $(ocamltest_ML_FILES:.ml=.cmo)
 
-cmx_files = $(ml_files:.ml=.cmx)
+ocamltest_CMX_FILES = $(ocamltest_ML_FILES:.ml=.cmx)
 
 # List of .mli files for ocamldep
-mli_files = \
+ocamltest_MLI_FILES = \
   $(filter %.mli,$(subst .mly,.mli,$(ocamltest_SOURCES)))
 
-c_files = $(filter %.c, $(ocamltest_SOURCES))
+ocamltest_C_FILES = $(filter %.c, $(ocamltest_SOURCES))
+ocamltest_STUBS = $(subst .c, , $(ocamltest_C_FILES))
 
-o_files = $(c_files:.c=.$(O))
+ocamltest_LEXERS = $(filter %.mll,$(ocamltest_SOURCES))
 
-lexers = $(filter %.mll,$(ocamltest_SOURCES))
+ocamltest_PARSERS = $(filter %.mly,$(ocamltest_SOURCES))
 
-parsers = $(filter %.mly,$(ocamltest_SOURCES))
+ocamltest_DEPS_PREREQS = \
+  $(ocamltest_LEXERS:.mll=.ml) \
+  $(ocamltest_PARSERS:.mly=.mli) $(ocamltest_PARSERS:.mly=.ml)
 
-dependencies_generated_prereqs = \
-  $(lexers:.mll=.ml) \
-  $(parsers:.mly=.mli) $(parsers:.mly=.ml)
-
-generated = $(dependencies_generated_prereqs) $(parsers:.mly=.output)
-
-bytecode_modules = $(o_files) $(cmo_files)
-
-native_modules = $(o_files) $(cmx_files)
+ocmaltest_GENERATED = \
+  $(ocamltest_DEPS_PREREQS) $(ocamltest_PARSERS:.mly=.output)
 
 directories = $(addprefix $(ROOTDIR)/,utils bytecomp parsing \
                                        compilerlibs file_formats)
@@ -115,7 +111,8 @@ ocamlc = $(BEST_OCAMLC) $(flags)
 
 ocamlopt = $(BEST_OCAMLOPT) $(flags)
 
-.SECONDARY: $(lexers:.mll=.ml) $(parsers:.mly=.mli) $(parsers:.mly=.ml)
+.SECONDARY: $(ocamltest_LEXERS:.mll=.ml) \
+  $(ocamltest_PARSERS:.mly=.mli) $(ocamltest_PARSERS:.mly=.ml)
 
 .PHONY: all allopt opt.opt # allopt and opt.opt are synonyms
 all: ocamltest$(EXE)
@@ -133,7 +130,9 @@ $(eval $(call PROGRAM_SYNONYM,ocamltest))
 
 ocamltest_unix.%: flags+=$(ocamltest_unix_include) -opaque
 
-ocamltest$(EXE): $(deps_byte) $(bytecode_modules)
+ocamltest$(EXE): \
+  $(deps_byte) \
+  $(ocamltest_STUBS:=.b.$(O)) $(ocamltest_MODULES:=.cmo)
 	$(V_LINKC)$(ocamlc) $(ocamltest_unix_include)-custom -o $@ $^
 
 %.cmo: %.ml $(deps_byte)
@@ -141,7 +140,9 @@ ocamltest$(EXE): $(deps_byte) $(bytecode_modules)
 
 $(eval $(call PROGRAM_SYNONYM,ocamltest.opt))
 
-ocamltest.opt$(EXE): $(deps_opt) $(native_modules)
+ocamltest.opt$(EXE): \
+  $(deps_opt) \
+  $(ocamltest_STUBS:=.n.$(O)) $(ocamltest_MODULES:=.cmx)
 	$(V_LINKOPT)$(ocamlopt) $(ocamltest_unix_include)-o $@ $^
 
 %.cmx: %.ml $(deps_opt)
@@ -163,12 +164,12 @@ ocamltest.html: ocamltest.org
 clean:
 	rm -rf ocamltest ocamltest.exe ocamltest.opt ocamltest.opt.exe
 	rm -rf *.o *.obj *.cm*
-	rm -rf $(generated)
+	rm -rf $(ocmaltest_GENERATED)
 	rm -f ocamltest.html
 	rm -rf $(DEPDIR)
 
 ifeq "$(COMPUTE_DEPS)" "true"
-include $(addprefix $(DEPDIR)/, $(c_files:.c=.$(D)))
+include $(addprefix $(DEPDIR)/, $(ocamltest_C_FILES:.c=.$(D)))
 endif
 
 .PHONY: distclean
@@ -179,7 +180,7 @@ $(DEPDIR)/%.$(D): %.c | $(DEPDIR)
 	$(V_CCDEPS)$(DEP_CC) $(OC_CPPFLAGS) $(CPPFLAGS) $< -MT '$*.$(O)' -MF $@
 
 .PHONY: depend
-depend: $(dependencies_generated_prereqs)
-	$(V_OCAMLDEP)$(OCAMLDEP_CMD) $(mli_files) $(ml_files) > .depend
+depend: $(ocamltest_DEPS_PREREQS)
+	$(V_OCAMLDEP)$(OCAMLDEP_CMD) $(ocamltest_MLI_FILES) $(ocamltest_ML_FILES) > .depend
 
 -include .depend

@@ -198,6 +198,16 @@ endif
 	$(V_CC)$(CC) -c $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
 	  $(OUTPUTOBJ)$@ $<
 
+%.b.$(O): %.c $(REQUIRED_HEADERS)
+	$(V_CC)$(CC) -c $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
+	  $(OUTPUTOBJ)$@ $<
+
+%.n.$(O): OC_CFLAGS += $(OC_NATIVE_CFLAGS)
+
+%.n.$(O): %.c $(REQUIRED_HEADERS)
+	$(V_CC)$(CC) -c $(OC_CFLAGS) $(CFLAGS) $(OC_CPPFLAGS) $(CPPFLAGS) \
+	  $(OUTPUTOBJ)$@ $<
+
 $(DEPDIR):
 	$(MKDIR) $@
 
