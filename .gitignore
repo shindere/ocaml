@@ -87,6 +87,8 @@ META
 /debugger/debugger_parser.output
 /debugger/ocamldebug
 
+/driver/ocamldzo.ml
+
 /emacs/ocamltags
 /emacs/*.elc
 
