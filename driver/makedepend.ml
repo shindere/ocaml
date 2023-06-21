@@ -426,7 +426,7 @@ let process_ocaml_fragments buf ~need_struct_item action start_pos end_pos
 let mll_file_dependencies source_file =
   let mll = In_channel.with_open_bin source_file Misc.string_of_file in
   let lexbuf = Lexing.from_string mll in
-  let lexdef = Parser.lexer_definition Lexer.main lexbuf in
+  let lexdef = Lex_parser.lexer_definition Lex_lexer.main lexbuf in
   let buf = Buffer.create 4096 in
   let header_size = lexdef.header.end_pos - lexdef.header.start_pos in
   Buffer.add_substring buf mll lexdef.header.start_pos header_size;

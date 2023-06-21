@@ -152,8 +152,8 @@ COMP = \
   driver/compmisc.cmo \
   lex/syntax.cmo \
   lex/cset.cmo \
-  lex/lexer.cmo \
-  lex/parser.cmo \
+  lex/lex_parser.cmo \
+  lex/lex_lexer.cmo \
   driver/ocamldzo.cmo \
   driver/makedepend.cmo \
   driver/compile_common.cmo

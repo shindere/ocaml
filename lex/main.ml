@@ -72,7 +72,7 @@ let main () =
     {Lexing.pos_fname = source_name; Lexing.pos_lnum = 1;
      Lexing.pos_bol = 0; Lexing.pos_cnum = 0};
   try
-    let def = Parser.lexer_definition Lexer.main lexbuf in
+    let def = Lex_parser.lexer_definition Lex_lexer.main lexbuf in
     let (entries, transitions) = Lexgen.make_dfa def.entrypoints in
     if !ml_automata then begin
       Outputbis.output_lexdef
@@ -105,7 +105,7 @@ let main () =
           "File \"%s\", line %d, character %d: syntax error.\n"
           p.Lexing.pos_fname p.Lexing.pos_lnum
           (p.Lexing.pos_cnum - p.Lexing.pos_bol)
-    | Lexer.Lexical_error(msg, file, line, col) ->
+    | Lex_lexer.Lexical_error(msg, file, line, col) ->
         Printf.fprintf stderr
           "File \"%s\", line %d, character %d: %s.\n"
           file line col msg

@@ -17,7 +17,7 @@
 
 {
 open Syntax
-open Parser
+open Lex_parser
 
 (* Auxiliaries for the lexical analyzer *)
 

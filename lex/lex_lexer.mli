@@ -13,7 +13,7 @@
 (*                                                                        *)
 (**************************************************************************)
 
-val main: Lexing.lexbuf -> Parser.token
+val main: Lexing.lexbuf -> Lex_parser.token
 
 exception Lexical_error of string * string * int * int
 

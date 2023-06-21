@@ -6116,32 +6116,41 @@ driver/maindriver.cmx : \
     driver/maindriver.cmi
 driver/maindriver.cmi :
 driver/makedepend.cmo : \
+    lex/syntax.cmi \
     driver/pparse.cmi \
     parsing/parsetree.cmi \
     parsing/parser.cmi \
     parsing/parse.cmi \
+    driver/ocamldzo.cmi \
     utils/misc.cmi \
     parsing/location.cmi \
     parsing/lexer.cmi \
+    lex/lex_parser.cmi \
+    lex/lex_lexer.cmi \
     parsing/depend.cmi \
     utils/config.cmi \
     driver/compenv.cmi \
     utils/clflags.cmi \
     driver/makedepend.cmi
 driver/makedepend.cmx : \
+    lex/syntax.cmx \
     driver/pparse.cmx \
     parsing/parsetree.cmi \
     parsing/parser.cmx \
     parsing/parse.cmx \
+    driver/ocamldzo.cmx \
     utils/misc.cmx \
     parsing/location.cmx \
     parsing/lexer.cmx \
+    lex/lex_parser.cmx \
+    lex/lex_lexer.cmx \
     parsing/depend.cmx \
     utils/config.cmx \
     driver/compenv.cmx \
     utils/clflags.cmx \
     driver/makedepend.cmi
 driver/makedepend.cmi :
+driver/ocamldzo.cmi :
 driver/optcompile.cmo : \
     typing/typedtree.cmi \
     lambda/translmod.cmi \
@@ -6814,16 +6823,26 @@ lex/cset.cmo : \
 lex/cset.cmx : \
     lex/cset.cmi
 lex/cset.cmi :
-lex/lexer.cmo : \
+lex/lex_lexer.cmo : \
     lex/syntax.cmi \
-    lex/parser.cmi \
-    lex/lexer.cmi
-lex/lexer.cmx : \
+    lex/lex_parser.cmi \
+    lex/lex_lexer.cmi
+lex/lex_lexer.cmx : \
     lex/syntax.cmx \
-    lex/parser.cmx \
-    lex/lexer.cmi
-lex/lexer.cmi : \
-    lex/parser.cmi
+    lex/lex_parser.cmx \
+    lex/lex_lexer.cmi
+lex/lex_lexer.cmi : \
+    lex/lex_parser.cmi
+lex/lex_parser.cmo : \
+    lex/syntax.cmi \
+    lex/cset.cmi \
+    lex/lex_parser.cmi
+lex/lex_parser.cmx : \
+    lex/syntax.cmx \
+    lex/cset.cmx \
+    lex/lex_parser.cmi
+lex/lex_parser.cmi : \
+    lex/syntax.cmi
 lex/lexgen.cmo : \
     lex/table.cmi \
     lex/syntax.cmi \
@@ -6838,22 +6857,22 @@ lex/lexgen.cmi : \
     lex/syntax.cmi
 lex/main.cmo : \
     lex/syntax.cmi \
-    lex/parser.cmi \
     lex/outputbis.cmi \
     lex/output.cmi \
     lex/lexgen.cmi \
-    lex/lexer.cmi \
+    lex/lex_parser.cmi \
+    lex/lex_lexer.cmi \
     lex/cset.cmi \
     lex/compact.cmi \
     lex/common.cmi \
     lex/main.cmi
 lex/main.cmx : \
     lex/syntax.cmx \
-    lex/parser.cmx \
     lex/outputbis.cmx \
     lex/output.cmx \
     lex/lexgen.cmx \
-    lex/lexer.cmx \
+    lex/lex_parser.cmx \
+    lex/lex_lexer.cmx \
     lex/cset.cmx \
     lex/compact.cmx \
     lex/common.cmx \
@@ -6886,16 +6905,6 @@ lex/outputbis.cmi : \
     lex/syntax.cmi \
     lex/lexgen.cmi \
     lex/common.cmi
-lex/parser.cmo : \
-    lex/syntax.cmi \
-    lex/cset.cmi \
-    lex/parser.cmi
-lex/parser.cmx : \
-    lex/syntax.cmx \
-    lex/cset.cmx \
-    lex/parser.cmi
-lex/parser.cmi : \
-    lex/syntax.cmi
 lex/syntax.cmo : \
     lex/cset.cmi \
     lex/syntax.cmi

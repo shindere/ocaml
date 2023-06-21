@@ -96,12 +96,12 @@ META
 
 /lambda/runtimedef.ml
 
-/lex/parser.ml
-/lex/parser.mli
-/lex/lexer.ml
+/lex/lex_parser.ml
+/lex/lex_parser.mli
+/lex/lex_lexer.ml
 /lex/ocamllex
 /lex/ocamllex.opt
-/lex/parser.output
+/lex/lex_parser.output
 /manual/src/allfiles.tex
 /manual/src/biblio.tex
 /manual/src/foreword.tex

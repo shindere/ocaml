@@ -34,7 +34,7 @@ CAMLOPT=$(OCAMLRUN) ./ocamlopt$(EXE) $(STDLIBFLAGS) -I otherlibs/dynlink
 ARCHES=amd64 arm64 power s390x riscv
 VPATH = utils parsing typing bytecomp file_formats lambda middle_end \
   middle_end/closure middle_end/flambda middle_end/flambda/base_types \
-  asmcomp driver toplevel tools $(addprefix otherlibs/, $(ALL_OTHERLIBS))
+  asmcomp lex driver toplevel tools $(addprefix otherlibs/, $(ALL_OTHERLIBS))
 INCLUDES = $(addprefix -I ,$(VPATH))
 
 ifeq "$(strip $(NATDYNLINKOPTS))" ""
@@ -1108,7 +1108,8 @@ partialclean::
 ocamllex_LIBRARIES =
 
 ocamllex_MODULES = $(addprefix lex/,\
-  cset syntax parser lexer table lexgen compact  common output outputbis main)
+  cset syntax lex_parser lex_lexer table lexgen compact common output \
+  outputbis main)
 
 .PHONY: lex-all
 lex-all: lex/ocamllex
@@ -1129,10 +1130,10 @@ lex/ocamllex$(EXE): OC_BYTECODE_LINKFLAGS += -compat-32
 partialclean::
 	rm -f lex/*.cm* lex/*.o lex/*.obj \
         $(ocamllex_PROGRAMS) $(ocamllex_PROGRAMS:=.exe) \
-        lex/parser.ml lex/parser.mli lex/parser.output \
-        lex/lexer.ml
+        lex/lex_parser.ml lex/lex_parser.mli lex/lex_parser.output \
+        lex/lex_lexer.ml
 
-beforedepend:: lex/parser.ml lex/parser.mli lex/lexer.ml
+beforedepend:: lex/lex_parser.ml lex/lex_parser.mli lex/lex_lexer.ml
 
 # The ocamlyacc parser generator
 
