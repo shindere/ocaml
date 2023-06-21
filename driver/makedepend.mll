@@ -13,6 +13,8 @@
 (*                                                                        *)
 (**************************************************************************)
 
+{ (* beginning of header *)
+
 open Parsetree
 module String = Misc.Stdlib.String
 
@@ -572,6 +574,15 @@ let process_dep_arg = function
 
 let process_dep_args dep_args = List.iter process_dep_arg dep_args
 
+} (* end of header *)
+
+(* Rules to parse .mll and .mly files, at the moment just a place holder *)
+
+rule _mll_main = parse
+  _ { exit 5 }
+
+{ (* trailer *)
+
 (* Entry point *)
 
 let print_version () =
@@ -684,3 +695,5 @@ let main_from_option () =
                    Array.sub Sys.argv 2 (Array.length Sys.argv - 2) ] in
   Sys.argv.(0) <- args.(0);
   exit (run_main args)
+
+} (* end of trailer *)
