@@ -107,7 +107,7 @@ let of_prim find_primitive name =
 
 let require_primitive name =
   if name.[0] <> '%' then 
-    ignore(of_prim CamlinternalDynlink.find_primitive_for_execution name)
+    ignore(of_prim Dll.find_primitive_for_checking name)
 
 let all_primitives () =
   let prim = Array.make !c_prim_table.cnt "" in
