@@ -137,7 +137,8 @@ $(foreach PROGRAM, $(C_PROGRAMS),\
 
 # OCaml programs that are compiled in both bytecode and native code
 
-OCAML_PROGRAMS = ocamlc ocamlopt lex/ocamllex $(TOOLS_NAT_PROGRAMS)
+OCAML_PROGRAMS = ocamlc ocamlopt lex/ocamllex $(TOOLS_NAT_PROGRAMS) \
+  ocamltest/ocamltest
 
 $(foreach PROGRAM, $(OCAML_PROGRAMS),\
   $(eval $(call OCAML_PROGRAM,$(PROGRAM))))
@@ -1076,7 +1077,7 @@ clean::
 # Dependencies
 
 subdirs = stdlib $(addprefix otherlibs/, $(ALL_OTHERLIBS)) \
-  ocamldoc ocamltest
+  ocamldoc
 
 .PHONY: alldepend
 alldepend: depend
@@ -1220,14 +1221,124 @@ ocamldoc.opt: ocamlc.opt ocamlyacc ocamllex
 	$(MAKE) -C ocamldoc opt.opt
 
 # OCamltest
-ocamltest: ocamlc ocamlyacc ocamllex otherlibraries
-	$(MAKE) -C ocamltest all
 
-ocamltest.opt: ocamlc.opt ocamlyacc ocamllex
-	$(MAKE) -C ocamltest allopt
+# Libraries ocamltest depends on
+
+ocamltest_LIBRARIES = $(addprefix compilerlibs/,ocamlcommon ocamlbytecomp) \
+  $(addprefix $(ocamltest_unix_path)/,$(ocamltest_unix_name))
+
+# List of source files from which ocamltest is compiled
+# (all the different sorts of files are derived from this)
+
+# ocamltest has two components: its core and the OCaml "plugin"
+# which is actually built into the tool but clearly separated from its core
+
+ocamltest_CORE = \
+  ocamltest/run_$(UNIX_OR_WIN32).c ocamltest/run_stubs.c \
+  $(call OCAML_CONFIGURED_MODULE, ocamltest/ocamltest_config) \
+  $(call OCAML_MODULE, ocamltest/ocamltest_unix) \
+  $(call OCAML_MODULE, ocamltest/ocamltest_stdlib) \
+  $(call OCAML_MODULE, ocamltest/run_command) \
+  $(call OCAML_MODULE, ocamltest/filecompare) \
+  $(call OCAML_MODULE, ocamltest/variables) \
+  $(call OCAML_MODULE, ocamltest/environments) \
+  $(call OCAML_MODULE, ocamltest/result) \
+  $(call OCAML_MODULE, ocamltest/actions) \
+  $(call OCAML_MODULE, ocamltest/tests) \
+  $(call OCAML_MODULE, ocamltest/strace) \
+  $(call OCAML_MODULE, ocamltest/tsl_ast) \
+  $(call OCAMLYACC_PARSER, ocamltest/tsl_parser) \
+  $(call OCAMLLEX_LEXER, ocamltest/tsl_lexer) \
+  $(call OCAML_MODULE, ocamltest/modifier_parser) \
+  $(call OCAML_MODULE, ocamltest/tsl_semantics) \
+  $(call OCAML_MODULE, ocamltest/builtin_variables) \
+  $(call OCAML_MODULE, ocamltest/actions_helpers) \
+  $(call OCAML_MODULE, ocamltest/builtin_actions) \
+  $(call OCAML_MODULE, ocamltest/translate)
+
+ocamltest_ocaml_PLUGIN = \
+  $(call OCAML_MODULE, ocamltest/ocaml_backends) \
+  $(call OCAML_MODULE, ocamltest/ocaml_filetypes) \
+  $(call OCAML_MODULE, ocamltest/ocaml_variables) \
+  $(call OCAML_MODULE, ocamltest/ocaml_modifiers) \
+  $(call OCAML_MODULE, ocamltest/ocaml_directories) \
+  $(call OCAML_MODULE, ocamltest/ocaml_files) \
+  $(call OCAML_MODULE, ocamltest/ocaml_flags) \
+  $(call OCAML_MODULE, ocamltest/ocaml_commands) \
+  $(call OCAML_MODULE, ocamltest/ocaml_tools) \
+  $(call OCAML_MODULE, ocamltest/ocaml_compilers) \
+  $(call OCAML_MODULE, ocamltest/ocaml_toplevels) \
+  $(call OCAML_MODULE, ocamltest/ocaml_actions) \
+  $(call OCAML_MODULE, ocamltest/ocaml_tests)
+
+ocamltest_SOURCES = $(ocamltest_CORE) $(ocamltest_ocaml_PLUGIN) \
+  $(call OCAML_MODULE, ocamltest/options) \
+  $(call OCAML_MODULE, ocamltest/main)
+
+# Not all the following variables are actually used currently
+# but they are kept for potential future use
+
+# List of .ml files used for ocamldep and to get the list of modules
+
+ocamltest_ML_FILES = \
+  $(filter %.ml, \
+    $(subst .ml.in,.ml,\
+      $(subst .mll,.ml,$(subst .mly,.ml,$(ocamltest_SOURCES)))))
+
+ocamltest_MODULES = $(subst .ml,, $(ocamltest_ML_FILES))
+
+ocamltest_CMO_FILES = $(ocamltest_ML_FILES:.ml=.cmo)
+
+ocamltest_CMX_FILES = $(ocamltest_ML_FILES:.ml=.cmx)
+
+# List of .mli files for ocamldep
+ocamltest_MLI_FILES = \
+  $(filter %.mli,$(subst .mly,.mli,$(ocamltest_SOURCES)))
+
+ocamltest_C_FILES = $(filter %.c, $(ocamltest_SOURCES))
+ocamltest_STUBS = $(subst .c, , $(ocamltest_C_FILES))
+
+ifeq "$(COMPUTE_DEPS)" "true"
+include $(addprefix $(DEPDIR)/, $(ocamltest_C_FILES:.c=.$(D)))
+endif
+
+ocamltest_LEXERS = $(filter %.mll,$(ocamltest_SOURCES))
+
+ocamltest_PARSERS = $(filter %.mly,$(ocamltest_SOURCES))
+
+ocamltest_DEPS_PREREQS = \
+  $(ocamltest_LEXERS:.mll=.ml) \
+  $(ocamltest_PARSERS:.mly=.mli) $(ocamltest_PARSERS:.mly=.ml)
+
+ocamltest_GENERATED = \
+  $(ocamltest_DEPS_PREREQS) $(ocamltest_PARSERS:.mly=.output)
+
+beforedepend:: $(ocamltest_DEPS_PREREQS)
+
+.SECONDARY: $(ocamltest_LEXERS:.mll=.ml) \
+  $(ocamltest_PARSERS:.mly=.mli) $(ocamltest_PARSERS:.mly=.ml)
+
+ocamltest/%: CAMLC = $(BEST_OCAMLC) $(STDLIBFLAGS)
+
+ocamltest: ocamltest/ocamltest$(EXE)
+
+ocamltest/ocamltest$(EXE): OC_BYTECODE_LINKFLAGS += -custom
+
+ocamltest/ocamltest$(EXE): ocamlc ocamlyacc ocamllex
+
+ocamltest.opt: ocamltest/ocamltest.opt$(EXE)
+
+ocamltest/ocamltest.opt$(EXE): ocamlc.opt ocamlyacc ocamllex
+
+ocamltest/ocamltest_unix.%: \
+  OC_COMMON_COMPFLAGS += $(ocamltest_unix_include) -opaque
 
 partialclean::
-	$(MAKE) -C ocamltest clean
+	rm -rf ocamltest/ocamltest ocamltest/ocamltest.exe
+	rm -f ocamltest/ocamltest.opt ocamltest/ocamltest.opt.exe
+	rm -f $(addprefix ocamltest/,*.o *.obj *.cm*)
+	rm -rf $(ocmaltest_GENERATED)
+	rm -f ocamltest.html
 
 # Documentation
 
@@ -1244,6 +1355,14 @@ partialclean::
 
 partialclean::
 	$(MAKE) -C api_docgen clean
+
+# The OCamltest manual
+
+.PHONY: ocamltest-manual
+ocamltest-manual: ocamltest/ocamltest.html
+
+ocamltest/ocamltest.html: ocamltest/ocamltest.org
+	pandoc -s --toc -N -f org -t html -o $@ $<
 
 # The extra libraries
 
@@ -1621,7 +1740,8 @@ depend: beforedepend
 	$(V_GEN)for d in utils parsing typing bytecomp asmcomp middle_end \
          lambda file_formats middle_end/closure middle_end/flambda \
          middle_end/flambda/base_types \
-         driver toplevel toplevel/byte toplevel/native lex tools debugger; \
+         driver toplevel toplevel/byte toplevel/native lex tools debugger \
+	 ocamltest; \
 	 do \
 	   $(OCAMLDEP) $(OC_OCAMLDEPFLAGS) -I $$d $(INCLUDES) \
 	   $(OCAMLDEPFLAGS) $$d/*.mli $$d/*.ml \
@@ -1632,7 +1752,7 @@ depend: beforedepend
 distclean: clean
 	$(MAKE) -C manual distclean
 	$(MAKE) -C ocamldoc distclean
-	$(MAKE) -C ocamltest distclean
+	rm -f $(addprefix ocamltest/,ocamltest_config.ml ocamltest_unix.ml)
 	$(MAKE) -C otherlibs distclean
 	rm -f $(runtime_CONFIGURED_HEADERS)
 	$(MAKE) -C stdlib distclean

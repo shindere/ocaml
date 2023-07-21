@@ -283,6 +283,9 @@ LINK_BYTECODE_PROGRAM =\
 
 define OCAML_BYTECODE_PROGRAM
 $(eval $(call PROGRAM_SYNONYM,$(1)))
+# ifeq $(origin $$($(basename $(notdir $(1)))_STUBS))) "undefined"
+$$($(basename $(notdir $(1)))_STUBS))) ?=
+# endif  
 $(basename $(notdir $(1)))_BCOBJS = \
   $$(patsubst %,%.b.$(O), $$($(basename $(notdir $(1)))_STUBS)) \
   $$(patsubst %,%.cma, $$($(basename $(notdir $(1)))_LIBRARIES)) \
