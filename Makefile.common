@@ -343,6 +343,105 @@ $(eval $(call _OCAML_BYTECODE_PROGRAM,$(1)))
 $(eval $(call _OCAML_NATIVE_PROGRAM,$(1).opt))
 endef # OCAML_PROGRAM
 
+# Macros for OCaml libraries, similar to those for OCaml programs
+
+define _OCAML_LIBRARY_BASE
+$(basename $(notdir $(1)))_C_FILES = \
+  $$(filter %.c, $$($(basename $(notdir $(1)))_SOURCES))
+$(basename $(notdir $(1)))_MLI_FILES = \
+  $$(filter %.mli, \
+    $$(subst .mly,.mli,\
+      $$($(basename $(notdir $(1)))_SOURCES)))
+$(basename $(notdir $(1)))_CMI_FILES = \
+  $$(subst .mli,.cmi,$$($(basename $(notdir $(1)))_MLI_FILES))
+$(basename $(notdir $(1)))_ML_FILES = \
+  $$(filter %.ml, \
+    $$(subst .ml.in,.ml,$$(subst .mll,.ml,$$(subst .mly,.ml,\
+      $$($(basename $(notdir $(1)))_SOURCES)))))
+$(basename $(notdir $(1)))_MLL_FILES = \
+  $$(filter %.mll, \
+    $$($(basename $(notdir $(1)))_SOURCES))
+$(basename $(notdir $(1)))_MLY_FILES = \
+  $$(filter %.mly, \
+    $$($(basename $(notdir $(1)))_SOURCES))
+$(basename $(notdir $(1)))_SECONDARY_FILES = \
+  $$(patsubst %.mll,%.ml, $$($(basename $(notdir $(1)))_MLL_FILES)) \
+  $$(patsubst %.mly,%.mli, $$($(basename $(notdir $(1)))_MLY_FILES)) \
+  $$(patsubst %.mly,%.ml, $$($(basename $(notdir $(1)))_MLY_FILES))
+.SECONDARY: $$$$($(basename $(notdir $(1)))_SECONDARY_FILES)
+beforedepend:: $$$$($(basename $(notdir $(1)))_SECONDARY_FILES)
+$(basename $(notdir $(1)))_GENERATED_FILES = \
+  $$($(basename $(notdir $(1)))_SECONDARY_FILES) \
+  $$(patsubst %.mly,%.output, $$($(basename $(notdir $(1)))_MLY_FILES))
+endef # _OCAML_LIBRARY_BASE
+
+LINK_BYTECODE_LIBRARY =\
+  $(CAMLC) $(OC_COMMON_LINKFLAGS) $(OC_BYTECODE_LINKFLAGS)
+
+# The _OCAML_BYTECODE_LIBRARY macro defines a bytecode library but assuming
+# that _OCAML_LIBRARY_BASE has already been called. Its public counterpart
+# does not rely on this assumption and rather does call _OCAML_LIBRARY_BASE
+# itself.
+
+define _OCAML_BYTECODE_LIBRARY
+$(basename $(notdir $(1)))_BYTE_CMI_FILES = \
+  $$(foreach F,$$($(basename $(notdir $(1)))_CMI_FILES),\
+    $$(if $$(findstring /native/,$$(F)),,$$(F)))
+$(basename $(notdir $(1)))_BO_FILES = \
+  $$(patsubst %.c,%.b.$(O), $$($(basename $(notdir $(1)))_C_FILES))
+$(basename $(notdir $(1)))_CMO_FILES = \
+  $$(patsubst %.ml,%.cmo, \
+    $$(foreach F,$$($(basename $(notdir $(1)))_ML_FILES),\
+      $$(if $$(findstring /native/,$$(F)),,$$(F))))
+$(basename $(notdir $(1)))_BCOBJS = \
+  $$($(basename $(notdir $(1)))_BO_FILES) \
+  $$($(basename $(notdir $(1)))_CMO_FILES)
+$(1).cma: \
+  $$$$($(basename $(notdir $(1)))_BYTE_CMI_FILES) \
+  $$$$($(basename $(notdir $(1)))_BCOBJS)
+	$$(V_LINKC)$$(LINK_BYTECODE_LIBRARY) -a -o $$@ \
+	  $$($(basename $(notdir $(1)))_BCOBJS)
+endef # _OCAML_BYTECODE_LIBRARY
+
+define OCAML_BYTECODE_LIBRARY
+$(eval $(call _OCAML_LIBRARY_BASE,$(1)))
+$(eval $(call _OCAML_BYTECODE_LIBRARY,$(1)))
+endef # OCAML_BYTECODE_LIBRARY
+
+LINK_NATIVE_LIBRARY =\
+  $(CAMLOPT) $(OC_COMMON_LINKFLAGS) $(OC_NATIVE_LINKFLAGS)
+
+define _OCAML_NATIVE_LIBRARY
+$(basename $(notdir $(1)))_NATIVE_CMI_FILES = \
+  $$(foreach F,$$($(basename $(notdir $(1)))_CMI_FILES),\
+    $$(if $$(findstring /byte/,$$(F)),,$$(F)))
+$(basename $(notdir $(1)))_NO_FILES = \
+  $$(patsubst %.c,%.n.$(O), $$($(basename $(notdir $(1)))_C_FILES))
+$(basename $(notdir $(1)))_CMX_FILES = \
+  $$(patsubst %.ml,%.cmx, \
+    $$(foreach F,$$($(basename $(notdir $(1)))_ML_FILES),\
+      $$(if $$(findstring /byte/,$$(F)),,$$(F))))
+$(basename $(notdir $(1)))_NCOBJS = \
+  $$($(basename $(notdir $(1)))_NO_FILES) \
+  $$($(basename $(notdir $(1)))_CMX_FILES)
+$(1).cmxa: \
+  $$$$($(basename $(notdir $(1)))_NATIVE_CMI_FILES) \
+  $$$$($(basename $(notdir $(1)))_NCOBJS)
+	$$(V_LINKOPT)$$(LINK_NATIVE_LIBRARY) -a -o $$@ \
+	  $$($(basename $(notdir $(1)))_NCOBJS)
+endef # _OCAML_NATIVE_LIBRARY
+
+define OCAML_NATIVE_LIBRARY
+$(eval $(call _OCAML_LIBRARY_BASE,$(1)))
+$(eval $(call _OCAML_NATIVE_LIBRARY,$(1)))
+endef # OCAML_NATIVE_LIBRARY
+
+define OCAML_LIBRARY
+$(eval $(call _OCAML_LIBRARY_BASE,$(1)))
+$(eval $(call _OCAML_BYTECODE_LIBRARY,$(1)))
+$(eval $(call _OCAML_NATIVE_LIBRARY,$(1)))
+endef # OCAML_LIBRARY
+
 # Installing a bytecode executable, with debug information removed
 define INSTALL_STRIPPED_BYTE_PROG
 $(OCAMLRUN) $(ROOTDIR)/tools/stripdebug $(1) $(1).tmp \
