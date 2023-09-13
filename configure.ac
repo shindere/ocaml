@@ -807,12 +807,7 @@ AS_CASE([$host],
   [i686-*-mingw32*],
     [internal_cflags="$internal_cflags -mfpmath=sse -msse2"])
 
-# Use 64-bit file offset if possible
-# See also AC_SYS_LARGEFILE
-# Problem: flags are added to CC rather than CPPFLAGS
-AS_CASE([$host],
-  [*-*-mingw32*|*-pc-windows], [],
-  [common_cppflags="$common_cppflags -D_FILE_OFFSET_BITS=64"])
+AC_SYS_LARGEFILE
 
 # Adjust according to target
 

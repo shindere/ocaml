@@ -82,6 +82,10 @@
 
 #undef HAS_SYS_MMAN_H
 
+#undef _FILE_OFFSET_BITS
+
+/* #define _FILE_OFFSET_BITS 64 */
+
 /* 2. For the Unix library. */
 
 #undef HAS_SOCKETS
