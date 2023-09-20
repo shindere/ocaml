@@ -2375,8 +2375,8 @@ AS_IF([test "$ccomptype" != "msvc"],
 
 oc_cflags="$common_cflags $internal_cflags"
 oc_cppflags="$common_cppflags $internal_cppflags"
-ocamlc_cflags="$ocamlc_cflags $common_cflags $sharedlib_cflags"
-ocamlc_cppflags="$common_cppflags"
+ocamlc_cflags="-invalid-cflag"
+ocamlc_cppflags="-invalid-cppflag"
 
 AS_CASE([$host],
   [*-*-mingw32*],
@@ -2537,6 +2537,7 @@ ${mkdll_ldflags}"
 "$mkexe_via_cc_ldflags \$(OUTPUTEXE)\$(1) \$(2)"])
   AS_IF([test -n "$mkexe_via_cc_extra_cmd"],
     [mkexe_via_cc_ldflags="$mkexe_via_cc_ldflags $mkexe_via_cc_extra_cmd"])
+  mkexe_exp="invalid-mkexe-command"
 ])
 
 AC_OUTPUT

@@ -20029,8 +20029,8 @@ fi
 
 oc_cflags="$common_cflags $internal_cflags"
 oc_cppflags="$common_cppflags $internal_cppflags"
-ocamlc_cflags="$ocamlc_cflags $common_cflags $sharedlib_cflags"
-ocamlc_cppflags="$common_cppflags"
+ocamlc_cflags="-invalid-cflag"
+ocamlc_cppflags="-invalid-cppflag"
 
 case $host in #(
   *-*-mingw32*) :
@@ -20404,6 +20404,7 @@ fi
 then :
   mkexe_via_cc_ldflags="$mkexe_via_cc_ldflags $mkexe_via_cc_extra_cmd"
 fi
+  mkexe_exp="invalid-mkexe-command"
 
 
 : "${CONFIG_STATUS=./config.status}"
