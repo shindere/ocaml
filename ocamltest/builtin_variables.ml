@@ -54,6 +54,9 @@ let ocamltest_log = Variables.make ("ocamltest_log",
 let output = Variables.make ("output",
   "Where the output of executing the program is saved")
 
+let parallel = Variables.make ("parallel",
+  "Whether the test needs several cores")
+
 let program = Variables.make ("program",
   "Name of program produced by ocamlc.byte and ocamlopt.byte")
 let program2 = Variables.make ("program2",
@@ -127,6 +130,7 @@ let _ = List.iter Variables.register_variable
     ocamltest_response;
     ocamltest_log;
     output;
+    parallel;
     program; program2;
     reason;
     reference;

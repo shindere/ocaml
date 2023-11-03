@@ -235,6 +235,7 @@ let test_file test_filename =
              Builtin_variables.test_source_directory, test_source_directory;
              Builtin_variables.test_build_directory_prefix,
                test_build_directory_prefix;
+            Builtin_variables.parallel, "false";
              Builtin_variables.promote, promote;
              Builtin_variables.timeout, default_timeout;
            ] in

@@ -39,6 +39,8 @@ val ocamltest_log : Variables.t
 
 val output : Variables.t
 
+val parallel : Variables.t
+
 val program : Variables.t
 val program2 : Variables.t
 
