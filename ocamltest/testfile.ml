@@ -286,3 +286,17 @@ let is_testfile filename =
 let translate settings filename =
   Translate.file ~style:settings.style ~compact:settings.compact filename
 
+let get_startup_env filename =
+  let ast = tsl_parse_file_safe filename in
+  let (rootenv_statements, _tsl_ast) = extract_rootenv ast in
+  let rec loop env = function
+    | [] -> env
+    | statement :: statements ->
+      begin match interpret_environment_statement env statement with
+        | env -> loop env statements
+        | exception e ->
+          Printf.printf "%s\n%!" (report_error statement.loc e);
+          env
+      end
+  in
+  loop Environments.empty rootenv_statements

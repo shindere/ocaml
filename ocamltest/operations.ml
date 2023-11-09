@@ -44,7 +44,7 @@ type translate_settings =
   compact : bool;
 }
 
-let  default_translate_settings =
+let default_translate_settings =
 {
   files_to_translate = [];
   style = Translate.Plain;

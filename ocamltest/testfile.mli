@@ -20,3 +20,5 @@ val is_testfile : string -> bool
 val run : Operations.test_settings -> string -> unit
 
 val translate : Operations.translate_settings -> string -> unit
+
+val get_startup_env : string -> Environments.t

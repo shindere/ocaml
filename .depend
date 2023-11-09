@@ -9416,7 +9416,8 @@ ocamltest/testfile.cmx : \
     ocamltest/actions.cmx \
     ocamltest/testfile.cmi
 ocamltest/testfile.cmi : \
-    ocamltest/operations.cmi
+    ocamltest/operations.cmi \
+    ocamltest/environments.cmi
 ocamltest/tests.cmo : \
     ocamltest/result.cmi \
     ocamltest/actions.cmi \
