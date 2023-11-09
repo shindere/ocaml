@@ -1788,6 +1788,7 @@ ocamltest_ocaml_PLUGIN = \
 
 ocamltest_SOURCES = $(addprefix ocamltest/, \
   $(ocamltest_CORE) $(ocamltest_ocaml_PLUGIN) \
+  testfile.mli testfile.ml \
   main.mli main.ml)
 
 $(eval $(call COMPILE_C_FILE,ocamltest/%.b,ocamltest/%))
