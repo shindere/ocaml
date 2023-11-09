@@ -18,6 +18,7 @@
 open Ocamltest_stdlib
 open Tsl_ast
 open Tsl_semantics
+open Operations
 
 type behavior =
   | Skip_all
@@ -80,9 +81,6 @@ let tsl_parse_file_safe test_filename =
       test_filename p.pos_lnum (p.pos_cnum - p.pos_bol);
     announce_test_error test_filename "could not read test script";
     exit 1
-
-let print_usage () =
-  Printf.printf "%s\n%!" Options.usage
 
 let report_error loc e =
   print_exn loc e;
@@ -160,18 +158,13 @@ let get_test_build_directory_prefix test_dirname =
   if test_dirname = "." then root
   else Filename.concat root test_dirname
 
-let tests_to_skip = ref []
-
-let init_tests_to_skip () =
-  tests_to_skip := String.words (Sys.safe_getenv "OCAMLTEST_SKIP_TESTS")
-
 let extract_rootenv (Ast (stmts, subs)) =
   let (env, stmts) = split_env stmts in
   (env, Ast (stmts, subs))
 
-let test_file test_filename =
-  let start = if Options.show_timings then Unix.gettimeofday () else 0.0 in
-  let skip_test = List.mem test_filename !tests_to_skip in
+let test_file settings test_filename =
+  let start = if settings.show_timings then Unix.gettimeofday () else 0.0 in
+  let skip_file = List.mem test_filename settings.files_to_skip in
   let tsl_ast = tsl_parse_file_safe test_filename in
   let (rootenv_statements, tsl_ast) = extract_rootenv tsl_ast in
   let tsl_ast = match tsl_ast with
@@ -209,13 +202,13 @@ let test_file test_filename =
   let log_filename =
     Filename.concat test_build_directory_prefix (test_prefix ^ ".log") in
   let log =
-    if Options.log_to_stderr then stderr else begin
+    if settings.log_to_stderr then stderr else begin
       open_out log_filename
     end in
   let summary = Sys.with_chdir test_build_directory_prefix
     (fun () ->
-       let promote = string_of_bool Options.promote in
-       let default_timeout = string_of_int Options.default_timeout in
+       let promote = settings.promote in
+       let default_timeout = settings.default_timeout in
        let install_hook name =
          let hook_name = Filename.make_filename hookname_prefix name in
          if Sys.file_exists hook_name then begin
@@ -227,6 +220,7 @@ let test_file test_filename =
        let reference_filename = Filename.concat
            test_source_directory (test_prefix ^ ".reference") in
        let make = try Sys.getenv "MAKE" with Not_found -> "make" in
+       let promote_str = if promote then "true" else "false" in
        let initial_environment = Environments.from_bindings
            [
              Builtin_variables.make, make;
@@ -236,11 +230,11 @@ let test_file test_filename =
              Builtin_variables.test_build_directory_prefix,
                test_build_directory_prefix;
             Builtin_variables.parallel, "false";
-             Builtin_variables.promote, promote;
-             Builtin_variables.timeout, default_timeout;
+             Builtin_variables.promote, promote_str;
+             Builtin_variables.timeout, string_of_int default_timeout;
            ] in
        let common_prefix = " ... testing '" ^ test_basename ^ "' with" in
-       let initial_status = if skip_test then Skip_all else Run in
+       let initial_status = if skip_file then Skip_all else Run in
        let rootenv =
          Environments.initialize Environments.Pre log initial_environment
        in
@@ -268,16 +262,16 @@ let test_file test_filename =
        Actions.clear_all_hooks();
        summary
     ) in
-  if not Options.log_to_stderr then close_out log;
+  if not settings.log_to_stderr then close_out log;
   begin match summary with
   | Some_failure ->
-      if not Options.log_to_stderr then
+      if not settings.log_to_stderr then
         Sys.dump_file stderr ~prefix:"> " log_filename
   | No_failure | All_skipped ->
-      if not Options.keep_test_dir_on_success then
+      if not settings.keep_test_dir_on_success then
         clean_test_build_directory ()
   end;
-  if Options.show_timings && summary = No_failure then
+  if settings.show_timings && summary = No_failure then
     let wall_clock_duration = Unix.gettimeofday () -. start in
     Printf.eprintf "Wall clock: %s took %.02fs\n%!"
                    test_filename wall_clock_duration
@@ -325,27 +319,24 @@ let list_tests dir =
   end;
   sort_strings !res
 
-let () =
-  init_tests_to_skip()
+let list_tests dir =
+  match list_tests dir with
+  | [] -> exit 1
+  | res -> List.iter print_endline res
 
-let () =
-  let failed = ref false in
-  let work_done = ref false in
-  let list_tests dir =
-    match list_tests dir with
-    | [] -> failed := true
-    | res -> List.iter print_endline res
-  in
-  let find_test_dirs dir = List.iter print_endline (find_test_dirs dir) in
-  let doit f x = work_done := true; f x in
-  List.iter (doit find_test_dirs) Options.find_test_dirs;
-  List.iter (doit list_tests) Options.list_tests;
-  let do_file =
-    if Options.translate then
-      Translate.file ~style:Options.style ~compact:Options.compact
-    else
-      test_file
-  in
-  List.iter (doit do_file) Options.files_to_test;
-  if not !work_done then print_usage();
-  if !failed || not !work_done then exit 1
+let find_test_dirs dir =
+  List.iter print_endline (find_test_dirs dir)
+
+let translate_file settings filename =
+  Translate.file ~style:settings.style ~compact:settings.compact filename
+
+let main () =
+  match Options.parse_commandline () with
+  | Run_tests settings ->
+    List.iter (test_file settings) settings.files_to_test
+  | Find_test_dirs dirs -> List.iter find_test_dirs dirs
+  | List_tests dirs -> List.iter list_tests dirs
+  | Translate_tests settings ->
+    List.iter (translate_file settings) settings.files_to_translate
+
+let _ = main ()

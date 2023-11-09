@@ -1767,7 +1767,9 @@ ocamltest_CORE = \
   builtin_variables.mli builtin_variables.ml \
   actions_helpers.mli actions_helpers.ml \
   builtin_actions.mli builtin_actions.ml \
-  translate.mli translate.ml
+  translate.mli translate.ml \
+  operations.mli operations.ml \
+  options.mli options.ml
 
 ocamltest_ocaml_PLUGIN = \
   ocaml_backends.mli ocaml_backends.ml \
@@ -1786,7 +1788,6 @@ ocamltest_ocaml_PLUGIN = \
 
 ocamltest_SOURCES = $(addprefix ocamltest/, \
   $(ocamltest_CORE) $(ocamltest_ocaml_PLUGIN) \
-  options.mli options.ml \
   main.mli main.ml)
 
 $(eval $(call COMPILE_C_FILE,ocamltest/%.b,ocamltest/%))

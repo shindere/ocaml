@@ -13,7 +13,10 @@
 (*                                                                        *)
 (**************************************************************************)
 
-(* Description of ocamltest's command-line options *)
+(* Processing of ocamltest's command-line options *)
+
+open Ocamltest_stdlib
+open Operations
 
 let show_objects title string_of_object objects =
   let print_object o = print_endline ("  " ^ (string_of_object o)) in
@@ -47,74 +50,131 @@ let show_variables () =
   let variables = Variables.get_registered_variables () in
   show_objects "Available variables are:" string_of_variable variables
 
-let log_to_stderr = ref false
+let op = ref (Run_tests default_test_settings)
 
-let promote = ref false
+let error msg =
+  failwith ("cannot " ^ msg ^ " in " ^ (to_string !op) ^ " mode")
+  
+let set_log_to_stderr () =
+  match !op with
+  | Run_tests r ->
+    op  := Run_tests {r with log_to_stderr = true }
+  | _ -> error "log to stderr"
 
-let default_timeout = ref 0
+let set_promote () =
+  match !op with
+  | Run_tests r ->
+    op  := Run_tests {r with promote = true }
+  | _ -> error "promote"
 
-let keep_test_dir_on_success = ref false
+let set_show_timings () =
+  match !op with
+  | Run_tests r ->
+    op  := Run_tests {r with show_timings = true }
+  | _ -> error "show timings"
 
-let find_test_dirs = ref []
+let set_keep_test_dir_on_success () =
+  match !op with
+  | Run_tests r ->
+    op := Run_tests { r with keep_test_dir_on_success = true }
+  | _ -> error "keep test dirs on success"
 
-let list_tests = ref []
+let set_timeout t =
+  match !op with
+  | Run_tests r ->
+    if t > 0
+    then op := Run_tests {r with default_timeout = t }
+    else raise (Arg.Bad "negative timeout")
+  | _ -> error "timeout"
 
-let show_timings = ref false
+let set_find_test_dirs dir =
+  let dirs =
+  match !op with
+    | Find_test_dirs l -> l
+    | _ -> []
+  in
+  op := Find_test_dirs (dirs @ [dir])
 
-let translate = ref false
-let style = ref Translate.Plain
-let compact = ref false
+let set_list_tests dir =
+  let dirs =
+  match !op with
+    | List_tests l -> l
+    | _ -> []
+  in
+  op := List_tests (dirs @ [dir])
 
+let set_translate () =
+  op := Translate_tests default_translate_settings
 
-let add_to_list r x =
-  r := !r @ [x]
+let set_compact () =
+  match !op with
+  | Translate_tests r ->
+    op  := Translate_tests {r with compact = true }
+  | _ -> error "use -compact"
+
+let set_keep_chars () =
+  match !op with
+  | Translate_tests r ->
+    op  := Translate_tests {r with style = Chars }
+  | _ -> error "use -keep-chars"
+
+let set_keep_lines () =
+  match !op with
+  | Translate_tests r ->
+    op  := Translate_tests {r with style = Lines }
+  | _ -> error "use -keep-lines"
+
+let add_file_to_test filename =
+  match !op with
+  | Run_tests r ->
+    op  := Run_tests {r with files_to_test = r.files_to_test @ [filename] }
+  | _ -> error "test file"
 
 let commandline_options =
 [
-  ("-e", Arg.Set log_to_stderr, " Log to stderr instead of a file.");
-  ("-promote", Arg.Set promote,
+  ("-e", Arg.Unit set_log_to_stderr, " Log to stderr instead of a file.");
+  ("-promote", Arg.Unit set_promote,
    " Overwrite reference files with the test output (experimental, unstable)");
   ("-show-actions", Arg.Unit show_actions, " Show available actions.");
   ("-show-tests", Arg.Unit show_tests, " Show available tests.");
   ("-show-variables", Arg.Unit show_variables, " Show available variables.");
-  ("-show-timings", Arg.Set show_timings,
+  ("-show-timings", Arg.Unit set_show_timings,
    " Show the wall clock time taken for each test file.");
-  ("-timeout",
-     Arg.Int (fun t -> if t >= 0
-                       then default_timeout := t
-                       else raise (Arg.Bad "negative timeout")),
-     "<seconds> Set maximal execution time for every command (in seconds)");
-  ("-find-test-dirs", Arg.String (add_to_list find_test_dirs),
+  ("-timeout", Arg.Int set_timeout,
+   "<seconds> Set maximal execution time for every command (in seconds)");
+  ("-find-test-dirs", Arg.String set_find_test_dirs,
    " Find directories that contain tests (recursive).");
-  ("-list-tests", Arg.String (add_to_list list_tests),
+  ("-list-tests", Arg.String set_list_tests,
    " List tests in given directory.");
-  ("-keep-test-dir-on-success", Arg.Set keep_test_dir_on_success,
+  ("-keep-test-dir-on-success", Arg.Unit set_keep_test_dir_on_success,
    " Keep the test directory (with the generated test artefacts) on success.");
-  ("-translate", Arg.Set translate,
+  ("-translate", Arg.Unit set_translate,
    " Translate the test script from old to new syntax");
-  ("-compact", Arg.Set compact,
+  ("-compact", Arg.Unit set_compact,
    " If translating, output the new script in compact mode.");
-  ("-keep-lines", Arg.Unit (fun () -> style := Translate.Lines),
+  ("-keep-lines", Arg.Unit set_keep_lines,
    " If translating, preserve line numbers in the output.");
-  ("-keep-chars", Arg.Unit (fun () -> style := Translate.Chars),
+  ("-keep-chars", Arg.Unit set_keep_chars,
    " If translating, preserve char offsets in the output.");
 ]
 
-let files_to_test = ref []
-
 let usage = "Usage: " ^ Sys.argv.(0) ^ " options files to test"
 
-let () =
-  Arg.parse (Arg.align commandline_options) (add_to_list files_to_test) usage
+let print_usage () =
+  Printf.printf "%s\n%!" usage
 
-let log_to_stderr = !log_to_stderr
-let files_to_test = !files_to_test
-let promote = !promote
-let default_timeout = !default_timeout
-let find_test_dirs = !find_test_dirs
-let list_tests = !list_tests
-let keep_test_dir_on_success = !keep_test_dir_on_success
-let show_timings = !show_timings
-let translate = !translate
-let style = !style
-let compact = !compact
+let check_consistency = function
+  | Run_tests { files_to_test = []; _ } -> print_usage(); exit 1
+  | _ -> ()
+
+let init_files_to_skip = function
+  | Run_tests r ->
+    Run_tests { r with
+      files_to_skip = String.words (Sys.safe_getenv "OCAMLTEST_SKIP_FILESS")}
+  | _ as op -> op    
+
+let parse_commandline () =
+  Arg.parse (Arg.align commandline_options) add_file_to_test usage;
+  check_consistency !op;
+  op := init_files_to_skip !op;
+  !op

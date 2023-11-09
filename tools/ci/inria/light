@@ -49,7 +49,7 @@ case "${OCAML_ARCH}" in
     make=gmake
   ;;
   cygwin|cygwin64)
-    export OCAMLTEST_SKIP_TESTS="$memory_model_tests"
+    export OCAMLTEST_SKIP_FILES="$memory_model_tests"
   ;;
   mingw|mingw64|msvc|msvc64)
     error "Unsupported architecture ${OCAML_ARCH}"
