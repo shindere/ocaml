@@ -41,6 +41,10 @@ type t =
   | Run_tests of test_settings
   | Find_test_dirs of string list (* Directories to scan for test dirs *)
   | List_tests of string list (* Directories to scan for test files *)
+  | List_parallel_tests of string list
+    (* Directories to scan for files whose tests require more than one core *)
+  | List_sequential_tests of string list
+    (* Directories to scan for files whose tests require only one core *)
   | Translate_tests of translate_settings
 
 val to_string : t -> string

@@ -55,10 +55,16 @@ type t =
   | Run_tests of test_settings
   | Find_test_dirs of string list (* Directories to scan for test dirs *)
   | List_tests of string list (* Directories to scan for test files *)
+  | List_parallel_tests of string list
+    (* Directories to scan for files whose tests require more than one core *)
+  | List_sequential_tests of string list
+    (* Directories to scan for files whose tests require only one core *)
   | Translate_tests of translate_settings
 
 let to_string = function
   | Run_tests _ -> "run tests"
   | Find_test_dirs _ -> "find test dirs"
   | List_tests _ -> "list tests"
+  | List_parallel_tests _ -> "list parallel tests"
+  | List_sequential_tests _ -> "list sequential tests"
   | Translate_tests _ -> "translate"

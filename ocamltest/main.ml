@@ -42,7 +42,7 @@ let find_test_dirs dir =
   loop dir;
   sort_strings !res
 
-let list_tests dir =
+let list_tests' dir =
   let res = ref [] in
   if Sys.is_directory dir then begin
     Array.iter (fun s ->
@@ -57,9 +57,22 @@ let list_tests dir =
   sort_strings !res
 
 let list_tests dir =
-  match list_tests dir with
+  match list_tests' dir with
   | [] -> exit 1
   | res -> List.iter print_endline res
+
+let is_parallel env =
+  match Environments.lookup Builtin_variables.parallel env with
+  | Some "true"  -> true
+  | _ -> false
+
+let is_sequential env = not (test_is_parallel env)
+
+
+
+let list_parallel_tests _dir = ()
+
+let list_sequential_tests _dir = ()
 
 let find_test_dirs dir =
   List.iter print_endline (find_test_dirs dir)
@@ -70,6 +83,8 @@ let main () =
     List.iter (Testfile.run settings) settings.files_to_test
   | Find_test_dirs dirs -> List.iter find_test_dirs dirs
   | List_tests dirs -> List.iter list_tests dirs
+  | List_parallel_tests dirs -> List.iter list_parallel_tests dirs
+  | List_sequential_tests dirs -> List.iter list_sequential_tests dirs
   | Translate_tests settings ->
     List.iter (translate settings) settings.files_to_translate
 

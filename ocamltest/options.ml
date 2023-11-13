@@ -103,6 +103,22 @@ let set_list_tests dir =
   in
   op := List_tests (dirs @ [dir])
 
+let set_list_parallel_tests dir =
+  let dirs =
+  match !op with
+    | List_parallel_tests l -> l
+    | _ -> []
+  in
+  op := List_parallel_tests (dirs @ [dir])
+
+let set_list_sequential_tests dir =
+  let dirs =
+  match !op with
+    | List_sequential_tests l -> l
+    | _ -> []
+  in
+  op := List_sequential_tests (dirs @ [dir])
+
 let set_translate () =
   op := Translate_tests default_translate_settings
 
@@ -146,6 +162,10 @@ let commandline_options =
    " Find directories that contain tests (recursive).");
   ("-list-tests", Arg.String set_list_tests,
    " List tests in given directory.");
+  ("-list-parallel-tests", Arg.String set_list_parallel_tests,
+   " List files whose tests require more than one core in given directory.");
+  ("-list-sequential-tests", Arg.String set_list_sequential_tests,
+   " List files whose tests require only one core in given directory.");
   ("-keep-test-dir-on-success", Arg.Unit set_keep_test_dir_on_success,
    " Keep the test directory (with the generated test artefacts) on success.");
   ("-translate", Arg.Unit set_translate,
