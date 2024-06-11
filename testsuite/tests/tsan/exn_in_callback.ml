@@ -1,6 +1,6 @@
 (* TEST
 
- ocamlopt_flags = "-g -ccopt -O1 -ccopt -fno-omit-frame-pointer -ccopt -g";
+ ocamlopt_flags = "-g";
 
  set TSAN_OPTIONS="detect_deadlocks=0";
 

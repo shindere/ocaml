@@ -1,14 +1,14 @@
 (* TEST
 
- ocamlopt_flags = "-g -ccopt -O1 -ccopt -fno-omit-frame-pointer -ccopt -g";
+ ocamlopt_flags = "-g";
 
  modules = "waitgroup_stubs.c waitgroup.ml";
 
  set TSAN_OPTIONS="detect_deadlocks=0";
 
  tsan;
+ frame_pointers;
  native;
-
 *)
 exception ExnA
 exception ExnB
