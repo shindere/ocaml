@@ -1,10 +1,8 @@
 (* TEST
 
  set TSAN_OPTIONS="detect_deadlocks=0";
-
+ modules = "waitgroup_stubs.c waitgroup.ml";
  tsan;
- readonly_files = "waitgroup_stubs.c";
- all_modules = "${readonly_files} waitgroup.ml record_field.ml";
  native;
 
 *)

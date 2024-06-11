@@ -1,12 +1,12 @@
 (* TEST
 
- ocamlopt_flags = "-g -ccopt -fsanitize=thread -ccopt -O1 -ccopt -fno-omit-frame-pointer -ccopt -g";
+ ocamlopt_flags = "-g -ccopt -O1 -ccopt -fno-omit-frame-pointer -ccopt -g";
+
+ modules = "waitgroup_stubs.c waitgroup.ml";
 
  set TSAN_OPTIONS="detect_deadlocks=0";
 
  tsan;
- readonly_files = "waitgroup_stubs.c";
- all_modules = "${readonly_files} waitgroup.ml exn_reraise.ml";
  native;
 
 *)
