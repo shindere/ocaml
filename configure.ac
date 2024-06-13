@@ -2370,7 +2370,7 @@ AS_CASE([$host],
   [*-pc-windows],
     [PTHREAD_LIBS=''],
   [AX_PTHREAD(
-    [common_cflags="$common_cflags $PTHREAD_CFLAGS"
+    [
     # The two following lines add flags and libraries for pthread to the
     # global CFLAGS and LIBS variables. This means that all the subsequent
     # tests can rely on the assumption that pthread is enabled.
@@ -2609,8 +2609,9 @@ oc_native_cflags="$oc_cflags $oc_native_cflags"
 native_cflags="$common_cflags $native_cflags"
 oc_native_cppflags="$oc_cppflags $oc_native_cppflags"
 
-bytecode_cflags="$common_cflags $sharedlib_cflags $BYTECODE_CFLAGS"
-native_cflags="$native_cflags $NATIVE_CFLAGS"
+bytecode_cflags="$common_cflags $sharedlib_cflags\
+ $PTHREAD_CFLAGS $BYTECODE_CFLAGS"
+native_cflags="$native_cflags $PTHREAD_CFLAGS $NATIVE_CFLAGS"
 
 bytecode_cppflags="$common_cppflags $BYTECODE_CPPFLAGS"
 native_cppflags="$common_cppflags $NATIVE_CPPFLAGS"
