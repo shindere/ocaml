@@ -2154,7 +2154,7 @@ sync_dynlink: tools/sync_dynlink.opt$(EXE)
 	    ./tools/sync_dynlink.opt$(EXE) \
         otherlibs/dynlink/byte/dynlink_symtable.ml \
       > synced_dynlink.tmp
-	    mv synced_dynlink.tmp otherlibs/dynlink/byte/dynlink_symtable.ml
+	    diff synced_dynlink.tmp otherlibs/dynlink/byte/dynlink_symtable.ml
 # Tools
 
 TOOLS_BYTECODE_TARGETS = \

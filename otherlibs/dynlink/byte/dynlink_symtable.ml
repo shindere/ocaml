@@ -41,16 +41,21 @@ module Global = struct
 
   let quote s = "`" ^ s ^ "'"
 
-  let description ppf = function
+  let description ppf g =
+#46 "otherlibs/dynlink/byte/dynlink_symtable.ml"
+    let open Format in
+#55 "bytecomp/symtable.ml"
+    match g with
     | Glob_compunit (Compunit cu) ->
-        Format.fprintf ppf "compilation unit %a" Style.inline_code (quote cu)
+        fprintf ppf "compilation unit %a"
+          Style.inline_code (quote cu)
     | Glob_predef (Predef_exn exn) ->
-        Format.fprintf ppf "predefined exception %a"
+        fprintf ppf "predefined exception %a"
           Style.inline_code (quote exn)
-#69 "bytecomp/symtable.ml"
+#72 "bytecomp/symtable.ml"
   module Map = Map.Make(struct type nonrec t = t let compare = compare end)
 end
-#74 "bytecomp/symtable.ml"
+#77 "bytecomp/symtable.ml"
 type error =
     Undefined_global of Global.t
   | Unavailable_primitive of string
@@ -58,7 +63,7 @@ type error =
   | Uninitialized_global of Global.t
 
 exception Error of error
-#62 "otherlibs/dynlink/byte/dynlink_symtable.ml"
+#67 "otherlibs/dynlink/byte/dynlink_symtable.ml"
 module Dll = struct
 #18 "bytecomp/dll.ml"
 type dll_handle
@@ -77,7 +82,7 @@ external get_current_dlls: unit -> dll_handle array
 let search_path = ref ([] : string list)
 #42 "bytecomp/dll.ml"
 (* DLLs currently opened *)
-#81 "otherlibs/dynlink/byte/dynlink_symtable.ml"
+#86 "otherlibs/dynlink/byte/dynlink_symtable.ml"
 let opened_dlls = ref ([] : (string * dll_handle) list)
 (* Each known primitive and its ID number *)
 let primitives : (string, int) Hashtbl.t = Hashtbl.create 100
@@ -91,7 +96,7 @@ let extract_dll_name file =
     "dll" ^ String.sub file 2 (String.length file - 2)
   else
     file (* will cause error later *)
-#95 "otherlibs/dynlink/byte/dynlink_symtable.ml"
+#100 "otherlibs/dynlink/byte/dynlink_symtable.ml"
 (* Specialized version of [Dll.{open_dll,open_dlls,find_primitive}] for the
     execution mode. *)
 let open_dll name =
@@ -178,12 +183,12 @@ module GlobalMap = struct
     n
 
 end
-#108 "bytecomp/symtable.ml"
+#111 "bytecomp/symtable.ml"
 (* Global variables *)
 
 let global_table = ref GlobalMap.empty
 and literal_table = ref([] : (int * Obj.t) list)
-#116 "bytecomp/symtable.ml"
+#119 "bytecomp/symtable.ml"
 let slot_for_getglobal global =
   try
     GlobalMap.find !global_table global
@@ -197,7 +202,7 @@ let slot_for_literal cst =
   let n = GlobalMap.incr global_table in
   literal_table := (n, cst) :: !literal_table;
   n
-#280 "bytecomp/symtable.ml"
+#283 "bytecomp/symtable.ml"
 (* Relocate a block of object bytecode *)
 
 let patch_int buff pos n =
@@ -224,18 +229,18 @@ let patch_object buff patchlist =
       | (Reloc_primitive name, pos) ->
           patch_int buff pos (of_prim name))
     patchlist
-#325 "bytecomp/symtable.ml"
+#328 "bytecomp/symtable.ml"
 (* Functions for toplevel use *)
 
 (* Update the in-core table of globals *)
-#232 "otherlibs/dynlink/byte/dynlink_symtable.ml"
+#237 "otherlibs/dynlink/byte/dynlink_symtable.ml"
 module Meta = struct
 #16 "bytecomp/meta.ml"
 external global_data : unit -> Obj.t array = "caml_get_global_data"
 external realloc_global_data : int -> unit = "caml_realloc_global"
-#237 "otherlibs/dynlink/byte/dynlink_symtable.ml"
+#242 "otherlibs/dynlink/byte/dynlink_symtable.ml"
 end
-#329 "bytecomp/symtable.ml"
+#332 "bytecomp/symtable.ml"
 let update_global_table () =
   let ng = !global_table.cnt in
   if ng > Array.length(Meta.global_data()) then Meta.realloc_global_data ng;
@@ -259,16 +264,16 @@ external get_bytecode_sections : unit -> bytecode_sections =
 let init_toplevel () =
   let sect = get_bytecode_sections () in
   global_table := sect.symb;
-#263 "otherlibs/dynlink/byte/dynlink_symtable.ml"
+#268 "otherlibs/dynlink/byte/dynlink_symtable.ml"
   Dll.init ~dllpaths:sect.dlpt ~prims:sect.prim;
-#355 "bytecomp/symtable.ml"
+#358 "bytecomp/symtable.ml"
   sect.crcs
 
 (* Find the value of a global identifier *)
-#361 "bytecomp/symtable.ml"
+#364 "bytecomp/symtable.ml"
 let get_global_value global =
   (Meta.global_data()).(slot_for_getglobal global)
-#366 "bytecomp/symtable.ml"
+#369 "bytecomp/symtable.ml"
 (* Check that all compilation units referenced in the given patch list
    have already been initialized *)
 
@@ -309,17 +314,17 @@ let check_global_initialized patchlist =
 type global_map = GlobalMap.t
 
 let current_state () = !global_table
-#409 "bytecomp/symtable.ml"
+#412 "bytecomp/symtable.ml"
 let hide_additions (st : global_map) =
   if st.cnt > !global_table.cnt then
-#316 "otherlibs/dynlink/byte/dynlink_symtable.ml"
+#321 "otherlibs/dynlink/byte/dynlink_symtable.ml"
     failwith "Symtable.hide_additions";
-#412 "bytecomp/symtable.ml"
+#415 "bytecomp/symtable.ml"
   global_table :=
     {GlobalMap.
       cnt = !global_table.cnt;
       tbl = st.tbl }
-#431 "bytecomp/symtable.ml"
+#434 "bytecomp/symtable.ml"
 let is_defined_in_global_map (gmap : global_map) global =
   Global.Map.mem global gmap.tbl
 

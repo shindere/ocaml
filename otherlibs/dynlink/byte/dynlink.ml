@@ -136,7 +136,7 @@ module Bytecode = struct
           let new_error : DT.linking_error =
             match error with
             | Symtable.Undefined_global global ->
-              let desc = Format_doc.compat Symtable.Global.description in
+              let desc = Symtable.Global.description in
               Undefined_global (Format.asprintf "%a" desc global)
             | Symtable.Unavailable_primitive s -> Unavailable_primitive s
             | Symtable.Uninitialized_global global ->
