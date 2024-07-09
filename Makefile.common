@@ -413,6 +413,9 @@ $(basename $(notdir $(1)))_CMX_FILES = \
   $$(patsubst %.ml,%.cmx, \
     $$(foreach F,$$($(basename $(notdir $(1)))_ML_FILES),\
       $$(if $$(findstring /byte/,$$(F)),,$$(F))))
+$(basename $(notdir $(1)))_CMX_FILES_TO_COPY = \
+  $$(strip $$(foreach F,$$($(basename $(notdir $(1)))_CMX_FILES),\
+    $$(if $$(findstring /native/,,$$(F)),$$(F))))
 ALL_CMX_FILES += $$($(basename $(notdir $(1)))_CMX_FILES)
 $(basename $(notdir $(1)))_NCOBJS = \
   $$($(basename $(notdir $(1)))_NO_FILES) \
@@ -422,6 +425,12 @@ $(1).cmxa: \
   $$$$($(basename $(notdir $(1)))_NCOBJS)
 	$$(V_LINKOPT)$$(LINK_NATIVE_LIBRARY) -a -o $$@ \
 	  $$($(basename $(notdir $(1)))_NCOBJS)
+# Ensure that the .cmx files are in the same directory as the .cmxa.
+# If this were omitted, ocamldoc in particular will fail to build
+# with a -opaque warning.
+	@if [ -n "$$($(basename $(notdir $(1)))_CMX_FILES_TO_COPY)" ]; then \
+	  cp $$($(basename $(notdir $(1)))_CMX_FILES_TO_COPY) $$(dir $$@); \
+	fi
 endef # _OCAML_NATIVE_LIBRARY
 
 define OCAML_NATIVE_LIBRARY

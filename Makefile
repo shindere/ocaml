@@ -440,7 +440,7 @@ partialclean::
 	rm -f compilerlibs/ocamlbytecomp.cma
 
 partialclean::
-	rm -f compilerlibs/ocamlbytecomp.cmxa \
+	rm -f compilerlibs/*.cmx compilerlibs/ocamlbytecomp.cmxa \
 	      compilerlibs/ocamlbytecomp.a compilerlibs/ocamlbytecomp.lib
 
 
