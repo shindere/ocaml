@@ -57,6 +57,8 @@ allopt: lib$(LIBNAME)nat.$(A) $(LIBNAME).cmxa
 
 lib$(LIBNAME).$(A): OC_CFLAGS = $(OC_BYTECODE_CFLAGS)
 
+# The call to ocamlmklib below builds both dllthreads.so and libthreads.a
+
 lib$(LIBNAME).$(A): $(BYTECODE_C_OBJS)
 	$(V_OCAMLMKLIB)$(OCAMLMKLIB) -o $(LIBNAME) $^
 
