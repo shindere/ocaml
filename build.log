@@ -2505,9 +2505,8 @@ make[4] : on quitte le répertoire « /home/shindere/src/ocaml/trunk/otherlibs
 make[4] : on entre dans le répertoire « /home/shindere/src/ocaml/trunk/otherlibs/systhreads »
 gcc -O2 -fno-strict-aliasing -fwrapv -g -Wall -Wint-conversion -Wstrict-prototypes -Wold-style-definition -Wundef -Wold-style-declaration -Wimplicit-fallthrough=5 -Werror -fno-common -fexcess-precision=standard -Wvla -fno-tree-vrp -ffunction-sections -fPIC -pthread -I ../../runtime  -D_FILE_OFFSET_BITS=64    \
   -o st_stubs.b.o -c st_stubs.c
-../../boot/ocamlrun ../../tools/ocamlmklib -v -o threads st_stubs.b.o
-+ gcc -shared   -o ./dllthreads.so st_stubs.b.o     
-+ ar rcs ./libthreads.a  st_stubs.b.o
+rm -f libthreads.a && ar rc libthreads.a  st_stubs.b.o
+gcc -shared   -o dllthreads.so st_stubs.b.o
 ../../ocamlc.opt -nostdlib -I ../../stdlib -I ../../otherlibs/unix -c -w +33..39 -warn-error +A -g -bin-annot thread.mli
 ../../ocamlc.opt -nostdlib -I ../../stdlib -I ../../otherlibs/unix -c -w +33..39 -warn-error +A -g -bin-annot thread.ml
 ../../ocamlc.opt -nostdlib -I ../../stdlib -I ../../otherlibs/unix -c -w +33..39 -warn-error +A -g -bin-annot event.mli
@@ -2948,9 +2947,8 @@ make[4] : on quitte le répertoire « /home/shindere/src/ocaml/trunk/otherlibs
 make[4] : on entre dans le répertoire « /home/shindere/src/ocaml/trunk/otherlibs/systhreads »
 gcc -O2 -fno-strict-aliasing -fwrapv -g -Wall -Wint-conversion -Wstrict-prototypes -Wold-style-definition -Wundef -Wold-style-declaration -Wimplicit-fallthrough=5 -Werror -fno-common -fexcess-precision=standard -Wvla -fno-tree-vrp -ffunction-sections  -fPIC -pthread -I ../../runtime  -D_FILE_OFFSET_BITS=64    \
   -o st_stubs.n.o -c st_stubs.c
-../../boot/ocamlrun ../../tools/ocamlmklib -v -o threadsnat st_stubs.n.o
-+ gcc -shared   -o ./dllthreadsnat.so st_stubs.n.o     
-+ ar rcs ./libthreadsnat.a  st_stubs.n.o
+rm -f libthreadsnat.a && ar rc libthreadsnat.a  st_stubs.n.o
+gcc -shared   -o dllthreadsnat.so st_stubs.n.o
 ../../ocamlopt.opt -nostdlib -I ../../stdlib -I ../../otherlibs/unix -c -w +33..39 -warn-error +A -g -bin-annot -function-sections thread.ml
 ../../ocamlopt.opt -nostdlib -I ../../stdlib -I ../../otherlibs/unix -c -w +33..39 -warn-error +A -g -bin-annot -function-sections event.ml
 ../../ocamlopt.opt -nostdlib -I ../../stdlib -I ../../otherlibs/unix -linkall -a -cclib -lthreadsnat -o threads.cmxa thread.cmx event.cmx
