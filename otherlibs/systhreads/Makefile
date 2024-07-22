@@ -51,9 +51,9 @@ MLIFILES=thread.mli event.mli
 
 CMIFILES=$(MLIFILES:.mli=.cmi)
 
-all: lib$(LIBNAME).$(A) $(LIBNAME).cma $(CMIFILES)
+all: lib$(LIBNAME).$(A) $(LIBNAME).cma
 
-allopt: lib$(LIBNAME)nat.$(A) $(LIBNAME).cmxa $(CMIFILES)
+allopt: lib$(LIBNAME)nat.$(A) $(LIBNAME).cmxa
 
 lib$(LIBNAME).$(A): OC_CFLAGS = $(OC_BYTECODE_CFLAGS)
 
