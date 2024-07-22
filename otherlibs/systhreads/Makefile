@@ -34,6 +34,13 @@ endif
 
 LIBNAME=threads
 
+threads_BYTECODE_STUBLIBS = lib$(LIBNAME).$(A)
+threads_NATIVE_STUBLIBS = lib$(LIBNAME)nat.$(A)
+ifeq "$(SUPPORTS_SHARED_LIBRARIES)" "true"
+threads_BYTECODE_STUBLIBS += dll$(LIBNAME).$(SO)
+threads_NATIVE_STUBLIBS += dll$(LIBNAME)nat.$(SO)
+endif
+
 # Note: the header on which object files produced from st_stubs.c
 # should actually depend is known for sure only at compile-time.
 # That's why this dependency is handled in the Makefile directly
@@ -51,21 +58,25 @@ MLIFILES=thread.mli event.mli
 
 CMIFILES=$(MLIFILES:.mli=.cmi)
 
-all: lib$(LIBNAME).$(A) $(LIBNAME).cma
+all: $(threads_BYTECODE_STUBLIBS) $(LIBNAME).cma
 
-allopt: lib$(LIBNAME)nat.$(A) $(LIBNAME).cmxa
+allopt: $(threads_NATIVE_STUBLIBS) $(LIBNAME).cmxa
 
 lib$(LIBNAME).$(A): OC_CFLAGS = $(OC_BYTECODE_CFLAGS)
 
-# The call to ocamlmklib below builds both dllthreads.so and libthreads.a
-
 lib$(LIBNAME).$(A): $(BYTECODE_C_OBJS)
-	$(V_OCAMLMKLIB)$(OCAMLMKLIB) -o $(LIBNAME) $^
+	$(V_MKLIB)$(call MKLIB,$@, $^)
+
+dll$(LIBNAME).$(SO): $(BYTECODE_C_OBJS)
+	$(V_MKDLL)$(MKDLL) -o $@ $^
 
 lib$(LIBNAME)nat.$(A): OC_CFLAGS = $(OC_NATIVE_CFLAGS)
 
 lib$(LIBNAME)nat.$(A): $(NATIVE_C_OBJS)
-	$(V_OCAMLMKLIB)$(OCAMLMKLIB) -o $(LIBNAME)nat $^
+	$(V_MKLIB)$(call MKLIB,$@, $^)
+
+dll$(LIBNAME)nat.$(SO): $(NATIVE_C_OBJS)
+	$(V_MKDLL)$(MKDLL) -o $@ $^
 
 $(LIBNAME).cma: $(THREADS_BCOBJS)
 	$(V_OCAMLMKLIB)$(OCAMLMKLIB) -o $(LIBNAME) -ocamlc '$(CAMLC)' -linkall $^
