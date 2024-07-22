@@ -2505,12 +2505,15 @@ make[4] : on quitte le répertoire « /home/shindere/src/ocaml/trunk/otherlibs
 make[4] : on entre dans le répertoire « /home/shindere/src/ocaml/trunk/otherlibs/systhreads »
 gcc -O2 -fno-strict-aliasing -fwrapv -g -Wall -Wint-conversion -Wstrict-prototypes -Wold-style-definition -Wundef -Wold-style-declaration -Wimplicit-fallthrough=5 -Werror -fno-common -fexcess-precision=standard -Wvla -fno-tree-vrp -ffunction-sections -fPIC -pthread -I ../../runtime  -D_FILE_OFFSET_BITS=64    \
   -o st_stubs.b.o -c st_stubs.c
-../../boot/ocamlrun ../../tools/ocamlmklib -o threads st_stubs.b.o
+../../boot/ocamlrun ../../tools/ocamlmklib -v -o threads st_stubs.b.o
++ gcc -shared   -o ./dllthreads.so st_stubs.b.o     
++ ar rcs ./libthreads.a  st_stubs.b.o
 ../../ocamlc.opt -nostdlib -I ../../stdlib -I ../../otherlibs/unix -c -w +33..39 -warn-error +A -g -bin-annot thread.mli
 ../../ocamlc.opt -nostdlib -I ../../stdlib -I ../../otherlibs/unix -c -w +33..39 -warn-error +A -g -bin-annot thread.ml
 ../../ocamlc.opt -nostdlib -I ../../stdlib -I ../../otherlibs/unix -c -w +33..39 -warn-error +A -g -bin-annot event.mli
 ../../ocamlc.opt -nostdlib -I ../../stdlib -I ../../otherlibs/unix -c -w +33..39 -warn-error +A -g -bin-annot event.ml
-../../boot/ocamlrun ../../tools/ocamlmklib -o threads -ocamlc '../../ocamlc.opt -nostdlib -I ../../stdlib -I ../../otherlibs/unix' -linkall thread.cmo event.cmo
+../../boot/ocamlrun ../../tools/ocamlmklib -v -o threads -ocamlc '../../ocamlc.opt -nostdlib -I ../../stdlib -I ../../otherlibs/unix' -linkall thread.cmo event.cmo
++ ../../ocamlc.opt -nostdlib -I ../../stdlib -I ../../otherlibs/unix -a    -o threads.cma -linkall thread.cmo event.cmo -dllib -lthreads -cclib -lthreads    
 make[4] : on quitte le répertoire « /home/shindere/src/ocaml/trunk/otherlibs/systhreads »
 make[3] : on quitte le répertoire « /home/shindere/src/ocaml/trunk/otherlibs »
 ./ocamlc.opt -nostdlib -I ./stdlib -g -strict-sequence -principal -absname -w +a-4-9-40-41-42-44-45-48 -warn-error +a -bin-annot -strict-formats -I otherlibs/dynlink -I utils -I parsing -I typing -I bytecomp -I file_formats -I lambda -I middle_end -I middle_end/closure -I middle_end/flambda -I middle_end/flambda/base_types -I asmcomp -I driver -I toplevel -I tools -I runtime -I otherlibs/dynlink -I otherlibs/str -I otherlibs/systhreads -I otherlibs/unix -I otherlibs/runtime_events -I otherlibs/unix -I otherlibs/dynlink -I otherlibs/dynlink/byte -c otherlibs/dynlink/dynlink_config.mli
@@ -2945,7 +2948,9 @@ make[4] : on quitte le répertoire « /home/shindere/src/ocaml/trunk/otherlibs
 make[4] : on entre dans le répertoire « /home/shindere/src/ocaml/trunk/otherlibs/systhreads »
 gcc -O2 -fno-strict-aliasing -fwrapv -g -Wall -Wint-conversion -Wstrict-prototypes -Wold-style-definition -Wundef -Wold-style-declaration -Wimplicit-fallthrough=5 -Werror -fno-common -fexcess-precision=standard -Wvla -fno-tree-vrp -ffunction-sections  -fPIC -pthread -I ../../runtime  -D_FILE_OFFSET_BITS=64    \
   -o st_stubs.n.o -c st_stubs.c
-../../boot/ocamlrun ../../tools/ocamlmklib -o threadsnat st_stubs.n.o
+../../boot/ocamlrun ../../tools/ocamlmklib -v -o threadsnat st_stubs.n.o
++ gcc -shared   -o ./dllthreadsnat.so st_stubs.n.o     
++ ar rcs ./libthreadsnat.a  st_stubs.n.o
 ../../ocamlopt.opt -nostdlib -I ../../stdlib -I ../../otherlibs/unix -c -w +33..39 -warn-error +A -g -bin-annot -function-sections thread.ml
 ../../ocamlopt.opt -nostdlib -I ../../stdlib -I ../../otherlibs/unix -c -w +33..39 -warn-error +A -g -bin-annot -function-sections event.ml
 ../../ocamlopt.opt -nostdlib -I ../../stdlib -I ../../otherlibs/unix -linkall -a -cclib -lthreadsnat -o threads.cmxa thread.cmx event.cmx
