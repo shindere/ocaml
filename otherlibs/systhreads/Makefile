@@ -40,7 +40,7 @@ LIBNAME=threads
 # and removed from the output of the C compiler during make depend
 
 BYTECODE_C_OBJS=st_stubs.b.$(O)
-NATIVECODE_C_OBJS=st_stubs.n.$(O)
+NATIVE_C_OBJS=st_stubs.n.$(O)
 
 THREADS_SOURCES = thread.ml event.ml
 
@@ -62,7 +62,7 @@ lib$(LIBNAME).$(A): $(BYTECODE_C_OBJS)
 
 lib$(LIBNAME)nat.$(A): OC_CFLAGS = $(OC_NATIVE_CFLAGS)
 
-lib$(LIBNAME)nat.$(A): $(NATIVECODE_C_OBJS)
+lib$(LIBNAME)nat.$(A): $(NATIVE_C_OBJS)
 	$(V_OCAMLMKLIB)$(MKLIB) -o $(LIBNAME)nat $^
 
 $(LIBNAME).cma: $(THREADS_BCOBJS)
