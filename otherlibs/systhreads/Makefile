@@ -26,7 +26,7 @@ LIBS = $(STDLIBFLAGS) -I $(ROOTDIR)/otherlibs/unix
 CAMLC=$(BEST_OCAMLC) $(LIBS)
 CAMLOPT=$(BEST_OCAMLOPT) $(LIBS)
 
-MKLIB=$(OCAMLRUN) $(ROOTDIR)/tools/ocamlmklib$(EXE)
+OCAMLMKLIB=$(OCAMLRUN) $(ROOTDIR)/tools/ocamlmklib$(EXE)
 COMPFLAGS=-w +33..39 -warn-error +A -g -bin-annot
 ifeq "$(FLAMBDA)" "true"
 OPTCOMPFLAGS += -O3
@@ -58,15 +58,15 @@ allopt: lib$(LIBNAME)nat.$(A) $(LIBNAME).cmxa
 lib$(LIBNAME).$(A): OC_CFLAGS = $(OC_BYTECODE_CFLAGS)
 
 lib$(LIBNAME).$(A): $(BYTECODE_C_OBJS)
-	$(V_OCAMLMKLIB)$(MKLIB) -o $(LIBNAME) $^
+	$(V_OCAMLMKLIB)$(OCAMLMKLIB) -o $(LIBNAME) $^
 
 lib$(LIBNAME)nat.$(A): OC_CFLAGS = $(OC_NATIVE_CFLAGS)
 
 lib$(LIBNAME)nat.$(A): $(NATIVE_C_OBJS)
-	$(V_OCAMLMKLIB)$(MKLIB) -o $(LIBNAME)nat $^
+	$(V_OCAMLMKLIB)$(OCAMLMKLIB) -o $(LIBNAME)nat $^
 
 $(LIBNAME).cma: $(THREADS_BCOBJS)
-	$(V_OCAMLMKLIB)$(MKLIB) -o $(LIBNAME) -ocamlc '$(CAMLC)' -linkall $^
+	$(V_OCAMLMKLIB)$(OCAMLMKLIB) -o $(LIBNAME) -ocamlc '$(CAMLC)' -linkall $^
 
 # See remark above: force static linking of libthreadsnat.a
 $(LIBNAME).cmxa: $(THREADS_NCOBJS)
