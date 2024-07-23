@@ -679,3 +679,69 @@ module type Html_generator =
         method title : string
       end
   end
+
+class virtual text :
+  object
+    method create_title_label :
+      int * string option * Odoc_info.text -> string
+    method escape : string -> string
+    method html_of_Block : Buffer.t -> Odoc_info.text -> unit
+    method html_of_Bold : Buffer.t -> Odoc_info.text -> unit
+    method html_of_Center : Buffer.t -> Odoc_info.text -> unit
+    method html_of_Code : Buffer.t -> string -> unit
+    method html_of_CodePre : Buffer.t -> string -> unit
+    method html_of_Emphasize : Buffer.t -> Odoc_info.text -> unit
+    method html_of_Enum : Buffer.t -> Odoc_info.text list -> unit
+    method html_of_Index_list : Buffer.t -> unit
+    method html_of_Italic : Buffer.t -> Odoc_info.text -> unit
+    method html_of_Latex : Buffer.t -> string -> unit
+    method html_of_Left : Buffer.t -> Odoc_info.text -> unit
+    method html_of_Link : Buffer.t -> string -> Odoc_info.text -> unit
+    method html_of_List : Buffer.t -> Odoc_info.text list -> unit
+    method html_of_Module_list : Buffer.t -> Odoc_info.Name.t list -> unit
+    method html_of_Newline : Buffer.t -> unit
+    method html_of_Raw : Buffer.t -> string -> unit
+    method html_of_Ref :
+      Buffer.t ->
+      Odoc_info.Name.t ->
+      Odoc_info.ref_kind option -> Odoc_info.text option -> unit
+    method html_of_Right : Buffer.t -> Odoc_info.text -> unit
+    method html_of_Subscript : Buffer.t -> Odoc_info.text -> unit
+    method html_of_Superscript : Buffer.t -> Odoc_info.text -> unit
+    method html_of_Target : Buffer.t -> target:string -> code:string -> unit
+    method html_of_Title :
+      Buffer.t -> int -> string option -> Odoc_info.text -> unit
+    method html_of_Verbatim : Buffer.t -> string -> unit
+    method html_of_code : Buffer.t -> ?with_pre:bool -> string -> unit
+    method html_of_custom_text : Buffer.t -> string -> Odoc_info.text -> unit
+    method virtual html_of_info_first_sentence :
+      Buffer.t -> Odoc_info.info option -> unit
+    method html_of_text : ?with_p:bool -> Buffer.t -> Odoc_info.text -> unit
+    method html_of_text_element : Buffer.t -> Odoc_info.text_element -> unit
+    method html_of_text_with_p : Buffer.t -> Odoc_info.text -> unit
+    method virtual index_attributes : string
+    method virtual index_class_types : string
+    method virtual index_classes : string
+    method virtual index_exceptions : string
+    method virtual index_extensions : string
+    method virtual index_methods : string
+    method virtual index_module_types : string
+    method virtual index_modules : string
+    method virtual index_types : string
+    method virtual index_values : string
+    method keep_alpha_num : string -> string
+    method label_of_text : Odoc_info.text -> string
+    method virtual list_attributes : Odoc_info.Value.t_attribute list
+    method virtual list_class_types : Odoc_info.Class.t_class_type list
+    method virtual list_classes : Odoc_info.Class.t_class list
+    method virtual list_exceptions : Odoc_info.Exception.t_exception list
+    method virtual list_extensions :
+      Odoc_info.Extension.t_extension_constructor list
+    method virtual list_methods : Odoc_info.Value.t_method list
+    method virtual list_module_types : Odoc_info.Module.t_module_type list
+    method virtual list_modules : Odoc_info.Module.t_module list
+    method virtual list_types : Odoc_info.Type.t_type list
+    method virtual list_values : Odoc_info.Value.t_value list
+  end
+
+val print_concat : Buffer.t -> string -> ('a -> unit) -> 'a list -> unit
