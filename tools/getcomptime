@@ -1,0 +1,40 @@
+#!/bin/bash
+#**************************************************************************
+#*                                                                        *
+#*                                 OCaml                                  *
+#*                                                                        *
+#*                   Sebastien Hinderer, Tarides, Paris                   *
+#*                                                                        *
+#*   Copyright 2024 Institut National de Recherche en Informatique et     *
+#*     en Automatique.                                                    *
+#*                                                                        *
+#*   All rights reserved.  This file is distributed under the terms of    *
+#*   the GNU Lesser General Public License version 2.1, with the          *
+#*   special exception on linking described in the file LICENSE.          *
+#*                                                                        *
+#**************************************************************************
+
+# This script is used by OCaml's build system to store build times
+# for each target. It takes the target's name as its first argument and,
+# as its remaining arguments, the command to run to build this target
+# The result is printed on the script's standard output under the form
+# target_name: build time in seconds, as a float number
+
+# Exit on errors
+set -e
+
+# Show each executed command
+# set -x
+
+# Make sure floating point numbers are printed using a .
+LC_NUMERIC=C
+
+# Ask time to print the real time only
+TIMEFORMAT=%R
+
+target=$1
+shift
+
+duration=$({ time $@; } 2>&1)
+
+echo $target: $duration >> /tmp/timings

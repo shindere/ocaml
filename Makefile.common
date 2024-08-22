@@ -30,6 +30,10 @@ SPACE := $(EMPTY) $(EMPTY)
 # $( ) suppresses warning from the alignments in the V_ macros below
 $(SPACE) :=
 
+# Measuring time
+
+TIME = $(ROOTDIR)/tools/getcomptime
+
 ifeq "$(UNIX_OR_WIN32)" "win32"
 DIR_SEP := \$ # There must a space following the $
 CONVERT_PATH = $(subst /,$(DIR_SEP),$(strip $(1)))
