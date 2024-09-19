@@ -393,6 +393,17 @@ LINK_BYTECODE_LIBRARY =\
 # does not rely on this assumption and rather does call _OCAML_LIBRARY_BASE
 # itself.
 
+# For the libraries that have C stubs, ech C file can be compiled
+# up to four times depending on the compiler's configuration, to build
+# native and bytecode libraries and, for each of those, one static
+# and one dynamic version of the library.
+
+# The following macros thus define four lists of object files where
+# B stands for bytecode, N for native, S for static and d for
+# dynamic (shared).
+# For example, foo_BD_O_FILES is the list of object files for the
+# bytecode dynamic foo library.
+
 define _OCAML_BYTECODE_LIBRARY
 $(basename $(notdir $(1)))_BYTE_CMI_FILES = \
   $$(foreach F,$$($(basename $(notdir $(1)))_CMI_FILES),\
